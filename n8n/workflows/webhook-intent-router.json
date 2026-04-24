@@ -1,0 +1,171 @@
+{
+  "name": "WhatsApp Webhook - Backend Assisted Router",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sa-aesthetics-whatsapp",
+        "authentication": "none",
+        "responseMode": "responseNode"
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [250, 300],
+      "webhookId": "whatsapp-inbound"
+    },
+    {
+      "parameters": {
+        "options": {},
+        "jsCode": "const body = $input.first().json.body ?? $input.first().json;\nconst message = body?.data?.message || body?.message;\nconst from = body?.data?.from || body?.from || \"\";\nconst tenantPhone = body?.tenant_phone || body?.data?.to || body?.to || body?.instance || \"\";\nconst messageBody = message?.body || message?.text || body?.message || \"\";\n\nreturn [{\n  json: {\n    message_body: messageBody,\n    from_number: from,\n    tenant_phone: tenantPhone,\n    raw_payload: body\n  }\n}];"
+      },
+      "name": "Normalize Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=select id, name, slug, whatsapp_number from public.tenants where whatsapp_number = '{{ $(\"Normalize Payload\").item.json.tenant_phone }}' limit 1;",
+        "options": {
+          "queryBatching": "single",
+          "largeNumbersOutput": "text",
+          "replaceEmptyStrings": false
+        }
+      },
+      "name": "Find Tenant",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=select id, name, phone_number, consent_given from public.patients where tenant_id = nullif('{{ $(\"Find Tenant\").item.json.id ?? \"\" }}', '')::uuid and phone_number = '{{ $(\"Normalize Payload\").item.json.from_number }}' limit 1;",
+        "options": {
+          "queryBatching": "single",
+          "largeNumbersOutput": "text",
+          "replaceEmptyStrings": false
+        }
+      },
+      "name": "Find Patient",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.BACKEND_URL ?? 'http://host.docker.internal:8000' }}/upsert-lead",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { tenant_id: $(\"Find Tenant\").item.json.id, phone_number: $(\"Normalize Payload\").item.json.from_number, patient_id: $(\"Find Patient\").item.json.id ?? null, lead_score: $(\"Find Patient\").item.json.id ? 'warm' : 'cold', status: $(\"Find Patient\").item.json.id ? 'qualified' : 'new', notes: $(\"Normalize Payload\").item.json.message_body } }}",
+        "options": {}
+      },
+      "name": "Upsert Lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=insert into public.conversations (tenant_id, patient_id, message_direction, message_type, content, raw_payload) select nullif('{{ $(\"Find Tenant\").item.json.id ?? \"\" }}', '')::uuid, nullif('{{ $(\"Find Patient\").item.json.id ?? \"\" }}', '')::uuid, 'inbound', 'text', $$ {{ $(\"Normalize Payload\").item.json.message_body }} $$, $$ {{ JSON.stringify($(\"Normalize Payload\").item.json.raw_payload) }} $$::jsonb where '{{ $(\"Find Tenant\").item.json.id ?? \"\" }}' <> '' returning id;",
+        "options": {
+          "queryBatching": "single",
+          "largeNumbersOutput": "text",
+          "replaceEmptyStrings": false
+        }
+      },
+      "name": "Log Inbound Conversation",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.BACKEND_URL ?? 'http://host.docker.internal:8000' }}/assistant-reply",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { tenant_id: $(\"Find Tenant\").item.json.id, message_body: $(\"Normalize Payload\").item.json.message_body, patient_name: $(\"Find Patient\").item.json.name ?? null, consent_given: !!$(\"Find Patient\").item.json.consent_given, top_k: 3 } }}",
+        "options": {}
+      },
+      "name": "Assistant Reply",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=insert into public.conversations (tenant_id, patient_id, message_direction, message_type, content, raw_payload, intent_detected, llm_model_used) select nullif('{{ $(\"Find Tenant\").item.json.id ?? \"\" }}', '')::uuid, nullif('{{ $(\"Find Patient\").item.json.id ?? \"\" }}', '')::uuid, 'outbound', 'text', $$ {{ JSON.parse($(\"Assistant Reply\").item.json.ai_result).reply ?? $(\"Assistant Reply\").item.json.ai_result }} $$, jsonb_build_object('ai_result', $$ {{ $(\"Assistant Reply\").item.json.ai_result }} $$, 'rag_matches', $$ {{ JSON.stringify($(\"Assistant Reply\").item.json.rag_matches ?? []) }} $$::jsonb), $$ {{ JSON.parse($(\"Assistant Reply\").item.json.ai_result).intent ?? '' }} $$, '{{ $(\"Assistant Reply\").item.json.model ?? \"\" }}' where '{{ $(\"Find Tenant\").item.json.id ?? \"\" }}' <> '' returning id;",
+        "options": {
+          "queryBatching": "single",
+          "largeNumbersOutput": "text",
+          "replaceEmptyStrings": false
+        }
+      },
+      "name": "Log Outbound Conversation",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { success: true, tenant_id: $(\"Find Tenant\").item.json.id ?? null, patient_id: $(\"Find Patient\").item.json.id ?? null, lead_id: $(\"Upsert Lead\").item.json.lead?.id ?? null, inbound_conversation_id: $(\"Log Inbound Conversation\").item.json.id ?? null, outbound_conversation_id: $(\"Log Outbound Conversation\").item.json.id ?? null, inbound_message: $(\"Normalize Payload\").item.json.message_body, ai_result: $(\"Assistant Reply\").item.json.ai_result, rag_matches: $(\"Assistant Reply\").item.json.rag_matches ?? [] } }}"
+      },
+      "name": "Format Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1850, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "name": "Respond To Caller",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [2050, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Normalize Payload", "type": "main", "index": 0 }]]
+    },
+    "Normalize Payload": {
+      "main": [[{ "node": "Find Tenant", "type": "main", "index": 0 }]]
+    },
+    "Find Tenant": {
+      "main": [[{ "node": "Find Patient", "type": "main", "index": 0 }]]
+    },
+    "Find Patient": {
+      "main": [[{ "node": "Upsert Lead", "type": "main", "index": 0 }]]
+    },
+    "Upsert Lead": {
+      "main": [[{ "node": "Log Inbound Conversation", "type": "main", "index": 0 }]]
+    },
+    "Log Inbound Conversation": {
+      "main": [[{ "node": "Assistant Reply", "type": "main", "index": 0 }]]
+    },
+    "Assistant Reply": {
+      "main": [[{ "node": "Log Outbound Conversation", "type": "main", "index": 0 }]]
+    },
+    "Log Outbound Conversation": {
+      "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
+    },
+    "Format Response": {
+      "main": [[{ "node": "Respond To Caller", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "tags": []
+}

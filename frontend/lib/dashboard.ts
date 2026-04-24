@@ -1,0 +1,53 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+
+type StaffRecord = {
+  id: string;
+  tenant_id: string;
+  email: string;
+  role: string;
+  tenants: {
+    id: string;
+    name: string;
+    slug: string;
+    whatsapp_number: string | null;
+    business_hours: Record<string, unknown> | null;
+    deposit_required: boolean | null;
+    deposit_amount: number | null;
+    auto_booking_enabled: boolean | null;
+    reminder_schedule: Record<string, unknown> | null;
+  } | null;
+};
+
+export async function getDashboardContext() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const { data: staff } = await supabase
+    .from("users")
+    .select("id, tenant_id, email, role, tenants(id, name, slug, whatsapp_number, business_hours, deposit_required, deposit_amount, auto_booking_enabled, reminder_schedule)")
+    .eq("email", user.email)
+    .single<StaffRecord>();
+
+  if (!staff?.tenant_id) {
+    redirect("/onboard");
+  }
+
+  return { supabase, user, staff };
+}
+
+export const dashboardLinks = [
+  { href: "/dashboard", label: "Overview" },
+  { href: "/conversations", label: "Conversations" },
+  { href: "/patients", label: "Patients" },
+  { href: "/appointments", label: "Appointments" },
+  { href: "/leads", label: "Leads" },
+  { href: "/kb", label: "Knowledge Base" },
+  { href: "/settings", label: "Settings" },
+];

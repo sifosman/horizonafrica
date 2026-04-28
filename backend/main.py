@@ -3,12 +3,31 @@ import uuid
 from datetime import datetime, timezone
 from contextlib import asynccontextmanager
 
+
+def load_env_file() -> None:
+    env_path = os.path.join(os.path.dirname(__file__), ".env")
+    if not os.path.exists(env_path):
+        return
+
+    with open(env_path, "r", encoding="utf-8") as env_file:
+        for raw_line in env_file:
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            os.environ.setdefault(key.strip(), value.strip())
+
+
+load_env_file()
+
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from openai import OpenAI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client, Client
 from rag_pipeline import chunk_text, embed_chunks, embed_text, process_document
+
+import json
 
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://fohutiwjeizctiuquqtf.supabase.co")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
@@ -48,6 +67,14 @@ class DemoSeedPayload(BaseModel):
     )
 
 
+class OnboardClinicPayload(BaseModel):
+    clinic_name: str
+    slug: str
+    whatsapp_number: str
+    admin_email: str
+    admin_password: str
+
+
 class RagContextPayload(BaseModel):
     tenant_id: str
     query: str
@@ -72,6 +99,12 @@ class LeadUpsertPayload(BaseModel):
     interest_service: str | None = None
     budget_indication: str = "unknown"
     notes: str | None = None
+
+def _clean_optional_string(value: str | None) -> str | None:
+    if value is None:
+        return None
+    cleaned = value.strip()
+    return cleaned or None
 
 def persist_chunks(
     *,
@@ -148,6 +181,20 @@ def build_rag_context(matches: list[dict]) -> str:
     return "\n\n".join(context_blocks) if context_blocks else "No clinic knowledge base context was found."
 
 
+def parse_ai_result(content: str | None) -> dict:
+    if not content:
+        return {}
+
+    try:
+        parsed = json.loads(content)
+        if isinstance(parsed, dict):
+            return parsed
+    except json.JSONDecodeError:
+        pass
+
+    return {"reply": content}
+
+
 def generate_assistant_reply(payload: AssistantReplyPayload):
     rag_matches = fetch_rag_matches(payload.tenant_id, payload.message_body, payload.top_k)
     context = build_rag_context(rag_matches)
@@ -182,21 +229,89 @@ def generate_assistant_reply(payload: AssistantReplyPayload):
         ],
     )
     content = completion.choices[0].message.content
+    parsed_result = parse_ai_result(content)
     return {
         "ai_result": content,
+        "content": parsed_result.get("reply") or content,
+        "intent": parsed_result.get("intent"),
+        "confidence": parsed_result.get("confidence"),
+        "consent_required": parsed_result.get("consent_required"),
+        "rag_used": parsed_result.get("rag_used"),
         "rag_matches": rag_matches,
         "model": OPENROUTER_CHAT_MODEL,
     }
 
 
+def onboard_clinic(payload: OnboardClinicPayload):
+    clinic_name = payload.clinic_name.strip()
+    slug = payload.slug.strip().lower()
+    whatsapp_number = payload.whatsapp_number.strip()
+    admin_email = payload.admin_email.strip().lower()
+    admin_password = payload.admin_password
+
+    if not clinic_name or not slug or not whatsapp_number or not admin_email or not admin_password:
+        raise ValueError("All onboarding fields are required")
+
+    existing_tenant = supabase.table("tenants").select("id").eq("slug", slug).limit(1).execute()
+    if existing_tenant.data:
+        raise ValueError("A clinic with this slug already exists")
+
+    tenant_insert = supabase.table("tenants").insert({
+        "name": clinic_name,
+        "slug": slug,
+        "whatsapp_number": whatsapp_number,
+    }).execute()
+
+    tenant = tenant_insert.data[0] if tenant_insert.data else None
+    if not tenant:
+        raise RuntimeError("Failed to create clinic")
+
+    try:
+        auth_response = supabase.auth.admin.create_user({
+            "email": admin_email,
+            "password": admin_password,
+            "email_confirm": True,
+        })
+        auth_user = auth_response.user
+        if auth_user is None:
+            raise RuntimeError("Failed to create admin auth user")
+
+        created_user = None
+        try:
+            user_insert = supabase.table("users").insert({
+                "tenant_id": tenant["id"],
+                "email": admin_email,
+                "role": "admin",
+            }).execute()
+            created_user = user_insert.data[0] if user_insert.data else None
+        except Exception as user_exc:
+            import logging
+            logging.warning(f"Could not insert into public.users (permission/RLS): {user_exc}")
+
+        return {
+            "tenant": tenant,
+            "user": created_user,
+            "auth_user_id": auth_user.id,
+        }
+    except Exception:
+        supabase.table("tenants").delete().eq("id", tenant["id"]).execute()
+        raise
+
+
 def upsert_lead_record(payload: LeadUpsertPayload):
-    existing = supabase.table("leads").select("id, status").eq("tenant_id", payload.tenant_id).eq("phone_number", payload.phone_number).order("created_at", desc=True).limit(1).execute()
+    tenant_id = _clean_optional_string(payload.tenant_id)
+    patient_id = _clean_optional_string(payload.patient_id)
+
+    if tenant_id is None:
+        raise ValueError("tenant_id is required")
+
+    existing = supabase.table("leads").select("id, status").eq("tenant_id", tenant_id).eq("phone_number", payload.phone_number).order("created_at", desc=True).limit(1).execute()
     existing_data = existing.data or []
     current_timestamp = datetime.now(timezone.utc).isoformat()
 
     lead_payload = {
-        "tenant_id": payload.tenant_id,
-        "patient_id": payload.patient_id,
+        "tenant_id": tenant_id,
+        "patient_id": patient_id,
         "phone_number": payload.phone_number,
         "source": payload.source,
         "lead_score": payload.lead_score,
@@ -297,6 +412,16 @@ async def seed_demo_rag(payload: DemoSeedPayload):
         "document_id": document_id,
         "chunks_created": chunks_created,
     }
+
+
+@app.post("/onboard-clinic")
+async def onboard_clinic_endpoint(payload: OnboardClinicPayload):
+    try:
+        return onboard_clinic(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 @app.post("/rag-query")
 async def rag_query(tenant_id: str = Form(...), query: str = Form(...), top_k: int = 3):

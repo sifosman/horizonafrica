@@ -32,7 +32,7 @@ export async function getDashboardContext() {
   const { data: staff } = await supabase
     .from("users")
     .select("id, tenant_id, email, role, tenants(id, name, slug, whatsapp_number, business_hours, deposit_required, deposit_amount, auto_booking_enabled, reminder_schedule)")
-    .eq("email", user.email)
+    .eq("id", user.id)
     .single<StaffRecord>();
 
   // If no staff record, still allow access but with null staff

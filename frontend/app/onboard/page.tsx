@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
+
 export default function OnboardPage() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -23,52 +25,44 @@ export default function OnboardPage() {
     setLoading(true);
     setError("");
 
-    const { data: tenant, error: tenantError } = await supabase
-      .from("tenants")
-      .insert({ name: clinicName, slug, whatsapp_number: whatsapp })
-      .select()
-      .single();
+    try {
+      const response = await fetch(`${backendUrl}/onboard-clinic`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          clinic_name: clinicName,
+          slug,
+          whatsapp_number: whatsapp,
+          admin_email: adminEmail,
+          admin_password: adminPassword,
+        }),
+      });
 
-    if (tenantError || !tenant) {
-      setError(tenantError?.message || "Failed to create clinic");
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        setError(result?.detail || "Failed to create clinic");
+        setLoading(false);
+        return;
+      }
+
+      setTenantId(result?.tenant?.id || "");
+      router.push("/login");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create clinic");
       setLoading(false);
       return;
     }
 
-    setTenantId(tenant.id);
-    setStep(2);
     setLoading(false);
   };
 
   const createAdmin = async () => {
-    setLoading(true);
-    setError("");
-
-    const { error: signUpError } = await supabase.auth.signUp({
-      email: adminEmail,
-      password: adminPassword,
-    });
-
-    if (signUpError) {
-      setError(signUpError.message);
-      setLoading(false);
-      return;
-    }
-
-    const { error: userError } = await supabase.from("users").insert({
-      tenant_id: tenantId,
-      email: adminEmail,
-      role: "admin",
-    });
-
-    if (userError) {
-      setError(userError.message);
-      setLoading(false);
-      return;
-    }
-
-    router.push("/dashboard");
-    router.refresh();
+    void tenantId;
+    return;
   };
 
   return (
@@ -89,7 +83,7 @@ export default function OnboardPage() {
         {step === 1 && (
           <>
             <h1 className="text-2xl font-bold text-slate-900 mb-1">Clinic Details</h1>
-            <p className="text-slate-500 mb-6">Set up your clinic on SA Aesthetics Bot</p>
+            <p className="text-slate-500 mb-6">Set up your clinic and admin account on SA Aesthetics Bot</p>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Clinic Name</label>
@@ -124,18 +118,40 @@ export default function OnboardPage() {
                   placeholder="+27 82 123 4567"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Admin Email</label>
+                <input
+                  type="email"
+                  required
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  placeholder="admin@clinic.co.za"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Admin Password</label>
+                <input
+                  type="password"
+                  required
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  placeholder="Min 8 characters"
+                />
+              </div>
               <button
                 onClick={createTenant}
-                disabled={loading || !clinicName || !slug || !whatsapp}
+                disabled={loading || !clinicName || !slug || !whatsapp || !adminEmail || !adminPassword}
                 className="w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition disabled:opacity-50"
               >
-                {loading ? "Creating..." : "Continue"}
+                {loading ? "Creating..." : "Create Clinic Account"}
               </button>
             </div>
           </>
         )}
 
-        {step === 2 && (
+        {step === 2 && false && (
           <>
             <h1 className="text-2xl font-bold text-slate-900 mb-1">Admin Account</h1>
             <p className="text-slate-500 mb-6">Create your dashboard login</p>

@@ -35,10 +35,8 @@ export async function getDashboardContext() {
     .eq("email", user.email)
     .single<StaffRecord>();
 
-  if (!staff?.tenant_id) {
-    redirect("/onboard");
-  }
-
+  // If no staff record, still allow access but with null staff
+  // Dashboard will handle empty data gracefully
   return { supabase, user, staff };
 }
 

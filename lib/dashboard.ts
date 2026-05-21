@@ -25,15 +25,25 @@ export async function getDashboardContext() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  console.log("Auth user ID:", user?.id);
+  console.log("Auth user email:", user?.email);
+
   if (!user) {
     redirect("/login");
   }
 
-  const { data: staff } = await supabase
+  const { data: staff, error: staffError } = await supabase
     .from("users")
     .select("id, tenant_id, email, role, tenants(id, name, slug, whatsapp_number, business_hours, deposit_required, deposit_amount, auto_booking_enabled, reminder_schedule)")
     .eq("id", user.id)
     .single<StaffRecord>();
+
+  console.log("Staff query result:", staff);
+  console.log("Staff query error:", staffError);
+
+  if (staffError) {
+    console.error("Staff query error:", staffError);
+  }
 
   // If no staff record, still allow access but with null staff
   // Dashboard will handle empty data gracefully

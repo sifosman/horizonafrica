@@ -11,6 +11,17 @@ function formatJson(value: Record<string, unknown> | null | undefined) {
 
 export default async function SettingsPage() {
   const { staff } = await getDashboardContext();
+
+  if (!staff) {
+    return (
+      <DashboardShell clinicName="Dashboard" role="staff" title="Settings" description="Access Denied" currentPath="/settings">
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 text-center py-12 text-slate-500">
+          Staff account details not found. Please contact support.
+        </div>
+      </DashboardShell>
+    );
+  }
+
   const tenant = staff.tenants;
 
   return (

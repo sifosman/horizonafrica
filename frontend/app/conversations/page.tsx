@@ -4,6 +4,16 @@ import { getDashboardContext } from "@/lib/dashboard";
 export default async function ConversationsPage() {
   const { supabase, staff } = await getDashboardContext();
 
+  if (!staff?.tenant_id) {
+    return (
+      <DashboardShell clinicName="Dashboard" role="staff" title="Conversations" description="Access Denied" currentPath="/conversations">
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 text-center py-12 text-slate-500">
+          Staff account details not found. Please contact support.
+        </div>
+      </DashboardShell>
+    );
+  }
+
   const { data: conversations } = await supabase
     .from("conversations")
     .select("id, patient_id, message_direction, message_type, content, intent_detected, llm_model_used, created_at")

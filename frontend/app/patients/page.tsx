@@ -5,6 +5,16 @@ import { getDashboardContext } from "@/lib/dashboard";
 export default async function PatientsPage() {
   const { supabase, staff } = await getDashboardContext();
 
+  if (!staff?.tenant_id) {
+    return (
+      <DashboardShell clinicName="Dashboard" role="staff" title="Patients" description="Access Denied" currentPath="/patients">
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 text-center py-12 text-slate-500">
+          Staff account details not found. Please contact support.
+        </div>
+      </DashboardShell>
+    );
+  }
+
   const { data: patients } = await supabase
     .from("patients")
     .select("id, name, phone_number, email, medical_aid_provider, medical_aid_plan, consent_given, updated_at")

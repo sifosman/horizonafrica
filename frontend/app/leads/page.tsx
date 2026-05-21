@@ -6,6 +6,16 @@ const leadColumns = ["new", "qualified", "contacted", "booked", "converted", "lo
 export default async function LeadsPage() {
   const { supabase, staff } = await getDashboardContext();
 
+  if (!staff?.tenant_id) {
+    return (
+      <DashboardShell clinicName="Dashboard" role="staff" title="Leads" description="Access Denied" currentPath="/leads">
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 text-center py-12 text-slate-500">
+          Staff account details not found. Please contact support.
+        </div>
+      </DashboardShell>
+    );
+  }
+
   const { data: leads } = await supabase
     .from("leads")
     .select("id, phone_number, lead_score, status, interest_service, budget_indication, assigned_to_user_id, created_at, last_contact_at")

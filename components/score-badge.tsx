@@ -1,8 +1,8 @@
 import { LeadScore } from "@/lib/types";
 
 const styles: Record<LeadScore, string> = {
-  HOT: "bg-primary-container text-on-primary-container",
-  WARM: "bg-primary-fixed text-on-primary-fixed",
+  HOT: "bg-secondary-container text-on-secondary-container",
+  WARM: "bg-secondary-fixed text-on-secondary-fixed",
   COLD: "bg-surface-variant text-on-surface-variant",
 };
 

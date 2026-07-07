@@ -14,7 +14,7 @@ export function StatCard({
   value,
   icon: Icon,
   iconBg = "bg-surface-container-high",
-  iconColor = "text-primary",
+  iconColor = "text-secondary",
   trend,
 }: StatCardProps) {
   return (

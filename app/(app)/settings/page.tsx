@@ -45,7 +45,7 @@ const integrations: IntegrationStatus[] = [
 
 const statusStyles = {
   connected: { color: "text-secondary", bg: "bg-secondary-container/30", label: "Connected", icon: CheckCircle2 },
-  pending: { color: "text-primary", bg: "bg-primary-container/20", label: "Pending", icon: Clock },
+  pending: { color: "text-secondary", bg: "bg-secondary-container/20", label: "Pending", icon: Clock },
   "not-configured": { color: "text-on-surface-variant", bg: "bg-surface-container-high", label: "Not Configured", icon: XCircle },
 };
 
@@ -69,7 +69,7 @@ export default function SettingsPage() {
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
                   <div className="rounded-lg bg-surface-container-high p-2.5">
-                    <integration.icon className="h-5 w-5 text-primary" />
+                    <integration.icon className="h-5 w-5 text-secondary" />
                   </div>
                   <div>
                     <p className="font-semibold text-on-surface">{integration.name}</p>

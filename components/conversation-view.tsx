@@ -57,7 +57,7 @@ export function ConversationView({ conversations }: ConversationViewProps) {
               placeholder="Search conversations..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-lg border border-outline-variant bg-surface-container-low py-2.5 pl-10 pr-4 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
+              className="w-full rounded-lg border border-outline-variant bg-surface-container-low py-2.5 pl-10 pr-4 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/10"
             />
           </div>
           <div className="flex gap-2">
@@ -67,7 +67,7 @@ export function ConversationView({ conversations }: ConversationViewProps) {
                 onClick={() => setScoreFilter(s)}
                 className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
                   scoreFilter === s
-                    ? "bg-primary text-on-primary"
+                    ? "bg-secondary text-on-secondary"
                     : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container"
                 }`}
               >
@@ -120,7 +120,7 @@ export function ConversationView({ conversations }: ConversationViewProps) {
             {/* Chat Header */}
             <div className="flex items-center justify-between border-b border-outline-variant/30 px-5 py-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-high text-sm font-bold text-primary">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-high text-sm font-bold text-secondary">
                   {(selectedMessages[0]?.contact_name ?? selectedPhone).charAt(0).toUpperCase()}
                 </div>
                 <div>
@@ -154,14 +154,14 @@ export function ConversationView({ conversations }: ConversationViewProps) {
                   )}
                   {msg.ai_response && (
                     <div className="flex items-start gap-2 justify-end">
-                      <div className="rounded-lg rounded-tr-sm bg-primary px-4 py-2.5 max-w-[70%]">
-                        <p className="text-sm text-on-primary">{msg.ai_response}</p>
-                        <p className="mt-1 text-[11px] text-on-primary/70">
+                      <div className="rounded-lg rounded-tr-sm bg-secondary px-4 py-2.5 max-w-[70%]">
+                        <p className="text-sm text-on-secondary">{msg.ai_response}</p>
+                        <p className="mt-1 text-[11px] text-on-secondary/70">
                           {new Date(msg.created_at).toLocaleTimeString()}
                         </p>
                       </div>
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-container/20">
-                        <Bot className="h-4 w-4 text-primary" />
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-secondary-container/20">
+                        <Bot className="h-4 w-4 text-secondary" />
                       </div>
                     </div>
                   )}
@@ -180,7 +180,7 @@ export function ConversationView({ conversations }: ConversationViewProps) {
                 />
                 <button
                   disabled
-                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-on-primary disabled:opacity-50"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary text-on-secondary disabled:opacity-50"
                 >
                   <Send className="h-4 w-4" />
                 </button>

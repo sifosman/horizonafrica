@@ -46,14 +46,14 @@ export default async function DashboardPage() {
           value={totalLeads}
           icon={Users}
           iconBg="bg-surface-container-high"
-          iconColor="text-primary"
+          iconColor="text-secondary"
         />
         <StatCard
           label="Hot Leads"
           value={totalHot}
           icon={Flame}
-          iconBg="bg-primary-container/20"
-          iconColor="text-primary"
+          iconBg="bg-secondary-container/20"
+          iconColor="text-secondary"
         />
         <StatCard
           label="Active Conversations"
@@ -78,7 +78,7 @@ export default async function DashboardPage() {
             <h2 className="text-lg font-semibold text-on-surface">Recent Leads</h2>
             <Link
               href="/leads"
-              className="flex items-center gap-1 text-xs font-semibold text-primary transition-colors hover:text-primary-fixed-dim"
+              className="flex items-center gap-1 text-xs font-semibold text-secondary transition-colors hover:text-secondary-fixed-dim"
             >
               View all <ArrowRight className="h-3 w-3" />
             </Link>
@@ -129,7 +129,7 @@ export default async function DashboardPage() {
                   <div className="h-2 overflow-hidden rounded-full bg-surface-container-high">
                     <div
                       className={`h-full rounded-full transition-all ${
-                        score === "HOT" ? "bg-primary-container" : score === "WARM" ? "bg-primary-fixed-dim" : "bg-surface-variant"
+                        score === "HOT" ? "bg-secondary-container" : score === "WARM" ? "bg-secondary-fixed-dim" : "bg-surface-variant"
                       }`}
                       style={{ width: `${pct}%` }}
                     />
@@ -147,7 +147,7 @@ export default async function DashboardPage() {
           <h2 className="text-lg font-semibold text-on-surface">Recent Conversations</h2>
           <Link
             href="/conversations"
-            className="flex items-center gap-1 text-xs font-semibold text-primary transition-colors hover:text-primary-fixed-dim"
+            className="flex items-center gap-1 text-xs font-semibold text-secondary transition-colors hover:text-secondary-fixed-dim"
           >
             View all <ArrowRight className="h-3 w-3" />
           </Link>

@@ -26,24 +26,21 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
         />
       )}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-[260px] transform border-r border-outline-variant bg-inverse-surface transition-transform duration-200 lg:static lg:translate-x-0 flex flex-col py-6 px-4 ${
+        className={`fixed inset-y-0 left-0 z-40 w-[260px] transform border-r border-outline-variant/50 bg-surface transition-transform duration-200 lg:static lg:translate-x-0 flex flex-col py-6 px-4 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Brand Header */}
         <div className="mb-6 flex items-center justify-between px-4">
-          <div className="relative h-16 w-40">
-            <Image
-              src={logo}
-              alt="Horizon Africa"
-              fill
-              className="object-contain"
-              priority
-            />
-          </div>
+          <Image
+            src={logo}
+            alt="Horizon Africa"
+            className="ml-12 h-12 w-auto object-contain"
+            priority
+          />
           <button
             onClick={onClose}
-            className="text-surface-variant hover:text-white lg:hidden"
+            className="text-on-surface-variant hover:text-on-surface lg:hidden"
           >
             <X className="h-5 w-5" />
           </button>
@@ -54,7 +51,7 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
           <Link
             href="/broadcasts"
             onClick={onClose}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary-container py-3 text-xs font-semibold text-on-primary-container transition-all hover:opacity-90"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 text-xs font-semibold text-on-primary shadow-sm transition-all hover:brightness-110"
           >
             <Plus className="h-4 w-4" />
             New Broadcast
@@ -73,7 +70,7 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
                 className={`flex items-center gap-3 rounded-lg px-4 py-3 text-xs font-semibold transition-all ${
                   isActive
                     ? "bg-surface-container-highest text-on-surface"
-                    : "text-surface-variant hover:bg-surface-container-highest hover:text-white"
+                    : "text-on-surface-variant hover:bg-surface-container hover:text-on-surface"
                 }`}
               >
                 <item.icon className="h-5 w-5" />
@@ -87,7 +84,7 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
         <div className="mt-auto flex flex-col gap-1 border-t border-outline-variant/30 pt-4">
           <Link
             href="#"
-            className="flex items-center gap-3 rounded-lg px-4 py-3 text-xs font-semibold text-surface-variant transition-all hover:bg-surface-container-highest hover:text-white"
+            className="flex items-center gap-3 rounded-lg px-4 py-3 text-xs font-semibold text-on-surface-variant transition-all hover:bg-surface-container hover:text-on-surface"
           >
             <HelpCircle className="h-5 w-5" />
             Help Center
@@ -95,7 +92,7 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
           <form action="/auth/signout" method="POST">
             <button
               type="submit"
-              className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-xs font-semibold text-surface-variant transition-all hover:bg-surface-container-highest hover:text-white"
+              className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-xs font-semibold text-on-surface-variant transition-all hover:bg-surface-container hover:text-on-surface"
             >
               <LogOut className="h-5 w-5" />
               Logout

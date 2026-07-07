@@ -32,22 +32,22 @@ export function TopBar({ user, onMenuClick }: TopBarProps) {
       </div>
 
       <div className="flex items-center gap-4">
-        <button className="flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant transition-all hover:bg-surface-container-low hover:text-primary">
+        <button className="flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant transition-all hover:bg-surface-container-low hover:text-secondary">
           <Bell className="h-5 w-5" />
         </button>
-        <button className="flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant transition-all hover:bg-surface-container-low hover:text-primary">
+        <button className="flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant transition-all hover:bg-surface-container-low hover:text-secondary">
           <HelpCircle className="h-5 w-5" />
         </button>
         <div className="mx-2 h-6 w-px bg-outline-variant/50" />
         <form action="/auth/signout" method="POST">
           <button
             type="submit"
-            className="text-xs font-semibold text-on-surface transition-colors hover:text-primary"
+            className="text-xs font-semibold text-on-surface transition-colors hover:text-secondary"
           >
             Sign Out
           </button>
         </form>
-        <div className="ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-outline-variant bg-surface-container-high text-xs font-bold text-primary">
+        <div className="ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-outline-variant bg-surface-container-high text-xs font-bold text-secondary">
           {user?.email?.charAt(0).toUpperCase() ?? "U"}
         </div>
       </div>

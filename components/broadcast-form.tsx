@@ -32,7 +32,7 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
           <select
             value={groupId}
             onChange={(e) => setGroupId(e.target.value)}
-            className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-primary focus:outline-none"
+            className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-secondary focus:outline-none"
           >
             <option value="">Choose a group...</option>
             {groups.map((g) => (
@@ -46,7 +46,7 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
           <select
             value={template}
             onChange={(e) => setTemplate(e.target.value)}
-            className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-primary focus:outline-none"
+            className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-secondary focus:outline-none"
           >
             {templates.map((t) => (
               <option key={t} value={t}>{t.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</option>
@@ -61,7 +61,7 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
             onChange={(e) => setMessage(e.target.value)}
             rows={4}
             placeholder="Type your broadcast message..."
-            className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
+            className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/10"
           />
         </div>
 
@@ -137,7 +137,7 @@ export function ContactsManager({ groups, contacts: initialContacts }: ContactsM
         <h2 className="text-lg font-semibold text-on-surface">Contacts</h2>
         <button
           onClick={() => setShowAdd(!showAdd)}
-          className="flex items-center gap-2 rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-on-primary transition hover:opacity-90"
+          className="flex items-center gap-2 rounded-lg bg-secondary px-3 py-1.5 text-sm font-semibold text-on-secondary transition hover:opacity-90"
         >
           <Plus className="h-4 w-4" />
           Add Contact
@@ -151,19 +151,19 @@ export function ContactsManager({ groups, contacts: initialContacts }: ContactsM
             placeholder="Name"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            className="flex-1 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-primary focus:outline-none"
+            className="flex-1 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-secondary focus:outline-none"
           />
           <input
             type="text"
             placeholder="Phone (+27...)"
             value={newPhone}
             onChange={(e) => setNewPhone(e.target.value)}
-            className="flex-1 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-primary focus:outline-none"
+            className="flex-1 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-secondary focus:outline-none"
           />
           <select
             value={newGroup}
             onChange={(e) => setNewGroup(e.target.value)}
-            className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-primary focus:outline-none"
+            className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-secondary focus:outline-none"
           >
             <option value="">Select group...</option>
             {groups.map((g) => (
@@ -173,7 +173,7 @@ export function ContactsManager({ groups, contacts: initialContacts }: ContactsM
           <button
             onClick={addContact}
             disabled={saving || !newPhone || !newGroup}
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition hover:opacity-90 disabled:opacity-50"
+            className="rounded-lg bg-secondary px-4 py-2 text-sm font-semibold text-on-secondary transition hover:opacity-90 disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save"}
           </button>

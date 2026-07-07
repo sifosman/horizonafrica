@@ -41,7 +41,7 @@ export default async function BroadcastsPage() {
                 <p className="mt-1 text-3xl font-bold text-on-surface">{g.count}</p>
                 <p className="text-xs text-on-surface-variant/60">contacts</p>
               </div>
-              <div className="rounded-lg bg-primary-container/20 px-3 py-2 text-xs font-semibold text-primary">
+              <div className="rounded-lg bg-secondary-container/20 px-3 py-2 text-xs font-semibold text-secondary">
                 {g.group_name}
               </div>
             </div>

@@ -56,13 +56,13 @@ export function LeadTable({ leads }: LeadTableProps) {
               placeholder="Search by name or phone..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-              className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest py-2.5 pl-10 pr-4 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
+              className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest py-2.5 pl-10 pr-4 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/10"
             />
           </div>
           <select
             value={scoreFilter}
             onChange={(e) => { setScoreFilter(e.target.value as LeadScore | "ALL"); setPage(0); }}
-            className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-primary focus:outline-none"
+            className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-secondary focus:outline-none"
           >
             {scoreOptions.map((s) => (
               <option key={s} value={s}>{s === "ALL" ? "All Scores" : s}</option>
@@ -71,7 +71,7 @@ export function LeadTable({ leads }: LeadTableProps) {
           <select
             value={statusFilter}
             onChange={(e) => { setStatusFilter(e.target.value as LeadStatus | "ALL"); setPage(0); }}
-            className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-primary focus:outline-none"
+            className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-secondary focus:outline-none"
           >
             {statusOptions.map((s) => (
               <option key={s} value={s}>{s === "ALL" ? "All Statuses" : s.charAt(0).toUpperCase() + s.slice(1)}</option>
@@ -80,7 +80,7 @@ export function LeadTable({ leads }: LeadTableProps) {
         </div>
         <button
           onClick={exportCSV}
-          className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary transition hover:opacity-90"
+          className="flex items-center gap-2 rounded-lg bg-secondary px-4 py-2.5 text-sm font-semibold text-on-secondary transition hover:opacity-90"
         >
           <Download className="h-4 w-4" />
           Export CSV
@@ -202,7 +202,7 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
               <button
                 onClick={saveLead}
                 disabled={saving}
-                className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-on-primary transition hover:opacity-90 disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-1.5 text-sm font-semibold text-on-secondary transition hover:opacity-90 disabled:opacity-50"
               >
                 <Save className="h-4 w-4" />
                 {saving ? "Saving..." : "Save"}
@@ -223,7 +223,7 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
 
         <div className="space-y-4 p-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-container/20 text-lg font-semibold text-primary">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary-container/20 text-lg font-semibold text-secondary">
               {(currentLead.full_name ?? currentLead.phone_number).charAt(0).toUpperCase()}
             </div>
             <div>
@@ -235,7 +235,7 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
                 <select
                   value={editScore}
                   onChange={(e) => setEditScore(e.target.value as LeadScore)}
-                  className="rounded-lg border border-outline-variant bg-surface-container-lowest px-2 py-1 text-xs focus:border-primary focus:outline-none"
+                  className="rounded-lg border border-outline-variant bg-surface-container-lowest px-2 py-1 text-xs focus:border-secondary focus:outline-none"
                 >
                   <option value="HOT">HOT</option>
                   <option value="WARM">WARM</option>
@@ -255,7 +255,7 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
                   <select
                     value={editStatus}
                     onChange={(e) => setEditStatus(e.target.value as LeadStatus)}
-                    className="mt-0.5 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-2 py-1.5 text-sm focus:border-primary focus:outline-none"
+                    className="mt-0.5 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-2 py-1.5 text-sm focus:border-secondary focus:outline-none"
                   >
                     <option value="new">New</option>
                     <option value="contacted">Contacted</option>
@@ -270,7 +270,7 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
                     value={editNotes}
                     onChange={(e) => setEditNotes(e.target.value)}
                     rows={3}
-                    className="mt-0.5 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
+                    className="mt-0.5 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/10"
                   />
                 </div>
               </>

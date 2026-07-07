@@ -32,7 +32,7 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
       >
         {/* Brand Header */}
         <div className="mb-6 flex items-center justify-between px-4">
-          <div className="relative h-12 w-32">
+          <div className="relative h-16 w-40">
             <Image
               src={logo}
               alt="Horizon Africa"

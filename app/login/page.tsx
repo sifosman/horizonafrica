@@ -59,7 +59,7 @@ export default function LoginPage() {
         >
           {/* Brand Header */}
           <div className="mb-6 flex flex-col items-center">
-            <div className="relative mb-4 h-20 w-40">
+            <div className="relative mb-4 h-28 w-56">
               <Image
                 src={logo}
                 alt="Horizon Africa"

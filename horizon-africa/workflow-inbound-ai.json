@@ -1,0 +1,326 @@
+{
+  "name": "Horizon Africa - Inbound AI Lead Qualification",
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-webhook",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "WhatsApp Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "horizon-whatsapp-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract message data from Meta WhatsApp webhook payload\nconst body = $input.first().json;\n\n// Meta webhook verification (GET requests handled by webhook node)\n// For POST: extract message content\nlet phoneNumber = '';\nlet messageText = '';\nlet messageId = '';\nlet contactName = '';\n\nif (body.entry && body.entry[0] && body.entry[0].changes && body.entry[0].changes[0]) {\n  const change = body.entry[0].changes[0];\n  if (change.value && change.value.messages && change.value.messages[0]) {\n    const msg = change.value.messages[0];\n    phoneNumber = msg.from || '';\n    messageId = msg.id || '';\n    messageText = msg.text?.body || msg.button?.text || msg.interactive?.button_reply?.title || '';\n    \n    if (change.value.contacts && change.value.contacts[0]) {\n      contactName = change.value.contacts[0].profile?.name || '';\n    }\n  }\n}\n\n// Clean phone number for session ID\nconst sessionId = phoneNumber.replace(/[^0-9]/g, '');\n\nreturn {\n  json: {\n    phoneNumber,\n    sessionId,\n    messageText,\n    messageId,\n    contactName,\n    timestamp: new Date().toISOString(),\n    raw: JSON.stringify(body)\n  }\n};"
+      },
+      "id": "extract-message",
+      "name": "Extract Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messageText }}",
+        "options": {
+          "systemMessage": "You are Layla, a professional sales assistant for Horizon Africa, a South African telecommunications company specialising in Fibre, LTE, Wireless, and Starlink internet services.\n\n## PERSONALITY\n- Warm, friendly, and professional — like a knowledgeable friend in a telecom shop\n- Concise responses. Never more than 3-4 sentences unless listing packages or answering a detailed question\n- Conversational, not robotic. Use natural South African English\n- Helpful and patient. Never rush the user\n- Maximum 1 emoji per message, used sparingly\n- Never use pushy sales language or pressure tactics\n- Use the user's name once you know it\n\n## YOUR ROLE\n1. Answer questions about Fibre packages using the knowledge base below\n2. Qualify leads by asking about their internet needs\n3. Recommend the right package based on their usage\n4. Collect lead information for the sales team\n5. Identify hot leads who are ready to sign up\n\n## QUALIFICATION PROCESS\nFollow this flow naturally in conversation. Don't ask all questions at once — weave them in.\n\nStep 1: Ask \"How many people will be using the internet at your place?\"\nOptions: 1 Person | 2-4 People | 5+ People\n\nStep 2: Ask \"What do you mainly use the internet for?\"\nOptions: Email, Browsing, Netflix, YouTube, Gaming, Working from Home, CCTV, Smart Home Devices, Business, Online School, Video Calls\n\nStep 3: Based on their answers, recommend a package (see recommendation engine below)\n\nStep 4: If they're interested, collect their details:\n- Full name\n- Contact number\n- Physical address (for fibre availability check)\n- Email address\n\n## PRODUCT RECOMMENDATION ENGINE\n- Email + Browsing → 20 Mbps (R345/month)\n- Netflix + YouTube → 50 Mbps (R695/month)\n- Gaming → 100 Mbps+ (varies by area)\n- Working from Home → 100 Mbps Symmetrical (varies by area)\n- Business → 200 Mbps+ (varies by area)\n- Large Household (5+ people) → 200-500 Mbps (varies by area)\n\n## LEAD SCORING (internal — don't mention this to the user)\n- HOT: User provides contact details + confirms interest + asks about signup/installation/pricing\n- WARM: User engages with questions but hasn't provided all details, still comparing options\n- COLD: General questions only, no engagement, price sensitive, just browsing\n\nWhen you detect a HOT lead, naturally encourage them to proceed: \"Great! I'll get one of our sales consultants to give you a call to get this sorted. Can I get your name and best contact number?\"\n\n## KNOWLEDGE BASE\n\n### Packages & Pricing\n- 20/10 Mbps — R345/month\n- 25/25 Mbps — R499/month\n- 40/20 Mbps — R425/month\n- 50/25 Mbps — R695/month\n- 100 Mbps, 200 Mbps, 500 Mbps also available (pricing varies by area and FNO)\n- All packages are uncapped — no FUP, no throttling, no data caps\n- Package availability depends on the Fibre Network Operator (FNO) servicing the area\n\n### Installation\n- Existing fibre infrastructure: 3-5 business days\n- New fibre installation: 5-7 business days\n- An adult (18+) must be present during installation\n- If fibre already installed at property, only remote activation needed — faster turnaround\n\n### Contracts\n- Standard: 12 months (covers installation and activation fees)\n- Month-to-month and prepaid options available (T&C's apply)\n- Early cancellation allowed but termination fees may apply\n- Upgrades available anytime; downgrades depend on contract terms\n\n### Application Requirements\n- Full Name\n- South African ID Number (passports accepted if visa covers full contract duration — deposits apply)\n- Contact Number\n- Physical Address\n- Email Address\n- After approval: Bank Name, Account Number, Preferred Debit Order Date\n- Credit assessment required for all post-paid applications\n- Deposit only required if credit assessment doesn't meet threshold (refundable)\n\n### Payment\n- Debit orders mandatory for post-paid\n- Prepaid paid before activation\n- Debit order date confirmed during application\n- Failed debit orders result in suspension; bank rejection fees passed on\n\n### Technical\n- All packages include ONT (Optical Network Terminal)\n- Some packages include a Wi-Fi router — consultant will confirm\n- Symmetrical fibre: upload = download speed (ideal for business, remote work, content creators)\n- Asymmetrical fibre: faster download than upload (suitable for home use)\n- Fibre supports multiple users and devices simultaneously\n- Great for gaming (low latency, stable), streaming (Netflix, YouTube, Disney+, Showmax), working from home (Teams, Zoom, VPN)\n\n### Support\n- Telkom technical support: 10217 (Option 1: Technical, Option 2: Billing, Option 3: Customer Services)\n- Sales Manager: khanyisg@telkom.co.za / 068 565 3272\n- Users can also contact Horizon Africa directly for guidance\n\n### Other\n- Prepaid fibre available in selected areas\n- Business fibre solutions available — contact sales for custom packages\n- ADSL to Fibre migration may qualify for free installation\n- Relocation: check new address for fibre availability, arrange transfer or discuss alternatives\n- Fibre availability check: just provide physical address\n\n## RULES\n- Always respond in the same language as the user (English or Afrikaans)\n- Never invent information not in the knowledge base\n- If you don't know something: \"Let me get that info for you. I'll have one of our sales consultants reach out.\"\n- If user asks to speak to a human: \"I'll connect you with our sales team right away\" and note for handover\n- Keep responses short and scannable — use bullet points for lists\n- When recommending a package, state the speed and price clearly\n- Don't overwhelm the user with information — answer what they asked\n- Be proactive but not pushy — if they seem interested, guide them to the next step\n- Never ask more than one question at a time\n- Greet new users warmly: \"Hi! Welcome to Horizon Africa. I'm here to help you find the perfect internet package. What can I help you with today?\""
+        }
+      },
+      "id": "ai-agent",
+      "name": "AI Sales Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "credentials": {
+          "googlePalmApi": {
+            "id": "lSqxCKYseqhX1abe",
+            "name": "Google Gemini(PaLM) Api account"
+          }
+        },
+        "modelName": "models/gemini-3.5-flash",
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "id": "gemini-llm",
+      "name": "Google Gemini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [400, 200]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Extract Message').item.json.sessionId }}",
+        "contextWindowLength": 20
+      },
+      "id": "conversation-memory",
+      "name": "Conversation Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.2,
+      "position": [560, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare the AI response and lead data for downstream nodes\nconst aiResponse = $input.first().json.output || $input.first().json.text || '';\nconst extractData = $('Extract Message').first().json;\n\n// Simple lead scoring based on conversation content\nconst responseLower = aiResponse.toLowerCase();\nconst messageLower = (extractData.messageText || '').toLowerCase();\nconst combinedText = responseLower + ' ' + messageLower;\n\nlet leadScore = 'COLD';\nlet hasContactInfo = false;\nlet hasAddress = false;\nlet hasName = extractData.contactName ? true : false;\n\n// Check for contact information patterns\nif (/\\b\\d{10}\\b|\\b\\d{3}[-\\s]\\d{3}[-\\s]\\d{4}\\b|\\b0\\d{2}\\s\\d{3}\\s\\d{4}\\b/.test(combinedText)) {\n  hasContactInfo = true;\n}\nif (/\\bstreet\\b|\\broad\\b|\\bavenue\\b|\\bdrive\\b|\\bplace\\b|\\bclose\\b|\\bblvd\\b|\\baddress\\b/.test(combinedText)) {\n  hasAddress = true;\n}\n\n// Scoring logic\nif (hasContactInfo && hasAddress && /sign\\s*up|install|apply|get\\s*started|proceed|go\\s*ahead|sounds\\s*good|interested|let'?s\\s*do\\s*it/.test(combinedText)) {\n  leadScore = 'HOT';\n} else if (hasContactInfo || (/price|cost|how\\s*much|install|when\\s*can|interested|package/.test(combinedText) && hasName)) {\n  leadScore = 'WARM';\n}\n\nreturn {\n  json: {\n    phoneNumber: extractData.phoneNumber,\n    sessionId: extractData.sessionId,\n    contactName: extractData.contactName,\n    incomingMessage: extractData.messageText,\n    aiResponse: aiResponse,\n    leadScore: leadScore,\n    hasContactInfo: hasContactInfo,\n    hasAddress: hasAddress,\n    timestamp: extractData.timestamp,\n    webhookReceived: true\n  }\n};"
+      },
+      "id": "process-response",
+      "name": "Process Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v21.0/{{ $env.META_PHONE_NUMBER_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.META_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $json.phoneNumber }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": {{ JSON.stringify($json.aiResponse) }}\n  }\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "send-whatsapp-reply",
+      "name": "Send WhatsApp Reply",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 0],
+      "notes": "Sends AI response back to user via Meta WhatsApp Business API. Requires META_PHONE_NUMBER_ID and META_ACCESS_TOKEN env vars."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/conversations",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_ANON_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.SUPABASE_ANON_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"phone_number\": \"{{ $json.phoneNumber }}\",\n  \"contact_name\": \"{{ $json.contactName }}\",\n  \"incoming_message\": \"{{ $json.incomingMessage }}\",\n  \"ai_response\": \"{{ $json.aiResponse }}\",\n  \"lead_score\": \"{{ $json.leadScore }}\",\n  \"timestamp\": \"{{ $json.timestamp }}\"\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "log-supabase",
+      "name": "Log to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 200],
+      "notes": "Logs conversation to Supabase. Requires SUPABASE_URL and SUPABASE_ANON_KEY env vars."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-hot-lead",
+              "leftValue": "={{ $json.leadScore }}",
+              "rightValue": "HOT",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter:operator:equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-hot-lead",
+      "name": "Check Hot Lead",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1120, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.brevo.com/v3/smtp/email",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api-key",
+              "value": "={{ $env.BREVO_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"sender\": {\n    \"name\": \"Horizon Africa AI\",\n    \"email\": \"alerts@horizonafrica.co.za\"\n  },\n  \"to\": [\n    {\n      \"email\": \"{{ $env.SALES_TEAM_EMAIL }}\",\n      \"name\": \"Sales Team\"\n    }\n  ],\n  \"subject\": \"🔥 HOT LEAD ALERT - {{ $json.phoneNumber }}\",\n  \"htmlContent\": \"<h2>🔥 Hot Lead Detected</h2><p><strong>Phone:</strong> {{ $json.phoneNumber }}</p><p><strong>Name:</strong> {{ $json.contactName || 'Not provided' }}</p><p><strong>Lead Score:</strong> {{ $json.leadScore }}</p><p><strong>Last Message:</strong> {{ $json.incomingMessage }}</p><p><strong>AI Response:</strong> {{ $json.aiResponse }}</p><p><strong>Time:</strong> {{ $json.timestamp }}</p><hr><p>Follow up immediately — this lead is ready to convert!</p>\"\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "send-hot-lead-email",
+      "name": "Send Hot Lead Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1340, -100],
+      "notes": "Sends email alert to sales team via Brevo when a hot lead is detected. Requires BREVO_API_KEY and SALES_TEAM_EMAIL env vars."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"processed\",\n  \"leadScore\": \"{{ $json.leadScore }}\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1340, 100]
+    }
+  ],
+  "connections": {
+    "WhatsApp Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Message": {
+      "main": [
+        [
+          {
+            "node": "AI Sales Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Sales Agent": {
+      "main": [
+        [
+          {
+            "node": "Process Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "ai_languageModel": [
+        [
+          {
+            "node": "Google Gemini",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ],
+      "ai_memory": [
+        [
+          {
+            "node": "Conversation Memory",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Response": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp Reply",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send WhatsApp Reply": {
+      "main": [
+        [
+          {
+            "node": "Check Hot Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Hot Lead": {
+      "main": [
+        [
+          {
+            "node": "Send Hot Lead Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

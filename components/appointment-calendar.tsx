@@ -43,21 +43,21 @@ function isSameDay(a: Date, b: Date) {
 
 function statusColor(status: string) {
   switch (status) {
-    case "confirmed": return "bg-emerald-500";
-    case "proposed": return "bg-blue-500";
-    case "cancelled": return "bg-red-400";
-    case "completed": return "bg-slate-400";
-    default: return "bg-indigo-400";
+    case "confirmed": return "bg-primary";
+    case "proposed": return "bg-secondary-container text-primary";
+    case "cancelled": return "bg-error";
+    case "completed": return "bg-outline";
+    default: return "bg-tertiary";
   }
 }
 
 function statusBadge(status: string) {
   switch (status) {
-    case "confirmed": return "bg-emerald-100 text-emerald-700 border-emerald-200";
-    case "proposed": return "bg-blue-100 text-blue-700 border-blue-200";
-    case "cancelled": return "bg-red-100 text-red-600 border-red-200";
-    case "completed": return "bg-slate-100 text-slate-600 border-slate-200";
-    default: return "bg-indigo-100 text-indigo-700 border-indigo-200";
+    case "confirmed": return "bg-primary/10 text-primary border-primary/20";
+    case "proposed": return "bg-secondary-container text-primary border-primary/10";
+    case "cancelled": return "bg-error-container text-on-error-container border-error/10";
+    case "completed": return "bg-surface-container-high text-outline border-outline-variant/30";
+    default: return "bg-tertiary-container text-on-tertiary-container border-tertiary/10";
   }
 }
 
@@ -193,37 +193,37 @@ export function AppointmentCalendar({ appointments, timeBlocks: initialBlocks, t
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Header controls */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <button onClick={view === "month" ? prevMonth : prevWeek} className="p-2 rounded-lg hover:bg-slate-100 text-slate-600 transition">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+      <div className="bg-surface-container-lowest rounded-3xl shadow-sm border border-surface-container p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <button onClick={view === "month" ? prevMonth : prevWeek} className="p-2 rounded-full hover:bg-surface-container-high text-on-surface-variant transition-all">
+            <span className="material-symbols-outlined">chevron_left</span>
           </button>
-          <h2 className="text-lg font-bold text-slate-900 min-w-[200px] text-center">
+          <h2 className="text-xl font-bold text-primary min-w-[200px] text-center">
             {view === "month"
               ? `${MONTHS[month]} ${year}`
               : `${weekDays[0].getDate()} ${MONTHS[weekDays[0].getMonth()]} – ${weekDays[6].getDate()} ${MONTHS[weekDays[6].getMonth()]} ${weekDays[6].getFullYear()}`
             }
           </h2>
-          <button onClick={view === "month" ? nextMonth : nextWeek} className="p-2 rounded-lg hover:bg-slate-100 text-slate-600 transition">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+          <button onClick={view === "month" ? nextMonth : nextWeek} className="p-2 rounded-full hover:bg-surface-container-high text-on-surface-variant transition-all">
+            <span className="material-symbols-outlined">chevron_right</span>
           </button>
-          <button onClick={goToday} className="px-3 py-1.5 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition">Today</button>
+          <button onClick={goToday} className="px-5 py-2 text-sm font-bold text-primary bg-secondary-container hover:bg-secondary-container/80 rounded-full transition-all uppercase tracking-widest">Today</button>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex bg-slate-100 rounded-lg p-1 gap-1">
-            <button onClick={() => setView("month")} className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${view === "month" ? "bg-white shadow text-slate-900" : "text-slate-500 hover:text-slate-700"}`}>Month</button>
-            <button onClick={() => setView("week")} className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${view === "week" ? "bg-white shadow text-slate-900" : "text-slate-500 hover:text-slate-700"}`}>Week</button>
+          <div className="flex bg-surface-container-high rounded-full p-1 gap-1">
+            <button onClick={() => setView("month")} className={`px-6 py-2 rounded-full text-sm font-bold transition-all uppercase tracking-widest ${view === "month" ? "bg-surface-container-lowest shadow text-primary" : "text-outline hover:text-on-surface-variant"}`}>Month</button>
+            <button onClick={() => setView("week")} className={`px-6 py-2 rounded-full text-sm font-bold transition-all uppercase tracking-widest ${view === "week" ? "bg-surface-container-lowest shadow text-primary" : "text-outline hover:text-on-surface-variant"}`}>Week</button>
           </div>
         </div>
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-3 px-1">
-        {[["confirmed","bg-emerald-500","Confirmed"],["proposed","bg-blue-500","Proposed"],["cancelled","bg-red-400","Cancelled"],["blocked","bg-slate-300","Blocked"]].map(([,color,label]) => (
-          <div key={label} className="flex items-center gap-1.5 text-xs text-slate-500">
-            <div className={`w-2.5 h-2.5 rounded-full ${color}`} />
+      <div className="flex flex-wrap gap-4 px-2">
+        {[["confirmed","bg-primary","Confirmed"],["proposed","bg-secondary-container border border-primary/20","Proposed"],["cancelled","bg-error","Cancelled"],["blocked","bg-outline-variant","Blocked"]].map(([,color,label]) => (
+          <div key={label} className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-outline">
+            <div className={`w-2 h-2 rounded-full ${color}`} />
             {label}
           </div>
         ))}
@@ -231,15 +231,15 @@ export function AppointmentCalendar({ appointments, timeBlocks: initialBlocks, t
 
       {/* Month View */}
       {view === "month" && (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="grid grid-cols-7 border-b border-slate-200">
+        <div className="bg-surface-container-lowest rounded-3xl shadow-sm border border-surface-container overflow-hidden">
+          <div className="grid grid-cols-7 border-b border-surface-container bg-surface-container-low/30">
             {DAYS.map(d => (
-              <div key={d} className="py-3 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider">{d}</div>
+              <div key={d} className="py-4 text-center text-[10px] font-bold text-outline uppercase tracking-widest">{d}</div>
             ))}
           </div>
           <div className="grid grid-cols-7">
             {calendarDays.map((day: Date | null, i: number) => {
-              if (!day) return <div key={i} className="min-h-[110px] bg-slate-50/50 border-b border-r border-slate-100" />;
+              if (!day) return <div key={i} className="min-h-[120px] bg-surface-container-low/10 border-b border-r border-surface-container/50" />;
               const isToday = isSameDay(day, today);
               const appts = appointmentsOnDay(day as Date);
               const blocks = blocksOnDay(day as Date);
@@ -248,18 +248,18 @@ export function AppointmentCalendar({ appointments, timeBlocks: initialBlocks, t
                 <div
                   key={i}
                   onClick={() => handleDayClick(day)}
-                  className={`min-h-[110px] p-2 border-b border-r border-slate-100 cursor-pointer group transition-all ${
-                    isPast ? "bg-slate-50/60" : "bg-white hover:bg-blue-50/30"
+                  className={`min-h-[120px] p-2 border-b border-r border-surface-container/50 cursor-pointer group transition-all ${
+                    isPast ? "bg-surface-container-low/5 opacity-60" : "bg-white hover:bg-secondary-container/10"
                   }`}
                 >
-                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium mb-1.5 transition ${
-                    isToday ? "bg-blue-600 text-white shadow" : "text-slate-700 group-hover:bg-blue-100 group-hover:text-blue-700"
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mb-2 transition-all ${
+                    isToday ? "bg-primary text-on-primary shadow-lg shadow-primary/20" : "text-on-surface-variant group-hover:bg-primary-container/20 group-hover:text-primary"
                   }`}>
                     {day.getDate()}
                   </div>
-                  <div className="space-y-0.5">
+                  <div className="space-y-1">
                     {blocks.map((b: TimeBlock) => (
-                      <div key={b.id} className="text-xs px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 truncate font-medium">
+                      <div key={b.id} className="text-[10px] px-2 py-0.5 rounded-full bg-outline-variant text-on-surface-variant truncate font-bold uppercase tracking-tighter">
                         🚫 {b.title}
                       </div>
                     ))}
@@ -267,13 +267,15 @@ export function AppointmentCalendar({ appointments, timeBlocks: initialBlocks, t
                       <div
                         key={a.id}
                         onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSelectedAppointment(a); }}
-                        className={`text-xs px-1.5 py-0.5 rounded text-white truncate font-medium cursor-pointer hover:opacity-90 ${statusColor(a.status)}`}
+                        className={`text-[10px] px-2 py-0.5 rounded-full truncate font-bold uppercase tracking-tighter cursor-pointer hover:shadow-sm transition-shadow ${
+                          a.status === "confirmed" ? "bg-primary text-on-primary" : "bg-secondary-container text-primary border border-primary/10"
+                        }`}
                       >
                         {formatTime(new Date(a.scheduled_at))} {a.service_name || "Appt"}
                       </div>
                     ))}
                     {appts.length > 3 && (
-                      <div className="text-xs text-slate-400 font-medium px-1">+{appts.length - 3} more</div>
+                      <div className="text-[10px] text-outline font-bold px-2 uppercase">+{appts.length - 3} more</div>
                     )}
                   </div>
                 </div>
@@ -285,27 +287,27 @@ export function AppointmentCalendar({ appointments, timeBlocks: initialBlocks, t
 
       {/* Week View */}
       {view === "week" && (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="grid grid-cols-8 border-b border-slate-200">
-            <div className="py-3 text-xs text-slate-400 text-center" />
+        <div className="bg-surface-container-lowest rounded-3xl shadow-sm border border-surface-container overflow-hidden flex flex-col">
+          <div className="grid grid-cols-8 border-b border-surface-container bg-surface-container-low/30">
+            <div className="py-4 border-r border-surface-container/50" />
             {weekDays.map(d => {
               const isToday = isSameDay(d, today);
               return (
-                <div key={d.toISOString()} className={`py-3 text-center ${isToday ? "bg-blue-50" : ""}`}>
-                  <p className="text-xs font-medium text-slate-400 uppercase">{DAYS[d.getDay()]}</p>
-                  <div className={`mx-auto mt-0.5 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${isToday ? "bg-blue-600 text-white" : "text-slate-700"}`}>
+                <div key={d.toISOString()} className={`py-4 text-center border-r border-surface-container/50 ${isToday ? "bg-primary-container/5" : ""}`}>
+                  <p className="text-[10px] font-bold text-outline uppercase tracking-widest">{DAYS[d.getDay()]}</p>
+                  <div className={`mx-auto mt-1 w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all ${isToday ? "bg-primary text-on-primary shadow-lg shadow-primary/20" : "text-on-surface"}`}>
                     {d.getDate()}
                   </div>
                 </div>
               );
             })}
           </div>
-          <div className="grid grid-cols-8 overflow-y-auto max-h-[600px]">
+          <div className="grid grid-cols-8 overflow-y-auto max-h-[600px] custom-scrollbar">
             {/* Time gutter */}
-            <div className="border-r border-slate-100">
+            <div className="border-r border-surface-container/50 bg-surface-container-low/10">
               {HOURS.map(h => (
-                <div key={h} className="h-14 flex items-start justify-end pr-2 pt-1 border-b border-slate-50">
-                  <span className="text-xs text-slate-400">{h}:00</span>
+                <div key={h} className="h-16 flex items-start justify-end pr-3 pt-2 border-b border-surface-container/30">
+                  <span className="text-[10px] font-bold text-outline uppercase">{h}:00</span>
                 </div>
               ))}
             </div>
@@ -316,10 +318,10 @@ export function AppointmentCalendar({ appointments, timeBlocks: initialBlocks, t
                 <div
                   key={d.toISOString()}
                   onClick={() => handleDayClick(d)}
-                  className={`relative border-r border-slate-100 cursor-pointer ${isToday ? "bg-blue-50/20" : "hover:bg-slate-50/50"}`}
+                  className={`relative border-r border-surface-container/50 cursor-pointer transition-all ${isToday ? "bg-primary-container/5" : "hover:bg-secondary-container/5"}`}
                 >
                   {HOURS.map(h => (
-                    <div key={h} className="h-14 border-b border-slate-50" />
+                    <div key={h} className="h-16 border-b border-surface-container/30" />
                   ))}
                   {items.map((item, idx) => (
                     <div
@@ -329,8 +331,12 @@ export function AppointmentCalendar({ appointments, timeBlocks: initialBlocks, t
                         if (item.type === "appointment") setSelectedAppointment(item.data as Appointment);
                       }}
                       style={{ top: `${item.top}%`, height: `${item.height}%` }}
-                      className={`absolute inset-x-0.5 rounded text-white text-xs px-1 py-0.5 overflow-hidden font-medium z-10 ${
-                        item.type === "block" ? "bg-slate-300 text-slate-600" : statusColor((item.data as Appointment).status)
+                      className={`absolute inset-x-1 rounded-xl shadow-sm text-[10px] px-2 py-1.5 overflow-hidden font-bold uppercase tracking-tighter z-10 transition-all hover:scale-[1.02] hover:shadow-md ${
+                        item.type === "block" 
+                          ? "bg-outline-variant text-on-surface-variant border-l-4 border-outline" 
+                          : item.data.status === "confirmed" 
+                            ? "bg-primary text-on-primary border-l-4 border-primary-fixed" 
+                            : "bg-secondary-container text-primary border-l-4 border-primary border border-primary/10"
                       }`}
                     >
                       {item.type === "appointment"
@@ -348,68 +354,68 @@ export function AppointmentCalendar({ appointments, timeBlocks: initialBlocks, t
 
       {/* Block Time Modal */}
       {showBlockModal && selectedDay && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-            <div className="p-6 border-b border-slate-100">
-              <h3 className="text-lg font-bold text-slate-900">Block Time Slot</h3>
-              <p className="text-sm text-slate-500 mt-0.5">
+        <div className="fixed inset-0 bg-on-background/40 backdrop-blur-md flex items-center justify-center z-[100] p-4">
+          <div className="bg-surface-container-lowest rounded-3xl shadow-2xl w-full max-w-md border border-surface-container overflow-hidden">
+            <div className="p-8 border-b border-surface-container bg-surface-container-low/30">
+              <h3 className="text-xl font-bold text-primary">Block Time Slot</h3>
+              <p className="text-sm text-outline font-medium mt-1">
                 {selectedDay.toLocaleDateString("en-ZA", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
               </p>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-8 space-y-6">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Reason</label>
+                <label className="block text-[10px] font-bold text-primary uppercase tracking-widest mb-2">Reason</label>
                 <input
                   type="text"
                   value={blockTitle}
                   onChange={e => setBlockTitle(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-2xl text-sm focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
                   placeholder="e.g. Unavailable, Lunch, Training"
                 />
               </div>
-              <div className="flex items-center gap-2">
-                <input type="checkbox" id="allday" checked={blockAllDay} onChange={e => setBlockAllDay(e.target.checked)} className="rounded text-blue-600" />
-                <label htmlFor="allday" className="text-sm text-slate-700 font-medium">Block entire day</label>
+              <div className="flex items-center gap-3 bg-secondary-container/20 p-4 rounded-2xl border border-primary/10">
+                <input type="checkbox" id="allday" checked={blockAllDay} onChange={e => setBlockAllDay(e.target.checked)} className="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary" />
+                <label htmlFor="allday" className="text-sm text-primary font-bold uppercase tracking-wider cursor-pointer">Block entire day</label>
               </div>
               {!blockAllDay && (
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Start time</label>
-                    <input type="time" value={blockStartTime} onChange={e => setBlockStartTime(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+                    <label className="block text-[10px] font-bold text-primary uppercase tracking-widest mb-2">Start time</label>
+                    <input type="time" value={blockStartTime} onChange={e => setBlockStartTime(e.target.value)} className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-2xl text-sm focus:ring-2 focus:ring-primary outline-none" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">End time</label>
-                    <input type="time" value={blockEndTime} onChange={e => setBlockEndTime(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+                    <label className="block text-[10px] font-bold text-primary uppercase tracking-widest mb-2">End time</label>
+                    <input type="time" value={blockEndTime} onChange={e => setBlockEndTime(e.target.value)} className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-2xl text-sm focus:ring-2 focus:ring-primary outline-none" />
                   </div>
                 </div>
               )}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Notes (optional)</label>
+                <label className="block text-[10px] font-bold text-primary uppercase tracking-widest mb-2">Notes (optional)</label>
                 <textarea
                   value={blockNotes}
                   onChange={e => setBlockNotes(e.target.value)}
                   rows={2}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-2xl text-sm focus:ring-2 focus:ring-primary outline-none resize-none"
                   placeholder="Additional details..."
                 />
               </div>
 
               {blocksOnDay(selectedDay).length > 0 && (
-                <div>
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Existing blocks</p>
-                  <div className="space-y-1.5">
+                <div className="pt-4 border-t border-surface-container">
+                  <p className="text-[10px] font-bold text-outline uppercase tracking-widest mb-4">Existing blocks</p>
+                  <div className="space-y-3">
                     {blocksOnDay(selectedDay).map(b => (
-                      <div key={b.id} className="flex items-center justify-between bg-slate-50 rounded-lg px-3 py-2">
+                      <div key={b.id} className="flex items-center justify-between bg-surface-container-low/50 rounded-2xl px-4 py-3 border border-outline-variant/20">
                         <div>
-                          <p className="text-sm font-medium text-slate-700">{b.title}</p>
-                          <p className="text-xs text-slate-400">{b.all_day ? "All day" : `${formatTime(new Date(b.start_at))} – ${formatTime(new Date(b.end_at))}`}</p>
+                          <p className="text-sm font-bold text-on-surface">{b.title}</p>
+                          <p className="text-xs text-outline font-medium uppercase tracking-tighter">{b.all_day ? "All day" : `${formatTime(new Date(b.start_at))} – ${formatTime(new Date(b.end_at))}`}</p>
                         </div>
                         <button
                           onClick={() => deleteBlock(b.id)}
                           disabled={deletingBlock === b.id}
-                          className="text-red-500 hover:text-red-700 p-1 rounded transition disabled:opacity-40"
+                          className="text-error hover:bg-error-container/50 p-2 rounded-full transition-all disabled:opacity-40"
                         >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                          <span className="material-symbols-outlined text-lg">delete</span>
                         </button>
                       </div>
                     ))}
@@ -417,9 +423,9 @@ export function AppointmentCalendar({ appointments, timeBlocks: initialBlocks, t
                 </div>
               )}
             </div>
-            <div className="p-6 pt-0 flex gap-3">
-              <button onClick={() => setShowBlockModal(false)} className="flex-1 py-2.5 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition">Cancel</button>
-              <button onClick={saveBlock} disabled={saving || !blockTitle} className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition disabled:opacity-50">
+            <div className="p-8 pt-0 flex gap-4 bg-surface-container-low/10">
+              <button onClick={() => setShowBlockModal(false)} className="flex-1 py-4 border border-outline-variant text-outline rounded-full text-xs font-bold uppercase tracking-widest hover:bg-surface-container-high transition-all">Cancel</button>
+              <button onClick={saveBlock} disabled={saving || !blockTitle} className="flex-1 py-4 bg-primary text-on-primary rounded-full text-xs font-bold uppercase tracking-widest shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all disabled:opacity-50">
                 {saving ? "Saving..." : "Block time"}
               </button>
             </div>
@@ -429,39 +435,57 @@ export function AppointmentCalendar({ appointments, timeBlocks: initialBlocks, t
 
       {/* Appointment Detail Modal */}
       {selectedAppointment && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm">
-            <div className="p-6 border-b border-slate-100 flex items-start justify-between">
+        <div className="fixed inset-0 bg-on-background/40 backdrop-blur-md flex items-center justify-center z-[100] p-4">
+          <div className="bg-surface-container-lowest rounded-3xl shadow-2xl w-full max-w-sm border border-surface-container overflow-hidden">
+            <div className="p-8 border-b border-surface-container bg-surface-container-low/30 flex items-start justify-between">
               <div>
-                <h3 className="text-lg font-bold text-slate-900">{selectedAppointment.service_name || "Appointment"}</h3>
-                <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium border ${statusBadge(selectedAppointment.status)}`}>
+                <h3 className="text-xl font-bold text-primary leading-tight">{selectedAppointment.service_name || "Appointment"}</h3>
+                <span className={`inline-block mt-2 px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border shadow-sm ${statusBadge(selectedAppointment.status)}`}>
                   {selectedAppointment.status}
                 </span>
               </div>
-              <button onClick={() => setSelectedAppointment(null)} className="text-slate-400 hover:text-slate-600 p-1 rounded transition">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              <button onClick={() => setSelectedAppointment(null)} className="text-outline hover:text-on-surface-variant p-2 rounded-full hover:bg-surface-container-high transition-all">
+                <span className="material-symbols-outlined">close</span>
               </button>
             </div>
-            <div className="p-6 space-y-3">
-              <div className="flex items-center gap-2 text-sm text-slate-600">
-                <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                {new Date(selectedAppointment.scheduled_at).toLocaleString("en-ZA", { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+            <div className="p-8 space-y-6">
+              <div className="flex items-center gap-4 text-sm font-medium text-on-surface-variant">
+                <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+                  <span className="material-symbols-outlined">calendar_today</span>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-primary uppercase tracking-widest">Scheduled At</p>
+                  <p className="text-on-surface mt-0.5">
+                    {new Date(selectedAppointment.scheduled_at).toLocaleString("en-ZA", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                  </p>
+                </div>
               </div>
               {selectedAppointment.duration_minutes && (
-                <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  {selectedAppointment.duration_minutes} minutes
+                <div className="flex items-center gap-4 text-sm font-medium text-on-surface-variant">
+                  <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+                    <span className="material-symbols-outlined">schedule</span>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-primary uppercase tracking-widest">Duration</p>
+                    <p className="text-on-surface mt-0.5">{selectedAppointment.duration_minutes} minutes</p>
+                  </div>
                 </div>
               )}
               {(selectedAppointment.patient_name || selectedAppointment.patient_phone) && (
-                <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                  {selectedAppointment.patient_name || selectedAppointment.patient_phone}
+                <div className="flex items-center gap-4 text-sm font-medium text-on-surface-variant">
+                  <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+                    <span className="material-symbols-outlined">person</span>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-primary uppercase tracking-widest">Patient</p>
+                    <p className="text-on-surface mt-0.5 font-bold">{selectedAppointment.patient_name || "Unknown Name"}</p>
+                    <p className="text-xs text-outline">{selectedAppointment.patient_phone}</p>
+                  </div>
                 </div>
               )}
             </div>
-            <div className="p-6 pt-0">
-              <button onClick={() => setSelectedAppointment(null)} className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-sm font-medium transition">Close</button>
+            <div className="p-8 pt-0">
+              <button onClick={() => setSelectedAppointment(null)} className="w-full py-4 bg-primary text-on-primary rounded-full text-xs font-bold uppercase tracking-widest shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all">Close</button>
             </div>
           </div>
         </div>

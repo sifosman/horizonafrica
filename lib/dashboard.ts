@@ -57,5 +57,6 @@ export const dashboardLinks = [
   { href: "/appointments", label: "Appointments" },
   { href: "/leads", label: "Leads" },
   { href: "/kb", label: "Knowledge Base" },
+  { href: "/team", label: "Team" },
   { href: "/settings", label: "Settings" },
 ];

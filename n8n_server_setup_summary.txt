@@ -1,0 +1,66 @@
+n8n Server Setup Summary
+==========================
+
+Server Details:
+- Provider: Absolute Hosting (South Africa)
+- Package: EPYC Turin VPS Silver
+- IP Address: 102.202.192.36
+- Hostname: HorizonAfrica.Server
+- Root Username: root
+- Root Password: RYc9wieScdR=
+- Monthly Cost: R229/month (incl. VAT)
+
+n8n Access:
+- URL: https://n8n.horizonafrica.co.za/
+- Status: Online and running with valid SSL certificate
+- SSL Certificate: Issued by Let's Encrypt, auto-renewed by Caddy
+- First Login: You will be prompted to create an owner account on first visit
+
+Important Notes:
+1. Visit https://n8n.horizonafrica.co.za/ in your browser
+2. On first launch, n8n will ask you to create an owner account
+3. Set a strong email and password for the owner account
+4. Once the owner account is created, the setup is complete
+
+Server Management Commands:
+- Restart n8n: cd /opt/n8n && docker compose restart
+- Update n8n: cd /opt/n8n && docker compose pull && docker compose up -d
+- View logs: cd /opt/n8n && docker compose logs -f
+- View n8n logs only: cd /opt/n8n && docker compose logs -f n8n
+- View Caddy logs: cd /opt/n8n && docker compose logs -f caddy
+- Stop all services: cd /opt/n8n && docker compose down
+- Start all services: cd /opt/n8n && docker compose up -d
+
+Installed Software:
+- Ubuntu 24.04
+- Docker Engine
+- Docker Compose
+- n8n (latest) with PostgreSQL 16
+- Caddy 2 (reverse proxy + SSL)
+- UFW firewall
+- fail2ban
+
+Firewall Configuration:
+- SSH (port 22): ALLOW
+- HTTP (port 80): ALLOW
+- HTTPS (port 443): ALLOW
+- n8n direct port (5678): localhost only (not exposed publicly)
+
+Docker Files:
+- /opt/n8n/docker-compose.yml
+- /opt/n8n/Caddyfile
+- /opt/n8n/n8n_data (n8n persistent data)
+- /opt/n8n/postgres_data (database)
+- /opt/n8n/caddy_data (SSL certificates)
+- /opt/n8n/caddy_config (Caddy config)
+
+Timezone: Africa/Johannesburg
+
+Database Password: n8n_db_password_2026
+n8n Encryption Key: HzN8nEncryptionKey2026SecureString
+
+Support Contact:
+- Mohamed Osman - OWD Solutions
+- 065 847 5289 | mohamed@owdsolutions.co.za
+
+Setup completed: 2026-06-30

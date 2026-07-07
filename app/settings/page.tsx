@@ -32,38 +32,49 @@ export default async function SettingsPage() {
       description="Review clinic operating settings that will drive scheduling, reminders, and automation."
       currentPath="/settings"
     >
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
-          <div>
-            <p className="text-sm text-slate-500">Clinic slug</p>
-            <p className="font-medium text-slate-900">{tenant?.slug || "Not set"}</p>
-          </div>
-          <div>
-            <p className="text-sm text-slate-500">WhatsApp number</p>
-            <p className="font-medium text-slate-900">{tenant?.whatsapp_number || "Not connected yet"}</p>
-          </div>
-          <div>
-            <p className="text-sm text-slate-500">Auto booking</p>
-            <p className="font-medium text-slate-900">{tenant?.auto_booking_enabled ? "Enabled" : "Disabled"}</p>
-          </div>
-          <div>
-            <p className="text-sm text-slate-500">Deposit policy</p>
-            <p className="font-medium text-slate-900">
-              {tenant?.deposit_required
-                ? `Required${tenant.deposit_amount ? ` · R${(tenant.deposit_amount / 100).toFixed(2)}` : ""}`
-                : "No deposit required"}
-            </p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-surface-container-lowest rounded-3xl shadow-sm border border-surface-container p-8 space-y-6">
+          <h3 className="text-xl font-bold text-primary mb-2">Clinic Profile</h3>
+          <div className="space-y-4">
+            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20">
+              <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Clinic slug</p>
+              <p className="font-bold text-on-surface">{tenant?.slug || "Not set"}</p>
+            </div>
+            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20">
+              <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">WhatsApp number</p>
+              <p className="font-bold text-on-surface">{tenant?.whatsapp_number || "Not connected yet"}</p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20">
+                <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Auto booking</p>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${tenant?.auto_booking_enabled ? "bg-primary/10 text-primary" : "bg-outline-variant text-outline"}`}>
+                  {tenant?.auto_booking_enabled ? "Active" : "Disabled"}
+                </span>
+              </div>
+              <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20">
+                <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Deposit policy</p>
+                <p className="text-sm font-bold text-on-surface">
+                  {tenant?.deposit_required
+                    ? `R${(tenant.deposit_amount ? tenant.deposit_amount / 100 : 0).toFixed(2)}`
+                    : "No deposit"}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
-          <div>
-            <p className="text-sm text-slate-500 mb-2">Business hours</p>
-            <pre className="bg-slate-50 rounded-lg p-4 text-xs text-slate-700 overflow-x-auto">{formatJson(tenant?.business_hours)}</pre>
+        <div className="space-y-8">
+          <div className="bg-surface-container-lowest rounded-3xl shadow-sm border border-surface-container p-8">
+            <h3 className="text-xl font-bold text-primary mb-4">Business Hours</h3>
+            <div className="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/20">
+              <pre className="text-[11px] font-mono text-on-surface-variant overflow-x-auto leading-relaxed">{formatJson(tenant?.business_hours)}</pre>
+            </div>
           </div>
-          <div>
-            <p className="text-sm text-slate-500 mb-2">Reminder schedule</p>
-            <pre className="bg-slate-50 rounded-lg p-4 text-xs text-slate-700 overflow-x-auto">{formatJson(tenant?.reminder_schedule)}</pre>
+          <div className="bg-surface-container-lowest rounded-3xl shadow-sm border border-surface-container p-8">
+            <h3 className="text-xl font-bold text-primary mb-4">Reminder Schedule</h3>
+            <div className="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/20">
+              <pre className="text-[11px] font-mono text-on-surface-variant overflow-x-auto leading-relaxed">{formatJson(tenant?.reminder_schedule)}</pre>
+            </div>
           </div>
         </div>
       </div>

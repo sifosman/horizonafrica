@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OWD Aesthetics | Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'DM Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(247, 232, 227, 0.5);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #eedfdb;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-fixed-variant": "#4e4541",
+                      "tertiary": "#615e56",
+                      "secondary-fixed-dim": "#d1c4bf",
+                      "on-error": "#ffffff",
+                      "outline": "#7f7667",
+                      "secondary": "#665c58",
+                      "surface-container-high": "#eae8e4",
+                      "on-error-container": "#93000a",
+                      "secondary-fixed": "#eedfdb",
+                      "on-tertiary-fixed": "#1d1c15",
+                      "on-primary-container": "#4e3700",
+                      "inverse-on-surface": "#f2f0ed",
+                      "on-tertiary": "#ffffff",
+                      "outline-variant": "#d1c5b4",
+                      "inverse-surface": "#30312e",
+                      "on-primary": "#ffffff",
+                      "on-primary-fixed": "#261900",
+                      "surface-container-highest": "#e4e2de",
+                      "surface-dim": "#dbdad6",
+                      "surface-variant": "#e4e2de",
+                      "on-tertiary-container": "#3d3b34",
+                      "error-container": "#ffdad6",
+                      "on-surface-variant": "#4e4639",
+                      "on-tertiary-fixed-variant": "#49473f",
+                      "on-secondary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-container": "#6d625e",
+                      "primary-fixed": "#ffdea5",
+                      "tertiary-container": "#a9a59c",
+                      "error": "#ba1a1a",
+                      "surface-bright": "#fbf9f5",
+                      "surface-container-low": "#f5f3ef",
+                      "surface-container": "#efeeea",
+                      "secondary-container": "#eedfdb",
+                      "on-primary-fixed-variant": "#5d4201",
+                      "on-secondary-fixed": "#211a17",
+                      "background": "#fbf9f5",
+                      "surface": "#fbf9f5",
+                      "on-surface": "#1b1c1a",
+                      "surface-tint": "#775a19",
+                      "on-background": "#1b1c1a",
+                      "primary-container": "#c5a059",
+                      "tertiary-fixed-dim": "#cac6bc",
+                      "primary-fixed-dim": "#e9c176",
+                      "tertiary-fixed": "#e7e2d8",
+                      "inverse-primary": "#e9c176",
+                      "primary": "#775a19"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "section-gap": "64px",
+                      "container-padding-desktop": "40px",
+                      "container-padding-mobile": "20px",
+                      "gutter": "24px",
+                      "base": "8px"
+              },
+              "fontFamily": {
+                      "body-md": ["DM Sans"],
+                      "title-md": ["DM Sans"],
+                      "display-lg": ["DM Sans"],
+                      "label-md": ["DM Sans"],
+                      "body-lg": ["DM Sans"],
+                      "headline-lg": ["DM Sans"],
+                      "headline-lg-mobile": ["DM Sans"]
+              },
+              "fontSize": {
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "500"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-surface text-on-surface flex overflow-hidden h-screen">
+<!-- SideNavBar Shell -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-surface-container-lowest shadow-md flex flex-col py-8 space-y-2 z-50">
+<div class="px-6 mb-10">
+<h1 class="font-headline-lg text-headline-lg font-medium text-primary">OWD Aesthetics</h1>
+<p class="font-label-md text-label-md tracking-widest uppercase text-outline mt-1">Luxury Wellness</p>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="bg-secondary-container text-primary border-l-4 border-primary font-bold px-4 py-3 flex items-center gap-base transition-all" href="index.html">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="text-on-surface-variant px-4 py-3 flex items-center gap-base hover:bg-secondary-container/20 transition-colors" href="bookings.html">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-body-md text-body-md">Bookings</span>
+</a>
+<a class="text-on-surface-variant px-4 py-3 flex items-center gap-base hover:bg-secondary-container/20 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-body-md text-body-md">Clients</span>
+</a>
+<a class="text-on-surface-variant px-4 py-3 flex items-center gap-base hover:bg-secondary-container/20 transition-colors" href="conversations.html">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+<span class="font-body-md text-body-md">Conversations</span>
+</a>
+<a class="text-on-surface-variant px-4 py-3 flex items-center gap-base hover:bg-secondary-container/20 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
+<span class="font-body-md text-body-md">Reports</span>
+</a>
+<a class="text-on-surface-variant px-4 py-3 flex items-center gap-base hover:bg-secondary-container/20 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</nav>
+<div class="px-6 py-4 mt-auto">
+<div class="flex items-center gap-3 p-3 rounded-xl bg-surface-container-low">
+<img alt="Clinician Profile" class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="Professional headshot of a smiling healthcare practitioner in a minimalist clinic environment. The practitioner is wearing a pristine white uniform. The background consists of soft warm lighting, neutral cream walls, and gold accent trim, reflecting a luxury wellness brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB09FFmyrnQHR1nBJhNnWCOyQGo9OhY7PRVDY_GGV1n73Yz_Ow_5TFon3_R8iukVInmOUPrwPJCN-TMq9lrMT8QDc1KdFK_1Pk_jNYZpMEPj5UQB96vb1dq0PC_UyF_In2fSbII_ZSOhlI7EhOY_AKY0l3cU1JFE-PBsVZpf_q-tDnBG-PqjvUIQbPNUWAUxhhWhJgRFOVo3bJSFOq9-h_GI6oqgtwVF6Vatg1deSbbxLXpILeGjyHPPn2Q6NJJCTAFKI-g49hWLGY"/>
+<div>
+<p class="font-body-md text-body-md font-bold text-on-surface">Asif Osman</p>
+<p class="text-[10px] text-outline uppercase tracking-wider">Owner</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 flex-1 flex flex-col h-screen overflow-hidden">
+<!-- TopAppBar Shell -->
+<header class="flex justify-between items-center w-full px-container-desktop h-20 bg-surface-container-low shadow-sm z-40 sticky top-0">
+<div class="flex items-center gap-4">
+<h2 class="font-title-md text-title-md font-bold text-primary">Overview</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary-container/10 border border-primary-container/20">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-md text-label-md text-primary">AI Active</span>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<button class="p-2 rounded-full hover:bg-secondary-container/50 transition-all">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-secondary-container/50 transition-all">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Scrollable Dashboard Content -->
+<div class="flex-1 overflow-y-auto px-container-desktop py-base bg-surface custom-scrollbar">
+<!-- Hero Greeting & Quick Actions -->
+<section class="mt-base mb-12 flex flex-col md:flex-row md:items-end justify-between gap-gutter">
+<div>
+<h3 class="font-display-lg text-display-lg text-primary mb-2">Welcome back, Asif.</h3>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Your clinic is thriving today. Here is what’s happening.</p>
+</div>
+<div class="flex flex-wrap gap-4">
+<button class="h-12 px-8 bg-primary text-on-primary rounded-full font-body-md text-body-md shadow-lg shadow-primary/20 hover:scale-105 transition-transform flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+                        New Booking
+                    </button>
+<button class="h-12 px-8 bg-secondary-container text-primary rounded-full font-body-md text-body-md hover:bg-secondary-container/80 transition-all flex items-center gap-2" onclick="window.location.href='conversations.html'">
+<span class="material-symbols-outlined text-[20px]" data-icon="mail">mail</span>
+                        Send Message
+                    </button>
+<button class="h-12 px-8 bg-surface-container-lowest border border-outline-variant text-on-surface-variant rounded-full font-body-md text-body-md hover:bg-surface-container-high transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]" data-icon="assessment">assessment</span>
+                        View Reports
+                    </button>
+</div>
+</section>
+<!-- KPI Cards Bento Grid -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+<div class="bg-surface-container-lowest p-6 rounded-3xl shadow-sm border border-surface-container hover:shadow-md transition-shadow">
+<p class="font-label-md text-label-md text-outline uppercase tracking-wider mb-4">Today's Bookings</p>
+<div class="flex items-baseline gap-2">
+<h4 class="font-display-lg text-display-lg text-primary">12</h4>
+<span class="text-primary-container text-body-md">+2 from yesterday</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-3xl shadow-sm border border-surface-container hover:shadow-md transition-shadow">
+<p class="font-label-md text-label-md text-outline uppercase tracking-wider mb-4">Pending Requests</p>
+<div class="flex items-baseline gap-2">
+<h4 class="font-display-lg text-display-lg text-error">04</h4>
+<span class="text-error text-body-md">Action Required</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-3xl shadow-sm border border-surface-container hover:shadow-md transition-shadow cursor-pointer" onclick="window.location.href='conversations.html'">
+<p class="font-label-md text-label-md text-outline uppercase tracking-wider mb-4">WhatsApp Chats</p>
+<div class="flex items-baseline gap-2">
+<h4 class="font-display-lg text-display-lg text-on-surface">08</h4>
+<span class="text-on-surface-variant text-body-md">AI Handled 6</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-3xl shadow-sm border border-surface-container hover:shadow-md transition-shadow bg-gradient-to-br from-primary/5 to-transparent">
+<p class="font-label-md text-label-md text-outline uppercase tracking-wider mb-4">Revenue Today</p>
+<div class="flex items-baseline gap-2">
+<h4 class="font-display-lg text-display-lg text-primary">R15,400</h4>
+</div>
+</div>
+</section>
+<!-- Main Interactive Area: Appointments & Conversations -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-gutter mb-section-gap">
+<!-- Appointments List (2 Columns) -->
+<section class="xl:col-span-2 flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<h5 class="font-headline-lg text-headline-lg text-primary">Today's Appointments</h5>
+<p class="font-body-md text-body-md text-outline">Wednesday, 24 May 2024</p>
+</div>
+<div class="bg-surface-container-lowest rounded-3xl p-8 shadow-sm">
+<div class="space-y-6">
+<!-- Appointment Row 1 -->
+<div class="group flex items-start gap-6 p-4 rounded-2xl hover:bg-secondary-container/20 transition-all border-l-4 border-primary">
+<div class="w-16 pt-1">
+<p class="font-title-md text-title-md text-primary">09:00</p>
+<p class="font-label-md text-label-md text-outline">60m</p>
+</div>
+<div class="flex-1">
+<p class="font-body-lg text-body-lg font-bold text-on-surface">Lerato M.</p>
+<p class="font-body-md text-body-md text-on-surface-variant">HydraFacial Signature</p>
+</div>
+<div class="pt-1">
+<span class="px-4 py-1.5 rounded-full bg-secondary-container text-primary font-label-md text-label-md">Confirmed</span>
+</div>
+<button class="opacity-0 group-hover:opacity-100 p-2 rounded-full hover:bg-primary/10 text-primary transition-all">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<!-- Appointment Row 2 -->
+<div class="group flex items-start gap-6 p-4 rounded-2xl hover:bg-secondary-container/20 transition-all border-l-4 border-outline-variant">
+<div class="w-16 pt-1">
+<p class="font-title-md text-title-md text-on-surface-variant">10:30</p>
+<p class="font-label-md text-label-md text-outline">30m</p>
+</div>
+<div class="flex-1">
+<p class="font-body-lg text-body-lg font-bold text-on-surface">Johan S.</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Botox Consultation</p>
+</div>
+<div class="pt-1">
+<span class="px-4 py-1.5 rounded-full bg-surface-container-high text-outline font-label-md text-label-md">Pending</span>
+</div>
+<button class="opacity-0 group-hover:opacity-100 p-2 rounded-full hover:bg-primary/10 text-primary transition-all">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<!-- Appointment Row 3 -->
+<div class="group flex items-start gap-6 p-4 rounded-2xl hover:bg-secondary-container/20 transition-all border-l-4 border-primary">
+<div class="w-16 pt-1">
+<p class="font-title-md text-title-md text-primary">11:30</p>
+<p class="font-label-md text-label-md text-outline">45m</p>
+</div>
+<div class="flex-1">
+<p class="font-body-lg text-body-lg font-bold text-on-surface">Sarah K.</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Chemical Peel (Medium)</p>
+</div>
+<div class="pt-1">
+<span class="px-4 py-1.5 rounded-full bg-secondary-container text-primary font-label-md text-label-md">Confirmed</span>
+</div>
+<button class="opacity-0 group-hover:opacity-100 p-2 rounded-full hover:bg-primary/10 text-primary transition-all">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+<div class="mt-8 text-center">
+<button class="text-primary font-label-md text-label-md uppercase tracking-widest hover:underline transition-all" onclick="window.location.href='bookings.html'">View Full Calendar</button>
+</div>
+</div>
+</section>
+<!-- Sidebar column: WhatsApp & AI Feed -->
+<aside class="flex flex-col gap-gutter">
+<!-- Recent Conversations -->
+<div class="bg-surface-container-lowest rounded-3xl p-6 shadow-sm border border-surface-container flex flex-col">
+<div class="flex items-center justify-between mb-6">
+<h5 class="font-title-md text-title-md text-primary">Conversations</h5>
+<span class="material-symbols-outlined text-primary" data-icon="chat">chat</span>
+</div>
+<div class="space-y-4">
+<!-- Chat 1 -->
+<div class="p-4 rounded-2xl bg-surface-container-low hover:shadow-md transition-shadow cursor-pointer border border-transparent hover:border-primary-container/20" onclick="window.location.href='conversations.html'">
+<div class="flex justify-between items-start mb-2">
+<p class="font-body-md text-body-md font-bold text-on-surface">Thandi N.</p>
+<span class="text-[10px] text-outline">5m ago</span>
+</div>
+<p class="text-body-md text-on-surface-variant line-clamp-1 mb-3">"Can I book for Friday?"</p>
+<span class="px-3 py-1 rounded-full bg-primary/10 text-primary font-label-md text-[10px] uppercase">AI Handled</span>
+</div>
+<!-- Chat 2 -->
+<div class="p-4 rounded-2xl bg-surface-container-low hover:shadow-md transition-shadow cursor-pointer border-2 border-primary-container/30" onclick="window.location.href='conversations.html'">
+<div class="flex justify-between items-start mb-2">
+<p class="font-body-md text-body-md font-bold text-on-surface">Pieter V.</p>
+<span class="text-[10px] text-outline">12m ago</span>
+</div>
+<p class="text-body-md text-on-surface-variant line-clamp-1 mb-3">"I have a rash..."</p>
+<span class="px-3 py-1 rounded-full bg-error-container text-on-error-container font-label-md text-[10px] uppercase">Needs Human Review</span>
+</div>
+</div>
+<button class="mt-6 w-full py-3 rounded-full border border-outline-variant text-outline font-body-md text-body-md hover:bg-surface-container-high transition-all" onclick="window.location.href='conversations.html'">
+                            View All Chats
+                        </button>
+</div>
+<!-- AI Activity Feed -->
+<div class="bg-surface-container-low/50 rounded-3xl p-6 border border-surface-container">
+<p class="font-label-md text-label-md text-outline uppercase tracking-wider mb-6">AI Activity Feed</p>
+<div class="space-y-4">
+<div class="flex gap-4">
+<div class="w-2 h-2 rounded-full bg-primary mt-2"></div>
+<div>
+<p class="font-body-md text-body-md text-on-surface">Replied to Sarah — availability query</p>
+<p class="text-[11px] text-outline">2 min ago</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="w-2 h-2 rounded-full bg-primary mt-2"></div>
+<div>
+<p class="font-body-md text-body-md text-on-surface">Confirmed booking for Lerato</p>
+<p class="text-[11px] text-outline">15 min ago</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</main>
+<!-- Simple Atmospheric Effect Script -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add subtle hover tracking for glass cards
+            const cards = document.querySelectorAll('.glass-card');
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    card.style.setProperty('--mouse-x', `${x}px`);
+                    card.style.setProperty('--mouse-y', `${y}px`);
+                });
+            });
+        });
+    </script>
+</body></html>

@@ -7,7 +7,7 @@ export default async function ConversationsPage() {
   if (!staff?.tenant_id) {
     return (
       <DashboardShell clinicName="Dashboard" role="staff" title="Conversations" description="Access Denied" currentPath="/conversations">
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 text-center py-12 text-slate-500">
+        <div className="bg-surface-container-lowest rounded-3xl p-12 shadow-sm border border-surface-container text-center text-outline">
           Staff account details not found. Please contact support.
         </div>
       </DashboardShell>
@@ -37,56 +37,93 @@ export default async function ConversationsPage() {
       clinicName={staff.tenants?.name ?? "Dashboard"}
       role={staff.role}
       title="Conversations"
-      description="Review inbound and outbound WhatsApp conversations, intent tags, and AI model usage."
+      description="Review inbound and outbound WhatsApp conversations handled by your AI assistant."
       currentPath="/conversations"
     >
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100">
-          <h3 className="font-semibold text-slate-900">Recent Messages</h3>
+      <div className="bg-surface-container-lowest rounded-3xl shadow-sm border border-surface-container overflow-hidden">
+        <div className="px-8 py-6 border-b border-surface-container bg-surface-container-low/30">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold text-primary">Recent Activity</h3>
+            <div className="flex gap-2">
+              <span className="bg-primary text-on-primary px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase">Live Feed</span>
+            </div>
+          </div>
         </div>
+        
         {conversations?.length ? (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-surface-container">
             {conversations.map((conversation) => {
               const patient = conversation.patient_id ? patientLookup.get(conversation.patient_id) : null;
+              const isInbound = conversation.message_direction === "inbound";
+              
               return (
-                <div key={conversation.id} className="px-6 py-4 space-y-2">
-                  <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
-                    <div>
-                      <p className="font-medium text-slate-900">
-                        {patient?.name || patient?.phone_number || "Unknown contact"}
-                      </p>
-                      <p className="text-sm text-slate-500">
-                        {new Date(conversation.created_at).toLocaleString("en-ZA")}
-                      </p>
+                <div key={conversation.id} className="px-8 py-6 hover:bg-surface-container-low/20 transition-all group">
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div className="flex gap-4">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-sm ${
+                        isInbound ? "bg-secondary-container text-primary" : "bg-primary text-on-primary"
+                      }`}>
+                        <span className="material-symbols-outlined">
+                          {isInbound ? "arrow_downward" : "arrow_upward"}
+                        </span>
+                      </div>
+                      <div className="overflow-hidden">
+                        <p className="font-bold text-on-surface truncate">
+                          {patient?.name || patient?.phone_number || "Guest contact"}
+                        </p>
+                        <p className="text-xs text-on-surface-variant font-medium mt-0.5">
+                          {new Date(conversation.created_at).toLocaleString("en-ZA", { 
+                            hour: '2-digit', 
+                            minute: '2-digit',
+                            day: 'numeric',
+                            month: 'short'
+                          })}
+                        </p>
+                      </div>
                     </div>
+                    
                     <div className="flex flex-wrap gap-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        conversation.message_direction === "inbound"
-                          ? "bg-blue-100 text-blue-700"
-                          : "bg-emerald-100 text-emerald-700"
+                      {conversation.intent_detected && (
+                        <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-primary-container/20 text-primary border border-primary/10">
+                          {conversation.intent_detected}
+                        </span>
+                      )}
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase ${
+                        isInbound ? "bg-blue-100 text-blue-700" : "bg-emerald-100 text-emerald-700"
                       }`}>
                         {conversation.message_direction}
                       </span>
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+                      <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-surface-container-high text-on-surface-variant">
                         {conversation.message_type}
                       </span>
-                      {conversation.intent_detected ? (
-                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-violet-100 text-violet-700">
-                          {conversation.intent_detected}
-                        </span>
-                      ) : null}
                     </div>
                   </div>
-                  <p className="text-sm text-slate-700 whitespace-pre-wrap">{conversation.content || "No content captured"}</p>
-                  {conversation.llm_model_used ? (
-                    <p className="text-xs text-slate-400">Model: {conversation.llm_model_used}</p>
-                  ) : null}
+
+                  <div className={`mt-4 p-4 rounded-2xl text-sm leading-relaxed border ${
+                    isInbound 
+                      ? "bg-white border-outline-variant/30 text-on-surface" 
+                      : "bg-primary-container/10 border-primary/10 text-on-primary-container"
+                  }`}>
+                    {conversation.content || <span className="italic opacity-50">No content available</span>}
+                  </div>
+
+                  {conversation.llm_model_used && (
+                    <div className="mt-3 flex items-center gap-1.5 ml-1">
+                      <span className="material-symbols-outlined text-[14px] text-primary">auto_awesome</span>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-primary/60">
+                        AI Response via {conversation.llm_model_used}
+                      </p>
+                    </div>
+                  )}
                 </div>
               );
             })}
           </div>
         ) : (
-          <div className="px-6 py-12 text-sm text-slate-400 text-center">No conversations logged yet.</div>
+          <div className="px-6 py-20 text-center flex flex-col items-center gap-4">
+            <span className="material-symbols-outlined text-4xl text-outline opacity-20">chat_bubble</span>
+            <p className="text-outline italic font-medium">No conversations logged yet.</p>
+          </div>
         )}
       </div>
     </DashboardShell>

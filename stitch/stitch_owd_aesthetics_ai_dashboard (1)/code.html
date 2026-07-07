@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Conversations | OWD Aesthetics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-background": "#1b1c1a",
+                    "surface-variant": "#e4e2de",
+                    "on-tertiary": "#ffffff",
+                    "on-surface": "#1b1c1a",
+                    "surface-container-low": "#f5f3ef",
+                    "surface-tint": "#775a19",
+                    "on-primary-fixed-variant": "#5d4201",
+                    "on-primary-fixed": "#261900",
+                    "tertiary-fixed": "#e7e2d8",
+                    "outline": "#7f7667",
+                    "tertiary-container": "#a9a59c",
+                    "on-surface-variant": "#4e4639",
+                    "tertiary-fixed-dim": "#cac6bc",
+                    "surface-container-high": "#eae8e4",
+                    "on-tertiary-container": "#3d3b34",
+                    "primary-container": "#c5a059",
+                    "on-error-container": "#93000a",
+                    "surface-container-lowest": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "outline-variant": "#d1c5b4",
+                    "on-secondary-container": "#6d625e",
+                    "on-tertiary-fixed-variant": "#49473f",
+                    "on-primary-container": "#4e3700",
+                    "secondary-fixed": "#eedfdb",
+                    "on-secondary-fixed": "#211a17",
+                    "inverse-surface": "#30312e",
+                    "surface-bright": "#fbf9f5",
+                    "primary-fixed-dim": "#e9c176",
+                    "on-secondary": "#ffffff",
+                    "inverse-primary": "#e9c176",
+                    "surface-dim": "#dbdad6",
+                    "surface": "#fbf9f5",
+                    "background": "#fbf9f5",
+                    "on-secondary-fixed-variant": "#4e4541",
+                    "secondary-fixed-dim": "#d1c4bf",
+                    "primary": "#775a19",
+                    "on-primary": "#ffffff",
+                    "secondary-container": "#eedfdb",
+                    "inverse-on-surface": "#f2f0ed",
+                    "secondary": "#665c58",
+                    "error": "#ba1a1a",
+                    "on-error": "#ffffff",
+                    "surface-container-highest": "#e4e2de",
+                    "tertiary": "#615e56",
+                    "primary-fixed": "#ffdea5",
+                    "surface-container": "#efeeea",
+                    "on-tertiary-fixed": "#1d1c15"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "section-gap": "64px",
+                    "container-padding-desktop": "40px",
+                    "container-padding-mobile": "20px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "title-md": ["DM Sans"],
+                    "display-lg": ["DM Sans"],
+                    "headline-lg-mobile": ["DM Sans"],
+                    "body-md": ["DM Sans"],
+                    "body-lg": ["DM Sans"],
+                    "headline-lg": ["DM Sans"],
+                    "label-md": ["DM Sans"]
+            },
+            "fontSize": {
+                    "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'DM Sans', sans-serif; background-color: #fbf9f5; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .chat-scroll::-webkit-scrollbar { width: 4px; }
+        .chat-scroll::-webkit-scrollbar-track { background: transparent; }
+        .chat-scroll::-webkit-scrollbar-thumb { background: #d1c5b4; border-radius: 10px; }
+        .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.7); }
+    </style>
+</head>
+<body class="bg-background text-on-surface overflow-hidden">
+<!-- Sidebar (Shared Component) -->
+<aside class="h-screen w-72 fixed left-0 top-0 bg-surface-container-lowest border-r border-outline-variant/30 flex flex-col py-8 z-50">
+<div class="px-8 mb-10">
+<h1 class="font-title-md text-title-md text-primary font-bold">OWD Aesthetics</h1>
+<p class="text-on-surface-variant text-sm">Luxury Wellness</p>
+</div>
+<nav class="flex-1 px-4 space-y-2">
+<a class="flex items-center gap-4 text-on-surface-variant px-6 py-3 hover:text-primary transition-all duration-300 rounded-full" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-lg text-body-lg">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant px-6 py-3 hover:text-primary transition-all duration-300 rounded-full" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-body-lg text-body-lg">Bookings</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant px-6 py-3 hover:text-primary transition-all duration-300 rounded-full" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-lg text-body-lg">Clients</span>
+</a>
+<!-- Active Tab -->
+<a class="flex items-center gap-4 bg-secondary-container text-on-secondary-container rounded-full px-6 py-3 font-medium border-l-4 border-primary shadow-sm" href="#">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-body-lg text-body-lg">Conversations</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant px-6 py-3 hover:text-primary transition-all duration-300 rounded-full" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-body-lg text-body-lg">Reports</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant px-6 py-3 hover:text-primary transition-all duration-300 rounded-full" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-lg text-body-lg">Settings</span>
+</a>
+</nav>
+<div class="px-4 mt-auto">
+<button class="w-full bg-primary text-on-primary rounded-full py-4 px-6 flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform">
+<span class="material-symbols-outlined">add</span>
+<span class="font-body-lg text-body-lg font-medium">New Appointment</span>
+</button>
+<div class="mt-8 pt-6 border-t border-outline-variant/30">
+<a class="flex items-center gap-4 text-on-surface-variant px-6 py-3 hover:text-primary transition-all duration-300 rounded-full" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-body-lg text-body-lg">Help Center</span>
+</a>
+</div>
+</div>
+</aside>
+<main class="ml-72 flex flex-col h-screen">
+<!-- TopAppBar (Shared Component) -->
+<header class="w-full sticky top-0 bg-surface shadow-sm flex justify-between items-center px-gutter py-4 z-40">
+<div class="flex items-center gap-8">
+<h2 class="font-display-lg text-2xl text-primary tracking-tight font-bold">Conversations</h2>
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="bg-surface-container-low border-none rounded-full pl-10 pr-6 py-2 text-sm w-80 focus:ring-1 focus:ring-primary transition-all" placeholder="Search chats..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">contact_support</span>
+</button>
+<div class="h-10 w-10 rounded-full overflow-hidden border border-outline-variant/30 cursor-pointer">
+<img alt="Clinic Manager Profile" class="w-full h-full object-cover" data-alt="A professional headshot of a sophisticated clinic manager in a high-end medical spa environment. She is wearing a soft cream-colored blazer, looking warm and approachable with soft directional lighting. The background is slightly blurred showing a minimalist, luxury clinic interior with gold accents and warm neutral tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKgh7cFej-9PIr-ggEj6MwGapoaV17Sw_DffPfzO0bwYuq1PX3QEqaB8bZ4v-YgZkMDdS-GyyIjDDWcWKLV0wXNvnezCwy_USjGpBUv8Ewa5kr4LmvEuUbvXAGU4wvuu1NBtQzA9AHQexxHKwgOrqJ5rwLIK6978Z2utRLQFZ5S_jFKgxsAxfXqBcDEqpiFGYakTIv2M1niZzCcF2TN0cIZvZcnYE0B9GnqlLpIS8D5lbmQKZmwBFd_3cjPjEPsr0OXJCPjuzivPo"/>
+</div>
+</div>
+</header>
+<!-- Messaging Interface -->
+<div class="flex flex-1 overflow-hidden">
+<!-- Left Pane: Chat List -->
+<section class="w-96 flex flex-col bg-surface border-r border-outline-variant/30 chat-scroll overflow-y-auto">
+<div class="p-6 sticky top-0 bg-surface z-10">
+<div class="flex gap-2">
+<span class="bg-primary text-on-primary px-4 py-1.5 rounded-full text-xs font-medium cursor-pointer">All Chats</span>
+<span class="bg-surface-container-high text-on-surface-variant px-4 py-1.5 rounded-full text-xs font-medium cursor-pointer hover:bg-secondary-container hover:text-on-secondary-container transition-colors">Needs Review (2)</span>
+</div>
+</div>
+<!-- Chat Items -->
+<div class="flex flex-col">
+<!-- Active Chat Item -->
+<div class="px-6 py-5 bg-secondary-container border-l-4 border-primary flex gap-4 cursor-pointer transition-colors relative">
+<div class="relative shrink-0">
+<img alt="Thandi N." class="w-14 h-14 rounded-full object-cover shadow-sm" data-alt="Close up portrait of a stylish woman with a serene expression, illuminated by soft warm light. The image has a clean, editorial aesthetic, fitting for a luxury wellness brand. Neutral background with soft textures." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaEr4baWpLI17cYnAhfKQ_ncMuSGGDyt4obKZjrQLMcqAM_b2wLfwkTd4MEEBnSvn__qmvJnMie3TIg_fKrrLERHD6awqRJNLeOiFTXN4P8nu7euKJxPP65oXCw0Xg1YUKi33grXm9-mfY3uj9lEJniQ-Ifsl2P3VrF4m7NbCRRhAl3bsv0D3QTbnU64jzQRTxAmYNSPpMajIDkrpYfflOZtSGFrbOArZNS2IWPVOMylNIhftGDJkMXYaSP6FOjZ1gHGWQSKC1XeQ"/>
+<span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></span>
+</div>
+<div class="flex-1 overflow-hidden">
+<div class="flex justify-between items-baseline mb-1">
+<h4 class="font-bold text-on-surface truncate">Thandi N.</h4>
+<span class="text-[11px] text-on-surface-variant font-medium">10:24 AM</span>
+</div>
+<p class="text-sm text-on-secondary-container truncate font-medium">"Is Friday at 3pm still open?"</p>
+<div class="mt-2 flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+<span class="text-[10px] uppercase tracking-wider font-bold text-error">Needs Review</span>
+</div>
+</div>
+</div>
+<!-- Other Chat Items -->
+<div class="px-6 py-5 hover:bg-surface-container-low transition-colors flex gap-4 cursor-pointer">
+<div class="shrink-0">
+<img alt="Sarah J." class="w-14 h-14 rounded-full object-cover grayscale opacity-80" data-alt="A portrait of a woman in a bright, airy setting, her skin looks glowing and healthy. The lighting is soft and natural, emphasizing the professional skincare results. Modern and clean aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsHD7BYkwAcb8ti3nVC1TdNNiLjkuizP7EX_0LGW9TFfO0Yn1h1d6FxQQwYAXiB0S_xYVrxthp6KhAZ2VqjYEN7rxGU8kkhMdeCptXwHOtO8vod5CuYeHPtE9xKJWyd1cwbLZ2YU2Ppeegq1QiG6sAcag9kKds52AKBv6IvyVaOiJEvv6uPRs1oh_zCTGrGK6Stiyx3oSjwtjYdqXXoaMKuBqheFyw-AuuOKM9AZ-4GYqwW8FfuizECqK-EXkdBloeN5K0jEurYVo"/>
+</div>
+<div class="flex-1 overflow-hidden">
+<div class="flex justify-between items-baseline mb-1">
+<h4 class="font-medium text-on-surface truncate">Sarah Jenkins</h4>
+<span class="text-[11px] text-on-surface-variant">Yesterday</span>
+</div>
+<p class="text-sm text-on-surface-variant truncate">"Thank you! The results are amazing."</p>
+<div class="mt-2 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px] text-primary">auto_awesome</span>
+<span class="text-[10px] uppercase tracking-wider font-bold text-primary/60">AI Handled</span>
+</div>
+</div>
+</div>
+<div class="px-6 py-5 hover:bg-surface-container-low transition-colors flex gap-4 cursor-pointer">
+<div class="shrink-0">
+<img alt="Marcus T." class="w-14 h-14 rounded-full object-cover grayscale opacity-80" data-alt="Elegant portrait of a man with clean, groomed appearance. The lighting is sophisticated and calm, highlighting a natural skin texture. High-end luxury photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxundppsRmHrcQnKjpy_vBZ5yHySpI8CAq0R_Rbs69LS6_3S72IzHtuvPDw1MWxUKoVKtQ7AtnHo6QrI4_lMQuUxqCFVsWEdZ0nK0SyMZ5GBdBcaadqTajhxywsxi2MqudMZikyquskmvsU6pyRvYySxq500CSLAz_wUQowM4V6dn-jihw799rfJ_ZurklgPo_FKHTLQdP_c29BISOXVqYzkisGhBbN46T9DpTure2pUIA4kc2kR-vPfTAfnVS5trqgLp5i9UJUGw"/>
+</div>
+<div class="flex-1 overflow-hidden">
+<div class="flex justify-between items-baseline mb-1">
+<h4 class="font-medium text-on-surface truncate">Marcus Thorne</h4>
+<span class="text-[11px] text-on-surface-variant">Wednesday</span>
+</div>
+<p class="text-sm text-on-surface-variant truncate">"Confirming my appointment for..."</p>
+<div class="mt-2 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px] text-primary">auto_awesome</span>
+<span class="text-[10px] uppercase tracking-wider font-bold text-primary/60">AI Handled</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Center Pane: Active Chat Window -->
+<section class="flex-1 flex flex-col bg-surface-container-low">
+<!-- Chat Header -->
+<div class="px-8 py-5 bg-surface border-b border-outline-variant/30 flex justify-between items-center shadow-sm">
+<div class="flex items-center gap-4">
+<div class="flex flex-col">
+<h3 class="font-bold text-on-surface">Thandi N.</h3>
+<div class="flex items-center gap-2">
+<span class="text-xs text-on-surface-variant">Active 2m ago</span>
+<span class="text-[10px] bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full font-bold">WHATSAPP</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="bg-surface-container-lowest border border-outline-variant/50 text-on-surface px-4 py-2 rounded-full text-sm font-medium hover:bg-surface transition-all flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-sm">person_off</span>
+                            Take Over from AI
+                        </button>
+</div>
+</div>
+<!-- Chat History -->
+<div class="flex-1 overflow-y-auto chat-scroll p-8 flex flex-col gap-6">
+<!-- Client Message -->
+<div class="flex flex-col items-start max-w-[80%]">
+<div class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm text-on-surface text-sm leading-relaxed">
+                            Hello OWD! I wanted to check if you still have that 3pm opening this Friday for the HydraFacial? I'm finally back in town!
+                        </div>
+<span class="text-[10px] text-on-surface-variant mt-2 ml-1">10:21 AM</span>
+</div>
+<!-- AI Automated Response -->
+<div class="flex flex-col items-end max-w-[80%] self-end">
+<div class="bg-primary-container/20 border border-primary/10 p-4 rounded-2xl rounded-tr-none shadow-sm text-on-primary-container text-sm leading-relaxed">
+<div class="flex items-center gap-1.5 mb-2">
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-primary">AI Assistant</span>
+</div>
+                            Hi Thandi! Welcome back. Let me check the schedule for you... Yes, Friday at 3:00 PM is currently available with Sarah. Would you like me to reserve that slot for you?
+                        </div>
+<span class="text-[10px] text-on-surface-variant mt-2 mr-1">10:22 AM</span>
+</div>
+<!-- Recent Client Message - Waiting for Human -->
+<div class="flex flex-col items-start max-w-[80%]">
+<div class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm text-on-surface text-sm leading-relaxed border-2 border-primary/20">
+                            Perfect! Yes, please book it. Also, could I add a collagen boost to that treatment?
+                        </div>
+<div class="mt-3 flex items-center gap-3">
+<span class="text-[10px] text-on-surface-variant">10:24 AM</span>
+<div class="px-2 py-1 bg-error/10 text-error text-[10px] font-bold rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">warning</span>
+                                AI PAUSED: HUMAN REVIEW NEEDED
+                            </div>
+</div>
+</div>
+</div>
+<!-- Message Input -->
+<div class="p-8 bg-surface border-t border-outline-variant/30">
+<div class="relative bg-surface-container-low rounded-2xl p-4 shadow-inner border border-outline-variant/20">
+<textarea class="w-full bg-transparent border-none focus:ring-0 text-on-surface text-sm resize-none h-12" placeholder="Type a message or use '/' for templates..." rows="2"></textarea>
+<div class="flex justify-between items-center mt-2 pt-2 border-t border-outline-variant/30">
+<div class="flex gap-2">
+<button class="p-2 hover:bg-surface-container-high rounded-lg text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">attachment</span>
+</button>
+<button class="p-2 hover:bg-surface-container-high rounded-lg text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">mood</span>
+</button>
+<button class="p-2 hover:bg-surface-container-high rounded-lg text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">image</span>
+</button>
+</div>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-full text-sm font-medium flex items-center gap-2 shadow-md hover:shadow-lg transition-all active:scale-95">
+                                Send Message
+                                <span class="material-symbols-outlined text-sm">send</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Pane: Client Profile Summary -->
+<section class="w-80 bg-surface border-l border-outline-variant/30 flex flex-col p-8 overflow-y-auto chat-scroll">
+<div class="flex flex-col items-center mb-8">
+<div class="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-white shadow-xl">
+<img alt="Thandi N." class="w-full h-full object-cover" data-alt="High-resolution professional portrait of a woman in her late 20s with glowing skin and a gentle smile. She is in a luxurious wellness setting with soft bokeh background. Warm, golden hour lighting enhances the elegant and calm mood of the clinic environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7sQND9ZBoOEVwVUeYCMTTgzGByzXu8VqFAt-BsybQ7N5H8LcKoZGedKTPEN_zbbVCIGvbqwjYUSeRMRAIVfySxY4jANRVvuWUKqF0XPFuR16tutxMIbm_Lm_WQxPhnMLw1jgfv4bAx_w8DNdInfOZHqWG8QB4SiWhZV-SyLgyeuF5pshl91bVPJ6Ggxy156y_QRwcOu-tkOX2f74I7qr-h5qHGZA3KjzFgoUbcC_2_VWgmmQuz6SrBAFJkx_-sAFkdjjBUilM5Gk"/>
+</div>
+<h3 class="font-bold text-xl text-on-surface">Thandi N.</h3>
+<p class="text-sm text-on-surface-variant font-medium">Premium Member</p>
+</div>
+<div class="space-y-6">
+<div>
+<h4 class="text-[10px] uppercase tracking-widest font-bold text-primary mb-3">Contact Details</h4>
+<div class="space-y-3">
+<div class="flex items-center gap-3 text-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-lg">call</span>
+<span class="text-on-surface">+27 82 555 0123</span>
+</div>
+<div class="flex items-center gap-3 text-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-lg">mail</span>
+<span class="text-on-surface">thandi.n@example.com</span>
+</div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-low rounded-xl border border-outline-variant/20 shadow-sm">
+<h4 class="text-[10px] uppercase tracking-widest font-bold text-primary mb-2">Last Service</h4>
+<p class="text-sm font-bold text-on-surface">Dermaplaning + LED Therapy</p>
+<p class="text-xs text-on-surface-variant mt-1">October 14, 2023 • $140.00</p>
+</div>
+<div>
+<h4 class="text-[10px] uppercase tracking-widest font-bold text-primary mb-3">Staff Notes</h4>
+<div class="bg-secondary-container/30 p-4 rounded-xl text-xs text-on-secondary-container leading-relaxed italic border border-outline-variant/30">
+                            "Prefers lukewarm water during rinsing. Always uses Sarah. Interested in new Morpheus8 treatments next month."
+                        </div>
+</div>
+<div class="pt-6 space-y-3 border-t border-outline-variant/30">
+<button class="w-full py-4 bg-primary text-on-primary rounded-full text-sm font-bold shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">event_available</span>
+                            Book Appointment
+                        </button>
+<button class="w-full py-4 bg-secondary-container text-on-secondary-container rounded-full text-sm font-bold hover:bg-surface-container-high transition-all flex items-center justify-center gap-2 border border-outline-variant/30">
+<span class="material-symbols-outlined">receipt_long</span>
+                            Send Invoice
+                        </button>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Micro-interaction script -->
+<script>
+        document.querySelectorAll('nav a, button, section div').forEach(el => {
+            el.addEventListener('click', (e) => {
+                // Subtle tactile feedback simulated
+            });
+        });
+
+        // Simple typing effect for AI simulation
+        const textarea = document.querySelector('textarea');
+        textarea.addEventListener('focus', () => {
+            textarea.parentElement.classList.add('ring-1', 'ring-primary');
+        });
+        textarea.addEventListener('blur', () => {
+            textarea.parentElement.classList.remove('ring-1', 'ring-primary');
+        });
+    </script>
+</body></html>

@@ -1,7 +1,7 @@
 from supabase import create_client
 
-SUPABASE_URL = "https://fohutiwjeizctiuquqtf.supabase.co"
-SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvaHV0aXdqZWl6Y3RpdXF1cXRmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Njc2NDA4OSwiZXhwIjoyMDkyMzQwMDg5fQ.zJ_TRNMp6cyOlKWbBEapOl37xc5nnY_03QUipFLmd64"
+SUPABASE_URL = "https://tchulrhxvsnzzdfibcnq.supabase.co"
+SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRjaHVscnh4dnNuenpkZmliY25xIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTUzMDM0NywiZXhwIjoyMDk3MTA2MzQ3fQ.tmO7SQqAIWhXizdOBUyuBvC9qkVkWz6Ido_5o6SF_xE"
 
 print("Testing table access...")
 supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)

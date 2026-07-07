@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Leads Management - Horizon Africa</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-primary": "#ffb95f",
+                        "on-surface": "#131b2e",
+                        "secondary": "#006a61",
+                        "outline": "#867461",
+                        "tertiary": "#00658b",
+                        "surface-container": "#eaedff",
+                        "primary-container": "#f59e0b",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#1abdff",
+                        "on-primary-fixed": "#2a1700",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#d8c3ad",
+                        "secondary-container": "#86f2e4",
+                        "error-container": "#ffdad6",
+                        "primary": "#855300",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#7fd0ff",
+                        "surface-container-high": "#e2e7ff",
+                        "surface": "#faf8ff",
+                        "surface-variant": "#dae2fd",
+                        "primary-fixed-dim": "#ffb95f",
+                        "on-background": "#131b2e",
+                        "surface-container-highest": "#dae2fd",
+                        "secondary-fixed-dim": "#6bd8cb",
+                        "surface-tint": "#855300",
+                        "surface-container-low": "#f2f3ff",
+                        "on-primary-fixed-variant": "#653e00",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#004c6a",
+                        "primary-fixed": "#ffddb8",
+                        "surface-bright": "#faf8ff",
+                        "inverse-on-surface": "#eef0ff",
+                        "on-secondary-container": "#006f66",
+                        "on-primary-container": "#613b00",
+                        "on-tertiary-fixed": "#001e2d",
+                        "inverse-surface": "#283044",
+                        "on-tertiary-container": "#004966",
+                        "on-secondary-fixed-variant": "#005049",
+                        "background": "#faf8ff",
+                        "on-secondary-fixed": "#00201d",
+                        "on-surface-variant": "#534434",
+                        "surface-dim": "#d2d9f4",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#c5e7ff",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#89f5e7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "stack-lg": "24px",
+                        "stack-sm": "8px",
+                        "margin-page": "32px",
+                        "container-max": "1440px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex overflow-hidden">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-screen w-[260px] bg-inverse-surface border-r border-outline-variant shadow-sm z-50 flex flex-col h-full py-stack-lg px-stack-md hidden md:flex">
+<div class="mb-stack-lg px-4">
+<h1 class="font-display-lg text-display-lg font-bold text-primary-fixed">Horizon Africa</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Enterprise Sales</p>
+</div>
+<button class="mb-stack-lg bg-primary-container text-white font-label-md text-label-md py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-opacity-90 transition-colors shadow-sm">
+<span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+            New Broadcast
+        </button>
+<div class="flex-1 flex flex-col gap-2">
+<!-- Overview -->
+<a class="flex items-center gap-3 px-4 py-3 text-surface-variant hover:text-white hover:bg-surface-container-highest transition-all rounded-lg font-label-md text-label-md group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
+                Overview
+            </a>
+<!-- Leads (Active) -->
+<a class="flex items-center gap-3 px-4 py-3 bg-surface-container-highest text-on-surface rounded-lg transition-all scale-[0.98] duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+                Leads
+            </a>
+<!-- Conversations -->
+<a class="flex items-center gap-3 px-4 py-3 text-surface-variant hover:text-white hover:bg-surface-container-highest transition-all rounded-lg font-label-md text-label-md group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">chat</span>
+                Conversations
+            </a>
+<!-- Broadcasts -->
+<a class="flex items-center gap-3 px-4 py-3 text-surface-variant hover:text-white hover:bg-surface-container-highest transition-all rounded-lg font-label-md text-label-md group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">campaign</span>
+                Broadcasts
+            </a>
+<!-- Settings -->
+<a class="flex items-center gap-3 px-4 py-3 text-surface-variant hover:text-white hover:bg-surface-container-highest transition-all rounded-lg font-label-md text-label-md group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">settings</span>
+                Settings
+            </a>
+</div>
+<div class="mt-auto flex flex-col gap-2 pt-stack-md border-t border-outline-variant/20">
+<a class="flex items-center gap-3 px-4 py-3 text-surface-variant hover:text-white hover:bg-surface-container-highest transition-all rounded-lg font-label-md text-label-md group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">help</span>
+                Help Center
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-surface-variant hover:text-white hover:bg-surface-container-highest transition-all rounded-lg font-label-md text-label-md group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">logout</span>
+                Logout
+            </a>
+</div>
+</nav>
+<!-- TopAppBar -->
+<header class="fixed top-0 right-0 h-[64px] left-[260px] bg-surface border-b border-outline-variant flex justify-between items-center px-margin-page z-40 hidden md:flex">
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" style="font-size: 18px;">search</span>
+<input class="pl-9 pr-4 py-2 bg-surface-container-low border-none rounded-full font-body-sm text-body-sm text-on-surface placeholder-on-surface-variant focus:ring-2 focus:ring-primary focus:outline-none w-64 transition-all" placeholder="Search leads..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-all duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-all duration-200">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="h-8 w-px bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-3 cursor-pointer p-1 pr-3 rounded-full hover:bg-surface-container-low transition-all duration-200">
+<img alt="User Avatar" class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a female sales executive in a modern office setting. Bright, natural lighting, wearing a smart casual blazer. Modern corporate aesthetic, high quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDQHQtFSF9vbjd1735tIuVcW7OSzFQA3JE4mchdjJ8KaeCGQiX80RhkAJBZnMRbAMkGZzYzAmfEqZ-orhjn2knOMsBPaFv_D33wxMtUlyQLaTTiC3U4ER86v0o6jbJhzzrD2oECcXWeAK6SYCs98uz1dumhqxWcpNBmrM2xsfwkZckTpXwJCv0eEmYiyzr8xbM6Z7SlUQe_i0fW6kWduVbGjQ6ZwsyqjcJGG-jjkNosqlGgZEN8fzbyw"/>
+<span class="font-label-md text-label-md text-on-surface">Sign Out</span>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-[260px] mt-[64px] p-margin-page overflow-y-auto bg-surface-container-lowest relative flex">
+<!-- Leads List Section (takes remaining space when drawer is open) -->
+<div class="flex-1 flex flex-col min-w-0 pr-gutter">
+<!-- Page Header & Actions -->
+<div class="flex justify-between items-end mb-stack-lg">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-1">Leads</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Manage and track your prospect pipeline.</p>
+</div>
+<div class="flex items-center gap-3">
+<!-- Status Filter -->
+<div class="relative">
+<select class="appearance-none bg-surface border border-outline-variant rounded-lg pl-3 pr-8 py-2 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer">
+<option value="">All Statuses</option>
+<option value="new">New</option>
+<option value="contacted">Contacted</option>
+<option value="qualified">Qualified</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant" style="font-size: 16px;">expand_more</span>
+</div>
+<!-- Score Filter -->
+<div class="relative">
+<select class="appearance-none bg-surface border border-outline-variant rounded-lg pl-3 pr-8 py-2 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer">
+<option value="">All Scores</option>
+<option value="hot">Hot</option>
+<option value="warm">Warm</option>
+<option value="cold">Cold</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant" style="font-size: 16px;">expand_more</span>
+</div>
+<button class="bg-primary-container text-white font-label-md text-label-md py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-opacity-90 transition-colors shadow-sm">
+<span class="material-symbols-outlined" style="font-size: 18px;">download</span>
+                        Export CSV
+                    </button>
+</div>
+</div>
+<!-- Data Table Container -->
+<div class="bg-surface rounded-xl border border-outline-variant overflow-hidden shadow-sm flex-1 flex flex-col">
+<div class="overflow-x-auto flex-1">
+<table class="w-full text-left border-collapse whitespace-nowrap">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant w-12"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant">Name</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant">Phone</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant">Product Interest</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant">Score</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant">Status</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant">Created Date</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30 font-body-sm text-body-sm">
+<!-- Row 1 (Selected) -->
+<tr class="bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer group">
+<td class="py-3 px-4"><input checked="" class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></td>
+<td class="py-3 px-4 font-medium text-on-surface flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-primary-container text-white flex items-center justify-center font-label-sm text-[10px]">OD</div>
+                                    Oluwaseun Davies
+                                </td>
+<td class="py-3 px-4 text-on-surface-variant">+234 801 234 5678</td>
+<td class="py-3 px-4 text-on-surface-variant">Fibre 100Mbps Enterprise</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary-container text-[#78350F]">HOT</span>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-tertiary-fixed text-on-tertiary-fixed border border-tertiary/20">Qualified</span>
+</td>
+<td class="py-3 px-4 text-on-surface-variant">Oct 24, 2023</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-lowest transition-colors cursor-pointer group bg-surface">
+<td class="py-3 px-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></td>
+<td class="py-3 px-4 font-medium text-on-surface flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-secondary text-white flex items-center justify-center font-label-sm text-[10px]">AN</div>
+                                    Amara Nwachukwu
+                                </td>
+<td class="py-3 px-4 text-on-surface-variant">+234 812 345 6789</td>
+<td class="py-3 px-4 text-on-surface-variant">Fibre 50Mbps Pro</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-inverse-primary text-[#78350F]">WARM</span>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-variant text-on-surface-variant border border-outline-variant">Contacted</span>
+</td>
+<td class="py-3 px-4 text-on-surface-variant">Oct 23, 2023</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-lowest transition-colors cursor-pointer group bg-surface">
+<td class="py-3 px-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></td>
+<td class="py-3 px-4 font-medium text-on-surface flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-tertiary text-white flex items-center justify-center font-label-sm text-[10px]">KM</div>
+                                    Kwame Mensah
+                                </td>
+<td class="py-3 px-4 text-on-surface-variant">+233 24 123 4567</td>
+<td class="py-3 px-4 text-on-surface-variant">SME Broadband Bundle</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-surface-variant text-on-surface-variant">COLD</span>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary-fixed text-on-secondary-fixed border border-secondary/20">New</span>
+</td>
+<td class="py-3 px-4 text-on-surface-variant">Oct 22, 2023</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="bg-surface border-t border-outline-variant p-3 flex justify-between items-center text-body-sm text-on-surface-variant">
+<span>Showing 1 to 3 of 45 leads</span>
+<div class="flex gap-1">
+<button class="p-1 rounded hover:bg-surface-container disabled:opacity-50" disabled=""><span class="material-symbols-outlined" style="font-size: 18px;">chevron_left</span></button>
+<button class="px-2 py-1 rounded bg-surface-container text-on-surface font-medium">1</button>
+<button class="px-2 py-1 rounded hover:bg-surface-container">2</button>
+<button class="px-2 py-1 rounded hover:bg-surface-container">3</button>
+<button class="p-1 rounded hover:bg-surface-container"><span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- Detail Drawer (Right Side) -->
+<aside class="w-[480px] bg-surface rounded-xl border border-outline-variant shadow-sm flex flex-col overflow-hidden transform transition-transform duration-300 translate-x-0 h-full">
+<!-- Drawer Header -->
+<div class="p-stack-md border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest">
+<div class="flex items-center gap-3">
+<button class="text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Lead Details</h3>
+</div>
+<button class="bg-primary text-white font-label-md text-label-md py-1.5 px-3 rounded flex items-center justify-center hover:bg-opacity-90 transition-colors shadow-sm">
+                    Save Changes
+                </button>
+</div>
+<!-- Drawer Content (Scrollable) -->
+<div class="p-stack-lg overflow-y-auto flex-1">
+<!-- Header Profile Info -->
+<div class="flex items-center gap-4 mb-stack-lg pb-stack-md border-b border-outline-variant/30">
+<div class="w-16 h-16 rounded-full bg-primary-container text-white flex items-center justify-center font-headline-md text-headline-md">
+                        OD
+                    </div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Oluwaseun Davies</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined" style="font-size: 14px;">apartment</span>
+                            TechFlow Logistics Ltd.
+                        </p>
+</div>
+</div>
+<!-- Quick Edits (Score & Status) -->
+<div class="grid grid-cols-2 gap-4 mb-stack-lg">
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Lead Score</label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface border border-outline-variant rounded-md pl-3 pr-8 py-2 font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary cursor-pointer">
+<option selected="" value="hot">Hot (High Intent)</option>
+<option value="warm">Warm</option>
+<option value="cold">Cold</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant" style="font-size: 16px;">expand_more</span>
+</div>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Status</label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface border border-outline-variant rounded-md pl-3 pr-8 py-2 font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary cursor-pointer">
+<option value="new">New</option>
+<option value="contacted">Contacted</option>
+<option selected="" value="qualified">Qualified</option>
+<option value="proposal">Proposal Sent</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant" style="font-size: 16px;">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Contact & Company Details -->
+<div class="bg-surface-container-low rounded-lg p-4 mb-stack-lg border border-outline-variant/30">
+<h5 class="font-label-md text-label-md text-on-surface mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-size: 16px;">contact_page</span>
+                        Contact Details
+                    </h5>
+<div class="grid grid-cols-1 gap-y-3">
+<div class="grid grid-cols-[120px_1fr] items-center">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Phone</span>
+<span class="font-body-sm text-body-sm text-on-surface flex items-center justify-between">
+                                +234 801 234 5678
+                                <button class="text-tertiary hover:text-tertiary-container"><span class="material-symbols-outlined" style="font-size: 16px;">content_copy</span></button>
+</span>
+</div>
+<div class="grid grid-cols-[120px_1fr] items-center">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Email</span>
+<span class="font-body-sm text-body-sm text-on-surface flex items-center justify-between">
+                                o.davies@techflow.ng
+                                <button class="text-tertiary hover:text-tertiary-container"><span class="material-symbols-outlined" style="font-size: 16px;">mail</span></button>
+</span>
+</div>
+<div class="grid grid-cols-[120px_1fr] items-center">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Location</span>
+<span class="font-body-sm text-body-sm text-on-surface">Lagos, Nigeria</span>
+</div>
+<div class="grid grid-cols-[120px_1fr] items-center pt-2 border-t border-outline-variant/20 mt-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Interest</span>
+<span class="font-body-sm text-body-sm text-on-surface font-medium">Fibre 100Mbps Enterprise</span>
+</div>
+</div>
+</div>
+<!-- Notes Section -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-size: 16px;">edit_note</span>
+                        Internal Notes
+                    </label>
+<textarea class="w-full h-32 bg-surface border border-outline-variant rounded-lg p-3 font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none" placeholder="Add notes about this lead..."></textarea>
+<div class="flex justify-end mt-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Last updated: Today, 10:45 AM</span>
+</div>
+</div>
+</div>
+</aside>
+</main>
+</body></html>

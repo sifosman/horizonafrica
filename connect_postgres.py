@@ -1,15 +1,15 @@
 import subprocess
 import sys
 
-# Supabase project reference: fohutiwjeizctiuquqtf
+# Supabase project reference: tchulrhxvsnzzdfibcnq
 # Direct database connection string format:
-# postgresql://postgres:[YOUR-PASSWORD]@db.fohutiwjeizctiuquqtf.supabase.co:5432/postgres
+# postgresql://postgres:[YOUR-PASSWORD]@db.tchulrhxvsnzzdfibcnq.supabase.co:5432/postgres
 
 # The service role key is available but we need the database password
 # which is different from the service role key
 
 print("To fix the RLS policies, you need to:")
-print("\n1. Go to: https://supabase.com/dashboard/project/fohutiwjeizctiuquqtf/editor")
+print("\n1. Go to: https://supabase.com/dashboard/project/tchulrhxvsnzzdfibcnq/editor")
 print("\n2. Click on 'SQL Editor' in the left sidebar")
 print("\n3. Create a new query and paste this SQL:")
 print("\n" + "="*70)

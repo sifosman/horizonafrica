@@ -27,3 +27,8 @@ Thumbs.db
 # Environment
 .env.local
 .env.production
+.env.example
+
+# Workflow files with secrets
+horizon-africa/workflow-inbound-ai-v2.json
+backend/.env

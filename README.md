@@ -52,14 +52,14 @@ docker-compose up -d
 ## Environment Variables
 Frontend `.env.local`:
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://fohutiwjeizctiuquqtf.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<key>
+NEXT_PUBLIC_SUPABASE_URL=https://tchulrhxvsnzzdfibcnq.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRjaHVscnh4dnNuenpkZmliY25xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MzAzNDcsImV4cCI6MjA5NzEwNjM0N30.y9hVLeI4F8jPtqq8mUvi0n0ljulYRAawx4eseNJ6tTs
 ```
 
 Backend:
 ```
-SUPABASE_URL=https://fohutiwjeizctiuquqtf.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=<service_role_key>
+SUPABASE_URL=https://tchulrhxvsnzzdfibcnq.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRjaHVscnh4dnNuenpkZmliY25xIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTUzMDM0NywiZXhwIjoyMDk3MTA2MzQ3fQ.tmO7SQqAIWhXizdOBUyuBvC9qkVkWz6Ido_5o6SF_xE
 ```
 
 ## Database Schema

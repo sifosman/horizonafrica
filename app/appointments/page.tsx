@@ -52,18 +52,27 @@ export default async function AppointmentsPage() {
       description="View, manage, and block time slots on your clinic calendar."
       currentPath="/appointments"
     >
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Total</p>
-          <p className="text-3xl font-bold text-slate-900 mt-1">{enrichedAppointments.length}</p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-surface-container-lowest rounded-3xl p-6 shadow-sm border border-surface-container hover:shadow-md transition-shadow">
+          <p className="text-[10px] font-bold text-outline uppercase tracking-widest mb-3">Total Volume</p>
+          <div className="flex items-baseline gap-2">
+            <h4 className="text-4xl font-medium text-on-surface">{enrichedAppointments.length}</h4>
+            <span className="text-outline text-xs uppercase font-bold tracking-tighter">Bookings</span>
+          </div>
         </div>
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Confirmed</p>
-          <p className="text-3xl font-bold text-emerald-600 mt-1">{confirmed}</p>
+        <div className="bg-surface-container-lowest rounded-3xl p-6 shadow-sm border border-surface-container hover:shadow-md transition-shadow">
+          <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-3">Confirmed</p>
+          <div className="flex items-baseline gap-2">
+            <h4 className="text-4xl font-medium text-primary">{confirmed}</h4>
+            <span className="text-primary/60 text-xs uppercase font-bold tracking-tighter">Ready</span>
+          </div>
         </div>
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Deposits Paid</p>
-          <p className="text-3xl font-bold text-blue-600 mt-1">{deposited}</p>
+        <div className="bg-surface-container-lowest rounded-3xl p-6 shadow-sm border border-surface-container hover:shadow-md transition-shadow">
+          <p className="text-[10px] font-bold text-on-primary-container uppercase tracking-widest mb-3">Deposits Paid</p>
+          <div className="flex items-baseline gap-2">
+            <h4 className="text-4xl font-medium text-primary-container">{deposited}</h4>
+            <span className="text-primary-container/60 text-xs uppercase font-bold tracking-tighter">Secured</span>
+          </div>
         </div>
       </div>
 

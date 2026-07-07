@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Email - Hosting Setup Instructions for Horizon Africa</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #202124; line-height: 1.6; max-width: 680px; margin: 0 auto; padding: 20px; }
+    h1 { font-size: 22px; color: #0b1f3b; }
+    h2 { font-size: 18px; color: #0b1f3b; margin-top: 28px; }
+    h3 { font-size: 15px; color: #0a84ff; margin-top: 20px; }
+    p { font-size: 14px; }
+    ol, ul { font-size: 14px; padding-left: 20px; }
+    li { margin-bottom: 8px; }
+    .step { background: #f0f7ff; border: 1px solid #c9e0ff; border-radius: 8px; padding: 14px 18px; margin: 12px 0; }
+    .step h3 { margin-top: 0; }
+    .highlight { background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px; padding: 12px 16px; margin: 16px 0; font-size: 13px; }
+    .info { background: #f5f5f5; border-radius: 8px; padding: 12px 16px; margin: 16px 0; font-size: 13px; }
+    .config-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+    .config-table th, .config-table td { padding: 8px 12px; border-bottom: 1px solid #e0e0e0; text-align: left; }
+    .config-table th { background: #f5f5f5; font-size: 12px; text-transform: uppercase; color: #5f6368; }
+    .config-table td.value { font-weight: 600; }
+    a { color: #0a84ff; }
+    .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid #e0e0e0; font-size: 12px; color: #5f6368; }
+    .copy-instruction { font-size: 13px; color: #5f6368; font-style: italic; }
+  </style>
+</head>
+<body>
+
+  <h1>Server Hosting Setup — Absolute Hosting (South Africa)</h1>
+
+  <p>Hi Keshlan,</p>
+
+  <p>As discussed, we need to set up a cloud server for your WhatsApp AI platform. I've selected <strong>Absolute Hosting</strong> — a South African hosting company with servers in Johannesburg. The package I recommend is their <strong>EPYC Turin VPS Silver</strong> at <strong>R229/month</strong>. Here's why they're a good fit for your project:</p>
+
+  <ul>
+    <li><strong>Local Johannesburg datacenter</strong> — fastest response times for your SA WhatsApp users</li>
+    <li><strong>ZAR billing</strong> — no exchange rate fluctuations, predictable monthly cost</li>
+    <li><strong>Enterprise-grade hardware</strong> — AMD EPYC processors, NVMe SSD storage, DDR5 ECC RAM</li>
+    <li><strong>Backed by Axxess</strong> (one of SA's largest ISPs, established 1997) — stable and well-resourced</li>
+    <li><strong>4.6/5 Google Review rating</strong> with praise for fast, hands-on SA-based support</li>
+    <li><strong>Unlimited bandwidth</strong> — no surprise overage charges</li>
+  </ul>
+
+  <p>The server will be created in <strong>Shavs Telecommunications 24 PTY Ltd T/a Horizon Africa's</strong> name, with your card for billing. This means you own the server and have full control. I'll configure everything on it once it's ready.</p>
+
+  <div class="highlight">
+    <strong>Monthly cost:</strong> R229/month (incl. VAT) for the EPYC Turin VPS Silver package — 2 CPU cores, 4GB RAM, 50GB NVMe storage, and unlimited bandwidth. This is more than enough for the WhatsApp AI platform and live chat system. You can upgrade to a larger package at any time if needed.
+  </div>
+
+  <h2>Step-by-Step Instructions</h2>
+
+  <div class="step">
+    <h3>Step 1: Open the VPS ordering page</h3>
+    <p>Click the link below to go directly to the VPS server packages page:</p>
+    <p><a href="https://client.absolutehosting.co.za/store/amd-vps-boxed-deals">https://client.absolutehosting.co.za/store/amd-vps-boxed-deals</a></p>
+    <p>You'll see several server packages. Look for the one called <strong>"EPYC Turin VPS Silver"</strong> — it should be the first one, priced at <strong>R229.00/month</strong>. Click the <strong>"Order Now"</strong> button under it.</p>
+  </div>
+
+  <div class="step">
+    <h3>Step 2: Choose your operating system</h3>
+    <p>On the configuration page, you'll see a dropdown labelled <strong>"VPS OS Template"</strong>. Click it and select <strong>Ubuntu 24</strong>.</p>
+    <p>Everything else (CPU, RAM, storage, bandwidth) is already set for this package — you don't need to change any sliders or numbers.</p>
+  </div>
+
+  <div class="step">
+    <h3>Step 3: Set server hostname and password</h3>
+    <p>Scroll down to the <strong>"Configure Server"</strong> section:</p>
+    <ul>
+      <li><strong>Hostname:</strong> Type <code>horizon.server</code> (or any name you like)</li>
+      <li><strong>Root Password:</strong> Click the <strong>"Generate Password"</strong> button next to the field. A popup will appear — click <strong>"Copy to clipboard and Insert"</strong>. <strong>Write this password down somewhere safe</strong> — you'll need to send it to me later.</li>
+    </ul>
+  </div>
+
+  <div class="step">
+    <h3>Step 4: Click "Continue"</h3>
+    <p>Scroll to the bottom and click the blue <strong>"Continue"</strong> button. A small popup may appear saying "Added to Cart" — just click <strong>"Continue"</strong> again.</p>
+  </div>
+
+  <div class="step">
+    <h3>Step 5: Create your account</h3>
+    <p>You'll now be on the checkout page. Make sure <strong>"Create a New Account"</strong> is selected (it should be by default). Fill in the following fields:</p>
+
+    <table class="config-table">
+      <tr>
+        <th>Field</th>
+        <th>What to enter</th>
+      </tr>
+      <tr>
+        <td>First Name *</td>
+        <td class="value">Keshlan</td>
+      </tr>
+      <tr>
+        <td>Last Name *</td>
+        <td class="value">Naidoo</td>
+      </tr>
+      <tr>
+        <td>Email Address *</td>
+        <td class="value">keshlannaidoo@gmail.com</td>
+      </tr>
+      <tr>
+        <td>Phone Number *</td>
+        <td class="value">Your phone number</td>
+      </tr>
+      <tr>
+        <td>Company Name (Optional)</td>
+        <td class="value">Shavs Telecommunications 24 PTY Ltd T/a Horizon Africa</td>
+      </tr>
+      <tr>
+        <td>Street Address *</td>
+        <td class="value">Your business address</td>
+      </tr>
+      <tr>
+        <td>City *</td>
+        <td class="value">Your city</td>
+      </tr>
+      <tr>
+        <td>Country *</td>
+        <td class="value">South Africa (should be pre-selected)</td>
+      </tr>
+      <tr>
+        <td>State</td>
+        <td class="value">Your province</td>
+      </tr>
+      <tr>
+        <td>Postcode</td>
+        <td class="value">Your postal code</td>
+      </tr>
+      <tr>
+        <td>Reg # (Optional)</td>
+        <td class="value">Your company registration number</td>
+      </tr>
+      <tr>
+        <td>VAT # (Optional)</td>
+        <td class="value">Your VAT number (if registered)</td>
+      </tr>
+      <tr>
+        <td>Mobile Number</td>
+        <td class="value">Your mobile number</td>
+      </tr>
+      <tr>
+        <td>Password (account login)</td>
+        <td class="value">Choose a password for your hosting account login — write this down too</td>
+      </tr>
+    </table>
+
+    <p class="copy-instruction">The password at the bottom of the form is for logging into your Absolute Hosting account (not the server). Make it something you can remember or save in a password manager.</p>
+  </div>
+
+  <div class="step">
+    <h3>Step 6: Choose payment method</h3>
+    <p>Scroll down to the <strong>"Payment Method"</strong> section. You'll see these options:</p>
+    <ul>
+      <li><strong>Payfast</strong> — instant EFT, card, or Zapper</li>
+      <li><strong>Peach Payments (Debit/Credit Cards)</strong> — Visa/Mastercard</li>
+      <li><strong>Paystack (Debit/Credit Cards)</strong> — Visa/Mastercard</li>
+      <li><strong>Payment via EFT</strong> — manual bank transfer</li>
+    </ul>
+    <p>Select <strong>Peach Payments (Debit/Credit Cards)</strong> or <strong>Paystack (Debit/Credit Cards)</strong> if you want to pay by card. This will set up recurring monthly billing on your card.</p>
+  </div>
+
+  <div class="step">
+    <h3>Step 7: Place the order</h3>
+    <ul>
+      <li>Tick the box that says <strong>"I have read and agree to the Terms of Service"</strong></li>
+      <li>Complete the reCAPTCHA (tick the "I'm not a robot" box)</li>
+      <li>Click the <strong>"Place Order"</strong> button</li>
+    </ul>
+    <p>You'll be redirected to the payment gateway to enter your card details. Once payment goes through, the server will be provisioned automatically within a few minutes.</p>
+  </div>
+
+  <h2>What to send me after setup</h2>
+
+  <div class="info">
+    <p>Once the server is set up and you've received a confirmation email from Absolute Hosting, please send me the following:</p>
+    <ol>
+      <li><strong>Server IP Address</strong> — this will be in the welcome email from Absolute Hosting (a series of numbers like 102.130.x.x)</li>
+      <li><strong>Root Password</strong> — the password that was generated in Step 3 above</li>
+      <li><strong>Your Absolute Hosting account login email and password</strong> — so I can access the control panel if needed</li>
+    </ol>
+    <p>You can email these to <a href="mailto:mohamed@owdsolutions.co.za">mohamed@owdsolutions.co.za</a> or send via WhatsApp.</p>
+  </div>
+
+  <div class="highlight">
+    <strong>Security note:</strong> Once I've finished configuring the server, I'll recommend you change the root password for security. I'll walk you through that when the time comes.
+  </div>
+
+  <h2>If you get stuck</h2>
+
+  <p>If any step is confusing or you're not sure what to click, just call me on <strong>065 847 5289</strong> and I'll talk you through it. The whole process should take about 10–15 minutes.</p>
+
+  <p>Alternatively, Absolute Hosting's support team is available on <strong>012 004 0112</strong> or <a href="mailto:hello@absolutehosting.co.za">hello@absolutehosting.co.za</a> — they're very helpful and can assist with the ordering process.</p>
+
+  <p>Best regards,<br>
+  Mohamed Osman<br>
+  OWD Solutions<br>
+  065 847 5289 | mohamed@owdsolutions.co.za</p>
+
+  <div class="footer">
+    This email contains setup instructions for the Horizon Africa WhatsApp AI Platform server hosting.
+  </div>
+
+</body>
+</html>

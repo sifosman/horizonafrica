@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, Users, MessageSquare, Radio, Settings, X, Plus, HelpCircle, LogOut } from "lucide-react";
+import logo from "@/app/assets/logo.png";
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
@@ -29,17 +31,19 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
         }`}
       >
         {/* Brand Header */}
-        <div className="mb-6 flex items-center gap-3 px-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-container text-sm font-bold text-white shrink-0">
-            HA
-          </div>
-          <div>
-            <h1 className="text-lg font-bold leading-tight text-primary-fixed">Horizon Africa</h1>
-            <p className="text-[11px] text-surface-variant opacity-80">Enterprise Sales</p>
+        <div className="mb-6 flex items-center justify-between px-4">
+          <div className="relative h-12 w-32">
+            <Image
+              src={logo}
+              alt="Horizon Africa"
+              fill
+              className="object-contain"
+              priority
+            />
           </div>
           <button
             onClick={onClose}
-            className="ml-auto text-surface-variant hover:text-white lg:hidden"
+            className="text-surface-variant hover:text-white lg:hidden"
           >
             <X className="h-5 w-5" />
           </button>

@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, Lock, Mail, Eye, EyeOff, ArrowRight, ShieldCheck } from "lucide-react";
+import logo from "@/app/assets/logo.png";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -35,7 +37,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#131b2e] px-4 font-sans text-white">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#001030] px-4 font-sans text-white">
       {/* Dot pattern background */}
       <div
         className="pointer-events-none absolute inset-0 opacity-80"
@@ -46,8 +48,8 @@ export default function LoginPage() {
       />
 
       {/* Atmospheric blur decorations */}
-      <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-primary-container/10 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-tertiary-container/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-primary-container/20 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-secondary-container/20 blur-3xl" />
 
       {/* Login Card */}
       <div className="relative z-10 w-full max-w-md">
@@ -57,8 +59,14 @@ export default function LoginPage() {
         >
           {/* Brand Header */}
           <div className="mb-6 flex flex-col items-center">
-            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary-container text-sm font-bold text-on-primary-container">
-              HA
+            <div className="relative mb-4 h-20 w-40">
+              <Image
+                src={logo}
+                alt="Horizon Africa"
+                fill
+                className="object-contain"
+                priority
+              />
             </div>
             <div className="text-center">
               <h1 className="mb-1 text-2xl font-semibold text-white">Welcome back</h1>

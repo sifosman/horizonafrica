@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, MessageSquare, Radio, Settings, X } from "lucide-react";
+import { LayoutDashboard, Users, MessageSquare, Radio, Settings, X, Plus, HelpCircle, LogOut } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
@@ -24,26 +24,41 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
         />
       )}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 transform border-r border-outline bg-surface transition-transform duration-200 lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 w-[260px] transform border-r border-outline-variant bg-inverse-surface transition-transform duration-200 lg:static lg:translate-x-0 flex flex-col py-6 px-4 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex h-16 items-center justify-between border-b border-outline px-6">
-          <Link href="/dashboard" className="flex items-center gap-2" onClick={onClose}>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600 text-white font-bold text-sm">
-              HA
-            </div>
-            <span className="font-semibold text-on-surface">Horizon Africa</span>
-          </Link>
+        {/* Brand Header */}
+        <div className="mb-6 flex items-center gap-3 px-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-container text-sm font-bold text-white shrink-0">
+            HA
+          </div>
+          <div>
+            <h1 className="text-lg font-bold leading-tight text-primary-fixed">Horizon Africa</h1>
+            <p className="text-[11px] text-surface-variant opacity-80">Enterprise Sales</p>
+          </div>
           <button
             onClick={onClose}
-            className="text-on-surface-variant hover:text-on-surface lg:hidden"
+            className="ml-auto text-surface-variant hover:text-white lg:hidden"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <nav className="flex-1 space-y-1 p-4">
+        {/* New Broadcast CTA */}
+        <div className="mb-6 px-2">
+          <Link
+            href="/broadcasts"
+            onClick={onClose}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary-container py-3 text-xs font-semibold text-on-primary-container transition-all hover:opacity-90"
+          >
+            <Plus className="h-4 w-4" />
+            New Broadcast
+          </Link>
+        </div>
+
+        {/* Navigation Links */}
+        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
             return (
@@ -51,10 +66,10 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
                 key={item.href}
                 href={item.href}
                 onClick={onClose}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
+                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-xs font-semibold transition-all ${
                   isActive
-                    ? "bg-primary-50 text-primary-700"
-                    : "text-on-surface-variant hover:bg-surface-variant hover:text-on-surface"
+                    ? "bg-surface-container-highest text-on-surface"
+                    : "text-surface-variant hover:bg-surface-container-highest hover:text-white"
                 }`}
               >
                 <item.icon className="h-5 w-5" />
@@ -64,13 +79,24 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
           })}
         </nav>
 
-        <div className="border-t border-outline p-4">
-          <p className="text-xs text-on-surface-variant">
-            WhatsApp AI Sales Platform
-          </p>
-          <p className="mt-1 text-xs text-on-surface-variant/60">
-            &copy; 2026 Horizon Africa
-          </p>
+        {/* Footer Links */}
+        <div className="mt-auto flex flex-col gap-1 border-t border-outline-variant/30 pt-4">
+          <Link
+            href="#"
+            className="flex items-center gap-3 rounded-lg px-4 py-3 text-xs font-semibold text-surface-variant transition-all hover:bg-surface-container-highest hover:text-white"
+          >
+            <HelpCircle className="h-5 w-5" />
+            Help Center
+          </Link>
+          <form action="/auth/signout" method="POST">
+            <button
+              type="submit"
+              className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-xs font-semibold text-surface-variant transition-all hover:bg-surface-container-highest hover:text-white"
+            >
+              <LogOut className="h-5 w-5" />
+              Logout
+            </button>
+          </form>
         </div>
       </aside>
     </>

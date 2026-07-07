@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { Conversation, LeadScore } from "@/lib/types";
 import { ScoreBadge } from "@/components/score-badge";
-import { Search, X, MessageSquare, Bot } from "lucide-react";
+import { Search, X, MessageSquare, Bot, Send } from "lucide-react";
 
 interface ConversationViewProps {
   conversations: Conversation[];
@@ -46,31 +46,38 @@ export function ConversationView({ conversations }: ConversationViewProps) {
     : [];
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-on-surface-variant/50" />
-          <input
-            type="text"
-            placeholder="Search by name or phone..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border border-outline bg-surface py-2 pl-10 pr-4 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
-          />
+    <div className="flex h-[calc(100vh-180px)] gap-4">
+      {/* Conversation List Pane */}
+      <div className="flex w-full flex-col rounded-xl border border-surface-variant bg-surface-container-lowest lg:w-[340px] lg:shrink-0">
+        <div className="border-b border-outline-variant/30 p-4">
+          <div className="relative mb-3">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-on-surface-variant/50" />
+            <input
+              type="text"
+              placeholder="Search conversations..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-lg border border-outline-variant bg-surface-container-low py-2.5 pl-10 pr-4 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
+            />
+          </div>
+          <div className="flex gap-2">
+            {scoreOptions.map((s) => (
+              <button
+                key={s}
+                onClick={() => setScoreFilter(s)}
+                className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                  scoreFilter === s
+                    ? "bg-primary text-on-primary"
+                    : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container"
+                }`}
+              >
+                {s === "ALL" ? "All" : s}
+              </button>
+            ))}
+          </div>
         </div>
-        <select
-          value={scoreFilter}
-          onChange={(e) => setScoreFilter(e.target.value as LeadScore | "ALL")}
-          className="rounded-lg border border-outline bg-surface px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
-        >
-          {scoreOptions.map((s) => (
-            <option key={s} value={s}>{s === "ALL" ? "All Scores" : s}</option>
-          ))}
-        </select>
-      </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-1 space-y-2 max-h-[600px] overflow-y-auto">
+        <div className="flex-1 space-y-1 overflow-y-auto p-2">
           {grouped.length > 0 ? (
             grouped.map(([phone, msgs]) => {
               const last = msgs[msgs.length - 1];
@@ -79,20 +86,20 @@ export function ConversationView({ conversations }: ConversationViewProps) {
                 <button
                   key={phone}
                   onClick={() => setSelectedPhone(phone)}
-                  className={`w-full rounded-lg border p-3 text-left transition ${
-                    isSelected ? "border-primary-500 bg-primary-50" : "border-outline bg-surface hover:bg-surface-variant/30"
+                  className={`w-full rounded-lg p-3 text-left transition ${
+                    isSelected ? "bg-surface-container-high" : "hover:bg-surface-container-low"
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-on-surface">
+                    <p className="text-sm font-semibold text-on-surface truncate">
                       {last.contact_name ?? phone}
                     </p>
                     <ScoreBadge score={last.lead_score as LeadScore} />
                   </div>
                   <p className="mt-1 truncate text-xs text-on-surface-variant">
-                    {last.incoming_message ?? "—"}
+                    {last.incoming_message ?? last.ai_response ?? "—"}
                   </p>
-                  <p className="mt-1 text-xs text-on-surface-variant/60">
+                  <p className="mt-1 text-[11px] text-on-surface-variant/60">
                     {msgs.length} messages · {new Date(last.created_at).toLocaleDateString()}
                   </p>
                 </button>
@@ -104,62 +111,95 @@ export function ConversationView({ conversations }: ConversationViewProps) {
             </p>
           )}
         </div>
+      </div>
 
-        <div className="lg:col-span-2 rounded-xl border border-outline bg-surface">
-          {selectedPhone ? (
-            <div className="flex h-[600px] flex-col">
-              <div className="flex items-center justify-between border-b border-outline px-4 py-3">
+      {/* Chat Window Pane */}
+      <div className="hidden flex-1 flex-col rounded-xl border border-surface-variant bg-surface-container-lowest lg:flex">
+        {selectedPhone ? (
+          <div className="flex h-full flex-col">
+            {/* Chat Header */}
+            <div className="flex items-center justify-between border-b border-outline-variant/30 px-5 py-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-high text-sm font-bold text-primary">
+                  {(selectedMessages[0]?.contact_name ?? selectedPhone).charAt(0).toUpperCase()}
+                </div>
                 <div>
-                  <p className="font-medium text-on-surface">
+                  <p className="font-semibold text-on-surface">
                     {selectedMessages[0]?.contact_name ?? selectedPhone}
                   </p>
                   <p className="text-xs text-on-surface-variant">{selectedPhone}</p>
                 </div>
-                <button onClick={() => setSelectedPhone(null)} className="text-on-surface-variant hover:text-on-surface">
-                  <X className="h-5 w-5" />
+              </div>
+              <button onClick={() => setSelectedPhone(null)} className="text-on-surface-variant hover:text-on-surface">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 space-y-4 overflow-y-auto p-5">
+              {selectedMessages.map((msg) => (
+                <div key={msg.id} className="space-y-2">
+                  {msg.incoming_message && (
+                    <div className="flex items-start gap-2">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-container-high">
+                        <MessageSquare className="h-4 w-4 text-on-surface-variant" />
+                      </div>
+                      <div className="rounded-lg rounded-tl-sm bg-surface-container-low px-4 py-2.5 max-w-[70%]">
+                        <p className="text-sm text-on-surface">{msg.incoming_message}</p>
+                        <p className="mt-1 text-[11px] text-on-surface-variant/60">
+                          {new Date(msg.created_at).toLocaleTimeString()}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {msg.ai_response && (
+                    <div className="flex items-start gap-2 justify-end">
+                      <div className="rounded-lg rounded-tr-sm bg-primary px-4 py-2.5 max-w-[70%]">
+                        <p className="text-sm text-on-primary">{msg.ai_response}</p>
+                        <p className="mt-1 text-[11px] text-on-primary/70">
+                          {new Date(msg.created_at).toLocaleTimeString()}
+                        </p>
+                      </div>
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-container/20">
+                        <Bot className="h-4 w-4 text-primary" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Input Area (decorative - matches stitch design) */}
+            <div className="border-t border-outline-variant/30 p-4">
+              <div className="flex items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-low px-4 py-2.5">
+                <input
+                  type="text"
+                  placeholder="Type a message... (read-only)"
+                  disabled
+                  className="flex-1 bg-transparent text-sm text-on-surface-variant placeholder:text-on-surface-variant/50 focus:outline-none"
+                />
+                <button
+                  disabled
+                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-on-primary disabled:opacity-50"
+                >
+                  <Send className="h-4 w-4" />
                 </button>
               </div>
-              <div className="flex-1 space-y-4 overflow-y-auto p-4">
-                {selectedMessages.map((msg) => (
-                  <div key={msg.id} className="space-y-2">
-                    {msg.incoming_message && (
-                      <div className="flex items-start gap-2">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-variant">
-                          <MessageSquare className="h-4 w-4 text-on-surface-variant" />
-                        </div>
-                        <div className="rounded-lg bg-surface-variant px-4 py-2 max-w-[75%]">
-                          <p className="text-sm text-on-surface">{msg.incoming_message}</p>
-                          <p className="mt-1 text-xs text-on-surface-variant/60">
-                            {new Date(msg.created_at).toLocaleTimeString()}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                    {msg.ai_response && (
-                      <div className="flex items-start gap-2 justify-end">
-                        <div className="rounded-lg bg-primary-600 px-4 py-2 max-w-[75%]">
-                          <p className="text-sm text-white">{msg.ai_response}</p>
-                          <p className="mt-1 text-xs text-primary-100">
-                            {new Date(msg.created_at).toLocaleTimeString()}
-                          </p>
-                        </div>
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100">
-                          <Bot className="h-4 w-4 text-primary-600" />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+              <p className="mt-2 text-center text-[11px] text-on-surface-variant/50">
+                AI responses are automated via n8n workflow
+              </p>
             </div>
-          ) : (
-            <div className="flex h-[600px] items-center justify-center">
+          </div>
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <div className="text-center">
+              <MessageSquare className="mx-auto mb-3 h-12 w-12 text-on-surface-variant/30" />
               <p className="text-sm text-on-surface-variant">
                 Select a conversation to view message history
               </p>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

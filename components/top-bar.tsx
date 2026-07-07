@@ -1,41 +1,55 @@
 "use client";
 
-import { Menu, LogOut } from "lucide-react";
+import { Menu, Bell, HelpCircle } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 interface TopBarProps {
   user: { email: string | null } | null;
   onMenuClick: () => void;
 }
 
-export function TopBar({ user, onMenuClick }: TopBarProps) {
-  return (
-    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-outline bg-surface px-4 lg:px-6">
-      <button
-        onClick={onMenuClick}
-        className="text-on-surface-variant hover:text-on-surface lg:hidden"
-      >
-        <Menu className="h-6 w-6" />
-      </button>
+const pageTitles: Record<string, string> = {
+  "/dashboard": "Overview",
+  "/leads": "Leads",
+  "/conversations": "Conversations",
+  "/broadcasts": "Broadcasts",
+  "/settings": "Settings",
+};
 
-      <div className="hidden lg:block">
-        <h2 className="text-sm font-medium text-on-surface-variant">
-          WhatsApp AI Sales Platform
-        </h2>
+export function TopBar({ user, onMenuClick }: TopBarProps) {
+  const pathname = usePathname();
+  const title = pageTitles[pathname] ?? "Overview";
+  return (
+    <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b border-outline-variant/20 bg-surface px-8">
+      <div className="flex items-center gap-4">
+        <button
+          onClick={onMenuClick}
+          className="text-on-surface-variant hover:text-on-surface lg:hidden"
+        >
+          <Menu className="h-6 w-6" />
+        </button>
+        <h2 className="hidden text-xl font-semibold text-on-surface md:block">{title}</h2>
       </div>
 
       <div className="flex items-center gap-4">
-        {user && (
-          <span className="text-sm text-on-surface-variant">{user.email}</span>
-        )}
+        <button className="flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant transition-all hover:bg-surface-container-low hover:text-primary">
+          <Bell className="h-5 w-5" />
+        </button>
+        <button className="flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant transition-all hover:bg-surface-container-low hover:text-primary">
+          <HelpCircle className="h-5 w-5" />
+        </button>
+        <div className="mx-2 h-6 w-px bg-outline-variant/50" />
         <form action="/auth/signout" method="POST">
           <button
             type="submit"
-            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-on-surface-variant transition hover:bg-surface-variant hover:text-on-surface"
+            className="text-xs font-semibold text-on-surface transition-colors hover:text-primary"
           >
-            <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline">Sign out</span>
+            Sign Out
           </button>
         </form>
+        <div className="ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-outline-variant bg-surface-container-high text-xs font-bold text-primary">
+          {user?.email?.charAt(0).toUpperCase() ?? "U"}
+        </div>
       </div>
     </header>
   );

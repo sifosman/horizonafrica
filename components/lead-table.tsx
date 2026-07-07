@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { Lead, LeadScore, LeadStatus } from "@/lib/types";
 import { ScoreBadge } from "@/components/score-badge";
-import { Search, Download, X, Save } from "lucide-react";
+import { Search, Download, X, Save, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface LeadTableProps {
   leads: Lead[];
@@ -11,12 +11,14 @@ interface LeadTableProps {
 
 const scoreOptions: (LeadScore | "ALL")[] = ["ALL", "HOT", "WARM", "COLD"];
 const statusOptions: (LeadStatus | "ALL")[] = ["ALL", "new", "contacted", "qualified", "converted", "lost"];
+const PAGE_SIZE = 8;
 
 export function LeadTable({ leads }: LeadTableProps) {
   const [search, setSearch] = useState("");
   const [scoreFilter, setScoreFilter] = useState<LeadScore | "ALL">("ALL");
   const [statusFilter, setStatusFilter] = useState<LeadStatus | "ALL">("ALL");
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [page, setPage] = useState(0);
 
   const filtered = useMemo(() => {
     return leads.filter((lead) => {
@@ -30,6 +32,10 @@ export function LeadTable({ leads }: LeadTableProps) {
     });
   }, [leads, search, scoreFilter, statusFilter]);
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages - 1);
+  const paginated = filtered.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
+
   function exportCSV() {
     const params = new URLSearchParams();
     if (scoreFilter !== "ALL") params.set("score", scoreFilter);
@@ -39,7 +45,8 @@ export function LeadTable({ leads }: LeadTableProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      {/* Filters Bar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 flex-col gap-3 sm:flex-row">
           <div className="relative flex-1">
@@ -48,14 +55,14 @@ export function LeadTable({ leads }: LeadTableProps) {
               type="text"
               placeholder="Search by name or phone..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-lg border border-outline bg-surface py-2 pl-10 pr-4 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+              onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+              className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest py-2.5 pl-10 pr-4 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
             />
           </div>
           <select
             value={scoreFilter}
-            onChange={(e) => setScoreFilter(e.target.value as LeadScore | "ALL")}
-            className="rounded-lg border border-outline bg-surface px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+            onChange={(e) => { setScoreFilter(e.target.value as LeadScore | "ALL"); setPage(0); }}
+            className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-primary focus:outline-none"
           >
             {scoreOptions.map((s) => (
               <option key={s} value={s}>{s === "ALL" ? "All Scores" : s}</option>
@@ -63,8 +70,8 @@ export function LeadTable({ leads }: LeadTableProps) {
           </select>
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as LeadStatus | "ALL")}
-            className="rounded-lg border border-outline bg-surface px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+            onChange={(e) => { setStatusFilter(e.target.value as LeadStatus | "ALL"); setPage(0); }}
+            className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-primary focus:outline-none"
           >
             {statusOptions.map((s) => (
               <option key={s} value={s}>{s === "ALL" ? "All Statuses" : s.charAt(0).toUpperCase() + s.slice(1)}</option>
@@ -73,46 +80,47 @@ export function LeadTable({ leads }: LeadTableProps) {
         </div>
         <button
           onClick={exportCSV}
-          className="flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-700"
+          className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary transition hover:opacity-90"
         >
           <Download className="h-4 w-4" />
           Export CSV
         </button>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-outline bg-surface">
+      {/* Data Table */}
+      <div className="card-shadow overflow-x-auto rounded-xl border border-surface-variant bg-surface-container-lowest">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-outline bg-surface-variant/50 text-left text-on-surface-variant">
-              <th className="px-4 py-3 font-medium">Name</th>
-              <th className="px-4 py-3 font-medium">Phone</th>
-              <th className="px-4 py-3 font-medium">Product Interest</th>
-              <th className="px-4 py-3 font-medium">Score</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-              <th className="px-4 py-3 font-medium">Created</th>
+            <tr className="border-b border-outline-variant bg-surface-container-low text-left text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+              <th className="px-5 py-4">Name</th>
+              <th className="px-5 py-4">Phone</th>
+              <th className="px-5 py-4">Product Interest</th>
+              <th className="px-5 py-4">Score</th>
+              <th className="px-5 py-4">Status</th>
+              <th className="px-5 py-4">Created</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.length > 0 ? (
-              filtered.map((lead) => (
+            {paginated.length > 0 ? (
+              paginated.map((lead) => (
                 <tr
                   key={lead.id}
                   onClick={() => setSelectedLead(lead)}
-                  className="cursor-pointer border-b border-outline/50 transition hover:bg-surface-variant/30"
+                  className="cursor-pointer border-b border-outline-variant/30 transition hover:bg-surface-container-low last:border-0"
                 >
-                  <td className="px-4 py-3 text-on-surface">{lead.full_name ?? "—"}</td>
-                  <td className="px-4 py-3 text-on-surface-variant">{lead.phone_number}</td>
-                  <td className="px-4 py-3 text-on-surface-variant">{lead.product_interest ?? "—"}</td>
-                  <td className="px-4 py-3"><ScoreBadge score={lead.lead_score} /></td>
-                  <td className="px-4 py-3 capitalize text-on-surface-variant">{lead.status}</td>
-                  <td className="px-4 py-3 text-on-surface-variant">
+                  <td className="px-5 py-3.5 text-on-surface">{lead.full_name ?? "—"}</td>
+                  <td className="px-5 py-3.5 text-on-surface-variant">{lead.phone_number}</td>
+                  <td className="px-5 py-3.5 text-on-surface-variant">{lead.product_interest ?? "—"}</td>
+                  <td className="px-5 py-3.5"><ScoreBadge score={lead.lead_score} /></td>
+                  <td className="px-5 py-3.5 capitalize text-on-surface-variant">{lead.status}</td>
+                  <td className="px-5 py-3.5 text-on-surface-variant">
                     {new Date(lead.created_at).toLocaleDateString()}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="px-4 py-12 text-center text-on-surface-variant">
+                <td colSpan={6} className="px-5 py-12 text-center text-on-surface-variant">
                   No leads found matching your filters.
                 </td>
               </tr>
@@ -121,9 +129,33 @@ export function LeadTable({ leads }: LeadTableProps) {
         </table>
       </div>
 
-      <p className="text-sm text-on-surface-variant">
-        Showing {filtered.length} of {leads.length} leads
-      </p>
+      {/* Pagination */}
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-on-surface-variant">
+          Showing {paginated.length} of {filtered.length} leads
+        </p>
+        {totalPages > 1 && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage(Math.max(0, currentPage - 1))}
+              disabled={currentPage === 0}
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-outline-variant text-on-surface-variant transition hover:bg-surface-container-low disabled:opacity-40"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <span className="text-xs font-medium text-on-surface-variant">
+              {currentPage + 1} / {totalPages}
+            </span>
+            <button
+              onClick={() => setPage(Math.min(totalPages - 1, currentPage + 1))}
+              disabled={currentPage === totalPages - 1}
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-outline-variant text-on-surface-variant transition hover:bg-surface-container-low disabled:opacity-40"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+      </div>
 
       {selectedLead && (
         <LeadDetailDrawer lead={selectedLead} onClose={() => setSelectedLead(null)} />
@@ -162,15 +194,15 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative w-full max-w-md overflow-y-auto bg-surface shadow-xl">
-        <div className="sticky top-0 flex items-center justify-between border-b border-outline bg-surface px-6 py-4">
-          <h2 className="font-semibold text-on-surface">Lead Details</h2>
+      <div className="relative w-full max-w-md overflow-y-auto bg-surface-container-lowest shadow-2xl">
+        <div className="sticky top-0 flex items-center justify-between border-b border-outline-variant bg-surface-container-lowest px-6 py-4">
+          <h2 className="text-lg font-semibold text-on-surface">Lead Details</h2>
           <div className="flex items-center gap-2">
             {editing ? (
               <button
                 onClick={saveLead}
                 disabled={saving}
-                className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-primary-700 disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-on-primary transition hover:opacity-90 disabled:opacity-50"
               >
                 <Save className="h-4 w-4" />
                 {saving ? "Saving..." : "Save"}
@@ -178,7 +210,7 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
             ) : (
               <button
                 onClick={() => setEditing(true)}
-                className="rounded-lg border border-outline px-3 py-1.5 text-sm font-medium text-on-surface-variant transition hover:bg-surface-variant"
+                className="rounded-lg border border-outline-variant px-3 py-1.5 text-sm font-semibold text-on-surface-variant transition hover:bg-surface-container-low"
               >
                 Edit
               </button>
@@ -191,7 +223,7 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
 
         <div className="space-y-4 p-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-lg font-semibold text-primary-700">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-container/20 text-lg font-semibold text-primary">
               {(currentLead.full_name ?? currentLead.phone_number).charAt(0).toUpperCase()}
             </div>
             <div>
@@ -203,7 +235,7 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
                 <select
                   value={editScore}
                   onChange={(e) => setEditScore(e.target.value as LeadScore)}
-                  className="rounded-lg border border-outline bg-surface px-2 py-1 text-xs focus:border-primary-500 focus:outline-none"
+                  className="rounded-lg border border-outline-variant bg-surface-container-lowest px-2 py-1 text-xs focus:border-primary focus:outline-none"
                 >
                   <option value="HOT">HOT</option>
                   <option value="WARM">WARM</option>
@@ -223,7 +255,7 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
                   <select
                     value={editStatus}
                     onChange={(e) => setEditStatus(e.target.value as LeadStatus)}
-                    className="mt-0.5 w-full rounded-lg border border-outline bg-surface px-2 py-1.5 text-sm focus:border-primary-500 focus:outline-none"
+                    className="mt-0.5 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-2 py-1.5 text-sm focus:border-primary focus:outline-none"
                   >
                     <option value="new">New</option>
                     <option value="contacted">Contacted</option>
@@ -238,7 +270,7 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
                     value={editNotes}
                     onChange={(e) => setEditNotes(e.target.value)}
                     rows={3}
-                    className="mt-0.5 w-full rounded-lg border border-outline bg-surface px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                    className="mt-0.5 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
                   />
                 </div>
               </>

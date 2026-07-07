@@ -25,22 +25,23 @@ export default async function BroadcastsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-on-surface">Broadcasts</h1>
+        <h1 className="text-3xl font-bold text-on-surface">Broadcasts</h1>
         <p className="mt-1 text-sm text-on-surface-variant">
           Manage broadcast campaigns, groups, and contacts
         </p>
       </div>
 
+      {/* Broadcast Group Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {contactCounts.map((g) => (
-          <div key={g.id} className="rounded-xl border border-outline bg-surface p-5">
+          <div key={g.id} className="card-shadow rounded-xl border border-surface-variant bg-surface-container-lowest p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-on-surface-variant">{g.group_label}</p>
-                <p className="mt-1 text-2xl font-bold text-on-surface">{g.count}</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">{g.group_label}</p>
+                <p className="mt-1 text-3xl font-bold text-on-surface">{g.count}</p>
                 <p className="text-xs text-on-surface-variant/60">contacts</p>
               </div>
-              <div className="rounded-lg bg-primary-50 px-3 py-2 text-sm font-medium text-primary-700">
+              <div className="rounded-lg bg-primary-container/20 px-3 py-2 text-xs font-semibold text-primary">
                 {g.group_name}
               </div>
             </div>
@@ -51,34 +52,35 @@ export default async function BroadcastsPage() {
         ))}
       </div>
 
-      <div className="rounded-xl border border-outline bg-surface p-5">
-        <h2 className="mb-4 font-semibold text-on-surface">Broadcast History</h2>
+      {/* Broadcast History */}
+      <div className="card-shadow rounded-xl border border-surface-variant bg-surface-container-lowest p-6">
+        <h2 className="mb-5 text-lg font-semibold text-on-surface">Broadcast History</h2>
         {history.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-outline text-left text-on-surface-variant">
-                  <th className="pb-2 font-medium">Campaign</th>
-                  <th className="pb-2 font-medium">Template</th>
-                  <th className="pb-2 font-medium">Sent</th>
-                  <th className="pb-2 font-medium">Delivered</th>
-                  <th className="pb-2 font-medium">Read</th>
-                  <th className="pb-2 font-medium">Failed</th>
-                  <th className="pb-2 font-medium">Status</th>
-                  <th className="pb-2 font-medium">Date</th>
+                <tr className="border-b border-outline-variant text-left text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+                  <th className="pb-3">Campaign</th>
+                  <th className="pb-3">Template</th>
+                  <th className="pb-3">Sent</th>
+                  <th className="pb-3">Delivered</th>
+                  <th className="pb-3">Read</th>
+                  <th className="pb-3">Failed</th>
+                  <th className="pb-3">Status</th>
+                  <th className="pb-3">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {history.map((h) => (
-                  <tr key={h.id} className="border-b border-outline/50">
-                    <td className="py-2.5 text-on-surface">{h.campaign_name}</td>
-                    <td className="py-2.5 text-on-surface-variant">{h.template_name ?? "—"}</td>
-                    <td className="py-2.5 text-on-surface-variant">{h.total_sent}</td>
-                    <td className="py-2.5 text-on-surface-variant">{h.total_delivered}</td>
-                    <td className="py-2.5 text-on-surface-variant">{h.total_read}</td>
-                    <td className="py-2.5 text-on-surface-variant">{h.total_failed}</td>
-                    <td className="py-2.5 capitalize text-on-surface-variant">{h.status}</td>
-                    <td className="py-2.5 text-on-surface-variant">
+                  <tr key={h.id} className="border-b border-outline-variant/30 last:border-0">
+                    <td className="py-3 text-on-surface">{h.campaign_name}</td>
+                    <td className="py-3 text-on-surface-variant">{h.template_name ?? "—"}</td>
+                    <td className="py-3 text-on-surface-variant">{h.total_sent}</td>
+                    <td className="py-3 text-on-surface-variant">{h.total_delivered}</td>
+                    <td className="py-3 text-on-surface-variant">{h.total_read}</td>
+                    <td className="py-3 text-on-surface-variant">{h.total_failed}</td>
+                    <td className="py-3 capitalize text-on-surface-variant">{h.status}</td>
+                    <td className="py-3 text-on-surface-variant">
                       {new Date(h.created_at).toLocaleDateString()}
                     </td>
                   </tr>
@@ -93,6 +95,7 @@ export default async function BroadcastsPage() {
         )}
       </div>
 
+      {/* Form + Contacts Manager */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <BroadcastForm groups={groups} />
         <ContactsManager groups={groups} contacts={contacts} />

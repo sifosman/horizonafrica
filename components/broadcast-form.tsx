@@ -24,15 +24,15 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
   const selectedGroup = groups.find((g) => String(g.id) === groupId);
 
   return (
-    <div className="rounded-xl border border-outline bg-surface p-5">
-      <h2 className="mb-4 font-semibold text-on-surface">New Broadcast</h2>
+    <div className="card-shadow rounded-xl border border-surface-variant bg-surface-container-lowest p-6">
+      <h2 className="mb-5 text-lg font-semibold text-on-surface">New Broadcast</h2>
       <div className="space-y-4">
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-on-surface-variant">Select Group</label>
+          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Select Group</label>
           <select
             value={groupId}
             onChange={(e) => setGroupId(e.target.value)}
-            className="w-full rounded-lg border border-outline bg-surface px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+            className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-primary focus:outline-none"
           >
             <option value="">Choose a group...</option>
             {groups.map((g) => (
@@ -42,11 +42,11 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-on-surface-variant">Template</label>
+          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Template</label>
           <select
             value={template}
             onChange={(e) => setTemplate(e.target.value)}
-            className="w-full rounded-lg border border-outline bg-surface px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+            className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-primary focus:outline-none"
           >
             {templates.map((t) => (
               <option key={t} value={t}>{t.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</option>
@@ -55,13 +55,13 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-on-surface-variant">Message Preview</label>
+          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Message Preview</label>
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             rows={4}
             placeholder="Type your broadcast message..."
-            className="w-full rounded-lg border border-outline bg-surface px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+            className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
           />
         </div>
 
@@ -69,7 +69,7 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
           <button
             disabled
             title="Requires Meta WhatsApp Business API approval"
-            className="flex cursor-not-allowed items-center gap-2 rounded-lg bg-surface-variant px-4 py-2 text-sm font-medium text-on-surface-variant/50"
+            className="flex cursor-not-allowed items-center gap-2 rounded-lg bg-surface-container-high px-4 py-2.5 text-sm font-semibold text-on-surface-variant/50"
           >
             <Lock className="h-4 w-4" />
             Send Broadcast
@@ -132,12 +132,12 @@ export function ContactsManager({ groups, contacts: initialContacts }: ContactsM
   }
 
   return (
-    <div className="rounded-xl border border-outline bg-surface p-5">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="font-semibold text-on-surface">Contacts</h2>
+    <div className="card-shadow rounded-xl border border-surface-variant bg-surface-container-lowest p-6">
+      <div className="mb-5 flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-on-surface">Contacts</h2>
         <button
           onClick={() => setShowAdd(!showAdd)}
-          className="flex items-center gap-2 rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-primary-700"
+          className="flex items-center gap-2 rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-on-primary transition hover:opacity-90"
         >
           <Plus className="h-4 w-4" />
           Add Contact
@@ -145,25 +145,25 @@ export function ContactsManager({ groups, contacts: initialContacts }: ContactsM
       </div>
 
       {showAdd && (
-        <div className="mb-4 flex flex-col gap-2 rounded-lg border border-outline bg-surface-variant/30 p-3 sm:flex-row">
+        <div className="mb-4 flex flex-col gap-2 rounded-lg border border-outline-variant bg-surface-container-low p-3 sm:flex-row">
           <input
             type="text"
             placeholder="Name"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            className="flex-1 rounded-lg border border-outline bg-surface px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+            className="flex-1 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-primary focus:outline-none"
           />
           <input
             type="text"
             placeholder="Phone (+27...)"
             value={newPhone}
             onChange={(e) => setNewPhone(e.target.value)}
-            className="flex-1 rounded-lg border border-outline bg-surface px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+            className="flex-1 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-primary focus:outline-none"
           />
           <select
             value={newGroup}
             onChange={(e) => setNewGroup(e.target.value)}
-            className="rounded-lg border border-outline bg-surface px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+            className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-primary focus:outline-none"
           >
             <option value="">Select group...</option>
             {groups.map((g) => (
@@ -173,7 +173,7 @@ export function ContactsManager({ groups, contacts: initialContacts }: ContactsM
           <button
             onClick={addContact}
             disabled={saving || !newPhone || !newGroup}
-            className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-700 disabled:opacity-50"
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition hover:opacity-90 disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save"}
           </button>
@@ -181,18 +181,18 @@ export function ContactsManager({ groups, contacts: initialContacts }: ContactsM
       )}
 
       {error && (
-        <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+        <p className="mb-3 rounded-lg bg-error-container/30 px-3 py-2 text-sm text-error">{error}</p>
       )}
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-outline text-left text-on-surface-variant">
-              <th className="pb-2 font-medium">Name</th>
-              <th className="pb-2 font-medium">Phone</th>
-              <th className="pb-2 font-medium">Group</th>
-              <th className="pb-2 font-medium">Opt-in</th>
-              <th className="pb-2 font-medium"></th>
+            <tr className="border-b border-outline-variant text-left text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+              <th className="pb-2">Name</th>
+              <th className="pb-2">Phone</th>
+              <th className="pb-2">Group</th>
+              <th className="pb-2">Opt-in</th>
+              <th className="pb-2"></th>
             </tr>
           </thead>
           <tbody>
@@ -200,17 +200,17 @@ export function ContactsManager({ groups, contacts: initialContacts }: ContactsM
               contacts.map((c) => {
                 const group = groups.find((g) => g.id === c.group_id);
                 return (
-                  <tr key={c.id} className="border-b border-outline/50">
+                  <tr key={c.id} className="border-b border-outline-variant/30 last:border-0">
                     <td className="py-2.5 text-on-surface">{c.contact_name ?? "—"}</td>
                     <td className="py-2.5 text-on-surface-variant">{c.phone_number}</td>
                     <td className="py-2.5 text-on-surface-variant">{group?.group_label ?? "—"}</td>
                     <td className="py-2.5">
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs ${c.opt_in ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold ${c.opt_in ? "bg-secondary-container/30 text-secondary" : "bg-surface-container-high text-on-surface-variant"}`}>
                         {c.opt_in ? "Yes" : "No"}
                       </span>
                     </td>
                     <td className="py-2.5">
-                      <button onClick={() => deleteContact(String(c.id))} className="text-on-surface-variant hover:text-red-600">
+                      <button onClick={() => deleteContact(String(c.id))} className="text-on-surface-variant hover:text-error">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </td>

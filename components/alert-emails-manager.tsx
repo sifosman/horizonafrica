@@ -59,9 +59,9 @@ export function AlertEmailsManager() {
   }
 
   return (
-    <div className="rounded-xl border border-outline bg-surface p-5">
-      <h2 className="mb-4 font-semibold text-on-surface">Staff Alert Emails</h2>
-      <p className="mb-4 text-sm text-on-surface-variant">
+    <div className="card-shadow rounded-xl border border-surface-variant bg-surface-container-lowest p-6">
+      <h2 className="mb-2 text-lg font-semibold text-on-surface">Staff Alert Emails</h2>
+      <p className="mb-5 text-sm text-on-surface-variant">
         Manage email recipients who receive hot lead alerts. These will be activated once Brevo is configured.
       </p>
 
@@ -74,13 +74,13 @@ export function AlertEmailsManager() {
             value={newEmail}
             onChange={(e) => setNewEmail(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && addEmail()}
-            className="w-full rounded-lg border border-outline bg-surface py-2 pl-10 pr-4 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+            className="w-full rounded-lg border border-outline-variant bg-surface-container-low py-2.5 pl-10 pr-4 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
           />
         </div>
         <button
           onClick={addEmail}
           disabled={saving || !newEmail.trim()}
-          className="flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-700 disabled:opacity-50"
+          className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary transition hover:opacity-90 disabled:opacity-50"
         >
           <Plus className="h-4 w-4" />
           Add
@@ -88,7 +88,7 @@ export function AlertEmailsManager() {
       </div>
 
       {error && (
-        <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+        <p className="mt-3 rounded-lg bg-error-container/30 px-3 py-2 text-sm text-error">{error}</p>
       )}
 
       <div className="mt-4 space-y-2">
@@ -96,12 +96,12 @@ export function AlertEmailsManager() {
           <p className="text-sm text-on-surface-variant">Loading...</p>
         ) : emails.length > 0 ? (
           emails.map((email) => (
-            <div key={email} className="flex items-center justify-between rounded-lg border border-outline px-3 py-2">
+            <div key={email} className="flex items-center justify-between rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2.5">
               <span className="text-sm text-on-surface">{email}</span>
               <button
                 onClick={() => removeEmail(email)}
                 disabled={saving}
-                className="text-xs text-on-surface-variant transition hover:text-red-600 disabled:opacity-50"
+                className="text-on-surface-variant transition hover:text-error disabled:opacity-50"
               >
                 <Trash2 className="h-4 w-4" />
               </button>

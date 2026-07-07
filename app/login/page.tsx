@@ -37,26 +37,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#001030] px-4 font-sans text-white">
-      {/* Dot pattern background */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-80"
-        style={{
-          backgroundImage: "radial-gradient(rgba(255, 255, 255, 0.05) 0.5px, transparent 0.5px)",
-          backgroundSize: "24px 24px",
-        }}
-      />
-
-      {/* Atmospheric blur decorations */}
-      <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-primary-container/20 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-secondary-container/20 blur-3xl" />
-
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-surface px-4 font-sans">
       {/* Login Card */}
       <div className="relative z-10 w-full max-w-md">
-        <div
-          className="rounded-xl border border-white/10 bg-white/[0.08] p-6 backdrop-blur-xl"
-          style={{ boxShadow: "0px 10px 30px -5px rgba(0, 0, 0, 0.3)" }}
-        >
+        <div className="rounded-2xl border border-outline-variant/50 bg-white p-8 shadow-xl">
           {/* Brand Header */}
           <div className="mb-6 flex flex-col items-center">
             <div className="relative mb-4 h-28 w-56">
@@ -69,8 +53,8 @@ export default function LoginPage() {
               />
             </div>
             <div className="text-center">
-              <h1 className="mb-1 text-2xl font-semibold text-white">Welcome back</h1>
-              <p className="text-sm text-white/60">Please enter your details to sign in</p>
+              <h1 className="mb-1 text-2xl font-semibold text-on-surface">Welcome back</h1>
+              <p className="text-sm text-on-surface-variant">Please enter your details to sign in</p>
             </div>
           </div>
 
@@ -80,19 +64,19 @@ export default function LoginPage() {
             <div className="space-y-1.5">
               <label
                 htmlFor="email"
-                className="ml-1 block text-xs font-semibold tracking-wide text-white/60"
+                className="ml-1 block text-xs font-semibold tracking-wide text-on-surface-variant"
               >
                 Email address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-white/40" />
+                <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-on-surface-variant/50" />
                 <input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full rounded-lg border border-white/10 bg-white/5 py-2.5 pl-10 pr-4 text-sm text-white outline-none transition-all placeholder:text-white/30 focus:border-primary-container focus:ring-2 focus:ring-primary-container/30"
+                  className="w-full rounded-lg border border-outline-variant/50 bg-surface-container-low py-2.5 pl-10 pr-4 text-sm text-on-surface outline-none transition-all placeholder:text-on-surface-variant/50 focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                   placeholder="name@company.com"
                 />
               </div>
@@ -102,25 +86,25 @@ export default function LoginPage() {
             <div className="space-y-1.5">
               <label
                 htmlFor="password"
-                className="ml-1 block text-xs font-semibold tracking-wide text-white/60"
+                className="ml-1 block text-xs font-semibold tracking-wide text-on-surface-variant"
               >
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-white/40" />
+                <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-on-surface-variant/50" />
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full rounded-lg border border-white/10 bg-white/5 py-2.5 pl-10 pr-12 text-sm text-white outline-none transition-all placeholder:text-white/30 focus:border-primary-container focus:ring-2 focus:ring-primary-container/30"
+                  className="w-full rounded-lg border border-outline-variant/50 bg-surface-container-low py-2.5 pl-10 pr-12 text-sm text-on-surface outline-none transition-all placeholder:text-on-surface-variant/50 focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 transition-colors hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/50 transition-colors hover:text-on-surface"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -135,18 +119,18 @@ export default function LoginPage() {
                   type="checkbox"
                   checked={remember}
                   onChange={(e) => setRemember(e.target.checked)}
-                  className="h-4 w-4 rounded border-white/20 bg-white/5 accent-primary-container"
+                  className="h-4 w-4 rounded border-outline-variant/50 bg-surface-container-low accent-secondary"
                 />
                 <label
                   htmlFor="remember"
-                  className="cursor-pointer text-[13px] text-white/60"
+                  className="cursor-pointer text-[13px] text-on-surface-variant"
                 >
                   Remember me
                 </label>
               </div>
               <a
                 href="#"
-                className="text-[13px] font-semibold text-primary-container transition-colors hover:underline"
+                className="text-[13px] font-semibold text-secondary transition-colors hover:underline"
               >
                 Forgot password?
               </a>
@@ -154,7 +138,7 @@ export default function LoginPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-400">
+              <div className="rounded-lg bg-error-container px-4 py-3 text-sm text-error">
                 {error}
               </div>
             )}
@@ -163,7 +147,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary-container py-3 text-base font-semibold text-on-primary-container shadow-lg transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 text-base font-semibold text-on-primary shadow-lg transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
             >
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
@@ -179,11 +163,11 @@ export default function LoginPage() {
 
           {/* Footer Link */}
           <div className="mt-6 text-center">
-            <p className="text-[13px] text-white/60">
+            <p className="text-[13px] text-on-surface-variant">
               Don&apos;t have an account?{" "}
               <a
                 href="#"
-                className="font-semibold text-primary-container transition-colors hover:underline"
+                className="font-semibold text-secondary transition-colors hover:underline"
               >
                 Contact Administrator
               </a>
@@ -192,9 +176,9 @@ export default function LoginPage() {
         </div>
 
         {/* Security Badge */}
-        <div className="mt-4 flex items-center justify-center gap-2 opacity-40 transition-all hover:opacity-100">
-          <ShieldCheck className="h-4 w-4 text-white" />
-          <span className="text-[11px] font-medium uppercase tracking-widest text-white">
+        <div className="mt-4 flex items-center justify-center gap-2 opacity-60 transition-all hover:opacity-100">
+          <ShieldCheck className="h-4 w-4 text-on-surface-variant" />
+          <span className="text-[11px] font-medium uppercase tracking-widest text-on-surface-variant">
             Enterprise Secure
           </span>
         </div>

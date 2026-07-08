@@ -26,7 +26,7 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
         />
       )}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-[260px] transform border-r border-outline-variant/50 bg-surface transition-transform duration-200 lg:static lg:translate-x-0 flex flex-col py-6 px-4 ${
+        className={`fixed inset-y-0 left-0 z-40 w-[260px] transform border-r border-outline-variant/50 bg-white transition-transform duration-200 lg:static lg:translate-x-0 flex flex-col py-6 px-4 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -35,7 +35,7 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
           <Image
             src={logo}
             alt="Horizon Africa"
-            className="ml-12 h-12 w-auto object-contain"
+            className="h-20 w-auto object-contain"
             priority
           />
           <button
@@ -47,11 +47,11 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
         </div>
 
         {/* New Broadcast CTA */}
-        <div className="mb-6 px-2">
+        <div className="mb-6">
           <Link
             href="/broadcasts"
             onClick={onClose}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 text-xs font-semibold text-on-primary shadow-sm transition-all hover:brightness-110"
+            className="flex w-full items-center justify-start gap-2 rounded-lg bg-primary px-4 py-3 text-xs font-semibold text-on-primary shadow-sm transition-all hover:brightness-110"
           >
             <Plus className="h-4 w-4" />
             New Broadcast

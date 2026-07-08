@@ -34,8 +34,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-on-surface">Overview</h1>
-        <p className="mt-1 text-sm text-on-surface-variant">
+        <p className="text-sm text-on-surface-variant">
           Snapshot of your WhatsApp AI sales pipeline
         </p>
       </div>

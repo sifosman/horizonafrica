@@ -13,8 +13,7 @@ export default async function ConversationsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-on-surface">Conversations</h1>
-        <p className="mt-1 text-sm text-on-surface-variant">
+        <p className="text-sm text-on-surface-variant">
           WhatsApp conversation history between leads and the AI assistant
         </p>
       </div>

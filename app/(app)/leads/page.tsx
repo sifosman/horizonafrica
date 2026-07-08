@@ -13,8 +13,7 @@ export default async function LeadsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-on-surface">Leads</h1>
-        <p className="mt-1 text-sm text-on-surface-variant">
+        <p className="text-sm text-on-surface-variant">
           Manage and track all sales leads from WhatsApp conversations
         </p>
       </div>

@@ -78,10 +78,6 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
               </Link>
             );
           })}
-        </nav>
-
-        {/* Footer Links */}
-        <div className="mt-auto flex flex-col gap-1 border-t border-outline-variant/30 pt-4">
           <Link
             href="#"
             className="flex items-center gap-3 rounded-lg px-4 py-3 text-xs font-semibold text-on-surface-variant transition-all hover:bg-surface-container hover:text-on-surface"
@@ -98,7 +94,7 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
               Logout
             </button>
           </form>
-        </div>
+        </nav>
       </aside>
     </>
   );

@@ -17,6 +17,12 @@ export interface Lead {
   lead_score: LeadScore;
   status: LeadStatus;
   notes: string | null;
+  follow_up_requested: boolean | null;
+  follow_up_date: string | null;
+  follow_up_sent: boolean | null;
+  follow_up_sent_at: string | null;
+  offered_package: string | null;
+  needs_escalation: boolean | null;
   created_at: string;
   updated_at: string;
 }

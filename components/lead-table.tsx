@@ -97,6 +97,7 @@ export function LeadTable({ leads }: LeadTableProps) {
               <th className="px-5 py-4">Product Interest</th>
               <th className="px-5 py-4">Score</th>
               <th className="px-5 py-4">Status</th>
+              <th className="px-5 py-4">Follow-Up</th>
               <th className="px-5 py-4">Created</th>
             </tr>
           </thead>
@@ -113,6 +114,19 @@ export function LeadTable({ leads }: LeadTableProps) {
                   <td className="px-5 py-3.5 text-on-surface-variant">{lead.product_interest ?? "—"}</td>
                   <td className="px-5 py-3.5"><ScoreBadge score={lead.lead_score} /></td>
                   <td className="px-5 py-3.5 capitalize text-on-surface-variant">{lead.status}</td>
+                  <td className="px-5 py-3.5">
+                    {lead.follow_up_requested ? (
+                      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
+                        lead.follow_up_sent
+                          ? "bg-green-100 text-green-700"
+                          : "bg-amber-100 text-amber-700"
+                      }`}>
+                        {lead.follow_up_sent ? "Sent" : "Pending"}
+                      </span>
+                    ) : (
+                      <span className="text-on-surface-variant">—</span>
+                    )}
+                  </td>
                   <td className="px-5 py-3.5 text-on-surface-variant">
                     {new Date(lead.created_at).toLocaleDateString()}
                   </td>
@@ -120,7 +134,7 @@ export function LeadTable({ leads }: LeadTableProps) {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="px-5 py-12 text-center text-on-surface-variant">
+                <td colSpan={7} className="px-5 py-12 text-center text-on-surface-variant">
                   No leads found matching your filters.
                 </td>
               </tr>
@@ -280,10 +294,22 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
                 <Field label="Email" value={currentLead.email} />
                 <Field label="Product Interest" value={currentLead.product_interest} />
                 <Field label="Recommended Package" value={currentLead.recommended_package} />
+                <Field label="Offered Package" value={currentLead.offered_package} />
                 <Field label="Household Size" value={currentLead.household_size} />
                 <Field label="Internet Usage" value={currentLead.internet_usage} />
                 <Field label="Physical Address" value={currentLead.physical_address} fullWidth />
                 <Field label="Notes" value={currentLead.notes} fullWidth />
+                {currentLead.follow_up_requested && (
+                  <>
+                    <Field label="Follow-Up Requested" value="Yes" />
+                    <Field label="Follow-Up Date" value={currentLead.follow_up_date ? new Date(currentLead.follow_up_date).toLocaleDateString() : null} />
+                    <Field label="Follow-Up Sent" value={currentLead.follow_up_sent ? "Yes" : "No"} />
+                    <Field label="Follow-Up Sent At" value={currentLead.follow_up_sent_at ? new Date(currentLead.follow_up_sent_at).toLocaleString() : null} />
+                  </>
+                )}
+                {currentLead.needs_escalation && (
+                  <Field label="Needs Escalation" value="Yes" fullWidth />
+                )}
               </>
             )}
             <Field label="Created" value={new Date(currentLead.created_at).toLocaleString()} />

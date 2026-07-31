@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { toast } from "sonner";
 import { Lead } from "@/lib/types";
 import {
   Bell,
@@ -57,8 +58,10 @@ export function FollowUpsManager({ initialLeads }: FollowUpsManagerProps) {
   const [result, setResult] = useState<SendResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const refreshLeads = useCallback(async () => {
+  const refreshLeads = useCallback(async (isManual = false) => {
+    if (isManual) setRefreshing(true);
     try {
       const res = await fetch("/api/leads?follow_up=true", {
         cache: "no-store",
@@ -67,10 +70,14 @@ export function FollowUpsManager({ initialLeads }: FollowUpsManagerProps) {
         const data = await res.json();
         setLeads(data.leads ?? data ?? []);
         setLastRefresh(new Date());
+        if (isManual) toast.success("Follow-ups refreshed");
+      } else if (isManual) {
+        toast.error("Failed to refresh follow-ups");
       }
     } catch {
-      // Silent fail on polling
+      if (isManual) toast.error("Network error refreshing follow-ups");
     }
+    setRefreshing(false);
   }, []);
 
   useEffect(() => {
@@ -89,12 +96,15 @@ export function FollowUpsManager({ initialLeads }: FollowUpsManagerProps) {
 
       if (!res.ok) {
         setError(data.error ?? "Failed to send follow-ups");
+        toast.error(data.error ?? "Failed to send follow-ups");
       } else {
         setResult(data);
+        toast.success(`Follow-ups sent: ${data.sent} sent, ${data.failed} failed`);
         await refreshLeads();
       }
     } catch {
       setError("Network error sending follow-ups");
+      toast.error("Network error sending follow-ups");
     }
 
     setSending(false);
@@ -114,11 +124,14 @@ export function FollowUpsManager({ initialLeads }: FollowUpsManagerProps) {
 
       if (!res.ok) {
         setError(data.error ?? "Failed to send follow-up");
+        toast.error(data.error ?? "Failed to send follow-up");
       } else {
+        toast.success("Follow-up sent");
         await refreshLeads();
       }
     } catch {
       setError("Network error sending follow-up");
+      toast.error("Network error sending follow-up");
     }
 
     setSendingId(null);
@@ -193,11 +206,12 @@ export function FollowUpsManager({ initialLeads }: FollowUpsManagerProps) {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={refreshLeads}
-              className="flex items-center gap-1.5 rounded-lg border border-outline-variant px-3 py-2 text-xs font-semibold text-on-surface-variant transition hover:bg-surface-container"
+              onClick={() => refreshLeads(true)}
+              disabled={refreshing}
+              className="flex items-center gap-1.5 rounded-lg border border-outline-variant px-3 py-2 text-xs font-semibold text-on-surface-variant transition hover:bg-surface-container disabled:opacity-50"
               title="Refresh"
             >
-              <RefreshCw className="h-3.5 w-3.5" />
+              <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
               Refresh
             </button>
             <button

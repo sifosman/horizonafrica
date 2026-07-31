@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { toast } from "sonner";
 import { BroadcastGroup, BroadcastContact } from "@/lib/types";
 import { Send, Loader2, CheckCircle2, XCircle, Info, Plus, Trash2, RefreshCw } from "lucide-react";
 
@@ -49,8 +50,12 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
             setTemplate(data.templates[0].name);
           }
         }
+        toast.success("Templates refreshed");
+      } else {
+        toast.error("Failed to refresh templates");
       }
     } catch {
+      toast.error("Network error refreshing templates");
       // Keep fallback templates on error
     }
     setTemplatesLoading(false);
@@ -91,11 +96,14 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
 
       if (!res.ok) {
         setError(data.error ?? "Failed to send broadcast");
+        toast.error(data.error ?? "Failed to send broadcast");
       } else {
         setResult(data);
+        toast.success(`Broadcast sent: ${data.sent}/${data.total_recipients} successful`);
       }
     } catch {
       setError("Network error sending broadcast");
+      toast.error("Network error sending broadcast");
     }
 
     setSending(false);
@@ -249,6 +257,7 @@ export function ContactsManager({ groups, contacts: initialContacts }: ContactsM
   const [newPhone, setNewPhone] = useState("");
   const [newGroup, setNewGroup] = useState<string>("");
   const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [contacts, setContacts] = useState(initialContacts);
 
@@ -272,18 +281,25 @@ export function ContactsManager({ groups, contacts: initialContacts }: ContactsM
       setNewName("");
       setNewPhone("");
       setNewGroup("");
+      toast.success("Contact added");
     } else {
       const { error } = await res.json();
       setError(error ?? "Failed to add contact");
+      toast.error(error ?? "Failed to add contact");
     }
     setSaving(false);
   }
 
   async function deleteContact(id: string) {
+    setDeletingId(id);
     const res = await fetch(`/api/broadcasts/contacts/${id}`, { method: "DELETE" });
     if (res.ok) {
       setContacts(contacts.filter((c) => String(c.id) !== id));
+      toast.success("Contact deleted");
+    } else {
+      toast.error("Failed to delete contact");
     }
+    setDeletingId(null);
   }
 
   return (
@@ -328,8 +344,13 @@ export function ContactsManager({ groups, contacts: initialContacts }: ContactsM
           <button
             onClick={addContact}
             disabled={saving || !newPhone || !newGroup}
-            className="rounded-lg bg-secondary px-4 py-2 text-sm font-semibold text-on-secondary transition hover:opacity-90 disabled:opacity-50"
+            className="flex items-center gap-2 rounded-lg bg-secondary px-4 py-2 text-sm font-semibold text-on-secondary transition hover:opacity-90 disabled:opacity-50"
           >
+            {saving ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Plus className="h-4 w-4" />
+            )}
             {saving ? "Saving..." : "Save"}
           </button>
         </div>
@@ -365,8 +386,16 @@ export function ContactsManager({ groups, contacts: initialContacts }: ContactsM
                       </span>
                     </td>
                     <td className="py-2.5">
-                      <button onClick={() => deleteContact(String(c.id))} className="text-on-surface-variant hover:text-error">
-                        <Trash2 className="h-4 w-4" />
+                      <button
+                        onClick={() => deleteContact(String(c.id))}
+                        disabled={deletingId === String(c.id)}
+                        className="text-on-surface-variant transition hover:text-error disabled:opacity-50"
+                      >
+                        {deletingId === String(c.id) ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
                       </button>
                     </td>
                   </tr>

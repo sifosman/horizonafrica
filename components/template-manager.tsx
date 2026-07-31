@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { toast } from "sonner";
 import { Template } from "@/lib/types";
 import {
   Plus,
@@ -61,6 +62,7 @@ function getStatusConfig(status: string) {
 export function TemplateManager() {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -86,7 +88,8 @@ export function TemplateManager() {
     Array<{ name: string; from: string; to: string }>
   >([]);
 
-  const fetchTemplates = useCallback(async () => {
+  const fetchTemplates = useCallback(async (isManual = false) => {
+    if (isManual) setRefreshing(true);
     try {
       const res = await fetch("/api/broadcasts/templates");
       if (res.ok) {
@@ -115,11 +118,15 @@ export function TemplateManager() {
 
         setPrevStatuses(newStatuses);
         setLastRefresh(new Date());
+        if (isManual) toast.success("Templates refreshed");
+      } else if (isManual) {
+        toast.error("Failed to refresh templates");
       }
     } catch {
-      // Silent fail on polling
+      if (isManual) toast.error("Network error refreshing templates");
     }
     setLoading(false);
+    setRefreshing(false);
   }, [prevStatuses]);
 
   // Initial fetch
@@ -167,10 +174,12 @@ export function TemplateManager() {
 
       if (!res.ok) {
         setError(data.error ?? "Failed to submit template");
+        toast.error(data.error ?? "Failed to submit template");
       } else {
         setSuccess(
           `Template "${name}" submitted to Meta for review. Status will update automatically.`
         );
+        toast.success(`Template "${name}" submitted to Meta for review`);
         // Reset form
         setName("");
         setBodyText("");
@@ -184,6 +193,7 @@ export function TemplateManager() {
       }
     } catch {
       setError("Network error submitting template");
+      toast.error("Network error submitting template");
     }
 
     setSubmitting(false);
@@ -242,13 +252,13 @@ export function TemplateManager() {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={fetchTemplates}
-              disabled={loading}
+              onClick={() => fetchTemplates(true)}
+              disabled={refreshing}
               className="flex items-center gap-1.5 rounded-lg border border-outline-variant px-3 py-2 text-xs font-semibold text-on-surface-variant transition hover:bg-surface-container disabled:opacity-50"
               title="Refresh templates"
             >
               <RefreshCw
-                className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`}
+                className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`}
               />
               Refresh
             </button>

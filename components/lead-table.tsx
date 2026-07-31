@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { toast } from "sonner";
 import { Lead, LeadScore, LeadStatus } from "@/lib/types";
 import { ScoreBadge } from "@/components/score-badge";
 import { Search, Download, X, Save, ChevronLeft, ChevronRight, Bell, Calendar, Loader2 } from "lucide-react";
@@ -42,6 +43,7 @@ export function LeadTable({ leads }: LeadTableProps) {
     if (statusFilter !== "ALL") params.set("status", statusFilter);
     if (search) params.set("search", search);
     window.open(`/api/leads/export?${params.toString()}`, "_blank");
+    toast.success("Exporting CSV...");
   }
 
   return (
@@ -214,13 +216,16 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
 
       if (!res.ok) {
         setFollowUpError(data.error ?? "Failed to schedule follow-up");
+        toast.error(data.error ?? "Failed to schedule follow-up");
       } else {
         setCurrentLead(data.lead);
         setFollowUpSuccess("Follow-up scheduled successfully.");
+        toast.success("Follow-up scheduled successfully");
         setTimeout(() => setFollowUpSuccess(null), 3000);
       }
     } catch {
       setFollowUpError("Network error scheduling follow-up");
+      toast.error("Network error scheduling follow-up");
     }
 
     setSavingFollowUp(false);
@@ -241,6 +246,9 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
       const { lead: updated } = await res.json();
       setCurrentLead(updated);
       setEditing(false);
+      toast.success("Lead updated successfully");
+    } else {
+      toast.error("Failed to update lead");
     }
     setSaving(false);
   }
@@ -258,7 +266,11 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
                 disabled={saving}
                 className="flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-1.5 text-sm font-semibold text-on-secondary transition hover:opacity-90 disabled:opacity-50"
               >
-                <Save className="h-4 w-4" />
+                {saving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
                 {saving ? "Saving..." : "Save"}
               </button>
             ) : (

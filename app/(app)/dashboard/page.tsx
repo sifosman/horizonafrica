@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { StatCard } from "@/components/stat-card";
 import { ScoreBadge } from "@/components/score-badge";
-import { Users, Flame, MessageSquare, Radio, ArrowRight } from "lucide-react";
+import { Users, Flame, MessageSquare, Radio, ArrowRight, Bell, AlertCircle } from "lucide-react";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export default async function DashboardPage() {
   const supabase = await createClient();
 
-  const [leadsCount, hotLeadsCount, conversationsCount, broadcastsCount, recentLeads, recentConversations, allLeads] = await Promise.all([
+  const [leadsCount, hotLeadsCount, conversationsCount, broadcastsCount, recentLeads, recentConversations, allLeads, pendingFollowUps, overdueFollowUps] = await Promise.all([
     supabase.from("leads").select("*", { count: "exact", head: true }),
     supabase.from("leads").select("*", { count: "exact", head: true }).eq("lead_score", "HOT"),
     supabase.from("conversations").select("*", { count: "exact", head: true }),
@@ -17,12 +17,16 @@ export default async function DashboardPage() {
     supabase.from("leads").select("*").order("created_at", { ascending: false }).limit(5),
     supabase.from("conversations").select("*").order("created_at", { ascending: false }).limit(5),
     supabase.from("leads").select("lead_score"),
+    supabase.from("leads").select("*", { count: "exact", head: true }).eq("follow_up_requested", true).eq("follow_up_sent", false),
+    supabase.from("leads").select("*", { count: "exact", head: true }).eq("follow_up_requested", true).eq("follow_up_sent", false).lt("follow_up_date", new Date().toISOString()),
   ]);
 
   const totalLeads = leadsCount.count ?? 0;
   const totalHot = hotLeadsCount.count ?? 0;
   const totalConversations = conversationsCount.count ?? 0;
   const totalBroadcasts = broadcastsCount.count ?? 0;
+  const totalPendingFollowUps = pendingFollowUps.count ?? 0;
+  const totalOverdueFollowUps = overdueFollowUps.count ?? 0;
 
   const scoreCounts = { HOT: 0, WARM: 0, COLD: 0 };
   allLeads.data?.forEach((lead) => {
@@ -67,6 +71,23 @@ export default async function DashboardPage() {
           icon={Radio}
           iconBg="bg-tertiary-container/30"
           iconColor="text-tertiary"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <StatCard
+          label="Pending Follow-Ups"
+          value={totalPendingFollowUps}
+          icon={Bell}
+          iconBg="bg-amber-50"
+          iconColor="text-amber-600"
+        />
+        <StatCard
+          label="Overdue Follow-Ups"
+          value={totalOverdueFollowUps}
+          icon={AlertCircle}
+          iconBg="bg-red-50"
+          iconColor="text-red-600"
         />
       </div>
 

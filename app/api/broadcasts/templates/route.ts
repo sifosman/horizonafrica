@@ -25,6 +25,7 @@ const LABEL_MAP: Record<string, string> = {
   hello_world: "Hello World (Test)",
   horizon_welcome_v1: "Welcome to Horizon Africa",
   horizon_followup_v5: "Follow-up Enquiry",
+  horizon_followup_v6: "Follow-up Reminder",
 };
 
 function formatLabel(name: string): string {

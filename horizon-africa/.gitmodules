@@ -1,4 +1,0 @@
-[submodule "dashboard"]
-	path = dashboard
-	url = https://github.com/sifosman/horizonafrica.git
-	branch = main

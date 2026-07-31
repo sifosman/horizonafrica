@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Retainer Addendum - FX Group WhatsApp AI Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0b1f3b;
+      --accent: #0a84ff;
+      --text: #202124;
+      --muted: #5f6368;
+      --border: #e0e0e0;
+      --bg: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+    .container { max-width: 900px; margin: 24px auto; padding: 24px; background: #fff; border: 1px solid var(--border); border-radius: 10px; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-mark { width: 44px; height: 44px; border-radius: 8px; background: linear-gradient(135deg, var(--primary), var(--accent)); }
+    .logo-img { height: 88px; width: auto; border-radius: 8px; display: block; object-fit: contain; }
+    h1 { margin: 0; font-size: 28px; color: var(--primary); }
+    .meta { text-align: right; font-size: 14px; color: var(--muted); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .card { border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+    .card h3 { margin: 0 0 8px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    .card p { margin: 2px 0; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th, td { padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { text-align: left; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .right { text-align: right; }
+    .totals { margin-top: 12px; display: grid; grid-template-columns: 1fr 240px; }
+    .totals .label { text-align: right; color: var(--muted); }
+    .totals .value { text-align: right; font-weight: 600; }
+
+    .notes { margin-top: 18px; font-size: 13px; color: var(--muted); }
+
+    footer { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 12px; }
+
+    @media print {
+      body { background: #fff; }
+      .container { border: none; border-radius: 0; box-shadow: none; margin: 0; width: 100%; }
+      .no-print { display: none !important; }
+      a { color: currentColor; text-decoration: none; }
+      @page { size: A4; margin: 16mm; }
+      table, th, td { page-break-inside: avoid; }
+    }
+    .btns { display: flex; gap: 8px; justify-content: flex-end; margin: 0 0 10px; }
+    .btn { background: var(--primary); color: #fff; border: none; border-radius: 8px; padding: 10px 14px; cursor: pointer; font-weight: 600; }
+    .btn.secondary { background: #e9eef6; color: var(--primary); }
+    .muted { color: var(--muted); }
+
+    .scope-section { margin-top: 16px; }
+    .scope-section h4 { margin: 0 0 6px; font-size: 13px; color: var(--primary); }
+    .scope-section ul { margin: 0 0 12px; padding-left: 18px; font-size: 13px; color: var(--muted); }
+    .scope-section ul li { margin-bottom: 3px; }
+    .highlight { background: #f0f7ff; border: 1px solid #c9e0ff; border-radius: 8px; padding: 14px 16px; margin-top: 16px; }
+    .highlight h4 { margin: 0 0 8px; font-size: 14px; color: var(--primary); }
+    .highlight p { margin: 2px 0; font-size: 13px; color: var(--text); }
+    .was-now { display: flex; align-items: center; gap: 14px; font-size: 15px; }
+    .was-now .was { color: var(--muted); text-decoration: line-through; }
+    .was-now .now { color: var(--primary); font-weight: 700; font-size: 20px; }
+    .was-now svg { width: 18px; height: 18px; stroke: var(--accent); fill: none; stroke-width: 2; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="no-print btns">
+      <button class="btn" onclick="window.print()">Print / Save as PDF</button>
+      <button class="btn secondary" onclick="downloadHTML()">Download HTML</button>
+    </div>
+
+    <header>
+      <div class="logo">
+        <img src="logo.png" alt="OWD Solutions Logo" class="logo-img" />
+        <div>
+          <h1>RETAINER ADDENDUM</h1>
+          <div class="muted">FX Group WhatsApp AI Platform — Monthly Support</div>
+        </div>
+      </div>
+      <div class="meta">
+        <div><strong>Addendum #</strong>: RA-2026-0715-FXG</div>
+        <div><strong>Date</strong>: 15 Jul 2026</div>
+        <div><strong>Effective From</strong>: Core platform go-live</div>
+        <div><strong>Replaces</strong>: R5,000/month retainer</div>
+      </div>
+    </header>
+
+    <div class="row">
+      <div class="card">
+        <h3>From</h3>
+        <p><strong>OWD Solutions</strong></p>
+        <p>31 Acres, Eldo Lakes East</p>
+        <p>81 Campbell Road</p>
+        <p>Email: mohamed@owdsolutions.co.za</p>
+        <p>Phone: 0658475289</p>
+      </div>
+      <div class="card">
+        <h3>Client</h3>
+        <p><strong>FX Group</strong></p>
+        <p>[Contact Name]</p>
+        <p>Phone: [Phone Number]</p>
+        <p>Email: [Email Address]</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Summary</h3>
+      <p style="font-size: 14px; color: var(--text); margin-bottom: 8px;">
+        This addendum replaces FX Group's current R5,000/month support retainer with a new all-in monthly retainer
+        that reflects the scope introduced by the Core Platform and Fast-Follow Modules quotes: dedicated server
+        ownership, Chatwoot and AI administration, monthly reporting and coaching upkeep, and the weekly in-person
+        visit to your Benoni office. All other terms of the existing working arrangement remain unchanged unless
+        stated otherwise below.
+      </p>
+      <div class="was-now">
+        <span class="was">R5,000/month</span>
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        <span class="now">R10,500/month</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <h3>New Monthly Retainer — Breakdown</h3>
+      <table style="width: 100%; margin-top: 8px;">
+        <tr>
+          <td style="padding: 10px 0; border-bottom: 1px solid var(--border);">
+            <strong>Dedicated Server Administration</strong><br>
+            <span style="font-size: 13px; color: var(--muted);">Monitoring, backups, and security patching for the dedicated server</span>
+          </td>
+          <td class="right" style="padding: 10px 0; border-bottom: 1px solid var(--border);">R1,500.00</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 0; border-bottom: 1px solid var(--border);">
+            <strong>Chatwoot &amp; AI Platform Admin</strong><br>
+            <span style="font-size: 13px; color: var(--muted);">Up to 5 AI/workflow changes per month &mdash; additional changes billed at R500/hour</span>
+          </td>
+          <td class="right" style="padding: 10px 0; border-bottom: 1px solid var(--border);">R2,000.00</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 0; border-bottom: 1px solid var(--border);">
+            <strong>AI Knowledge Base &amp; Prompt Tuning</strong><br>
+            <span style="font-size: 13px; color: var(--muted);">Keeping the AI's product, pricing, and policy knowledge current</span>
+          </td>
+          <td class="right" style="padding: 10px 0; border-bottom: 1px solid var(--border);">R1,000.00</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 0; border-bottom: 1px solid var(--border);">
+            <strong>Reporting &amp; Coaching Upkeep</strong><br>
+            <span style="font-size: 13px; color: var(--muted);">Monthly reporting review and coaching-content refresh (once Fast-Follow modules are live)</span>
+          </td>
+          <td class="right" style="padding: 10px 0; border-bottom: 1px solid var(--border);">R1,000.00</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 0;">
+            <strong>Weekly Benoni Visit</strong><br>
+            <span style="font-size: 13px; color: var(--muted);">In-person visit each Tuesday &mdash; travel time (~1hr each way) plus onsite time, &asymp;10 hours/month @ R500/hour</span>
+          </td>
+          <td class="right" style="padding: 10px 0;">R5,000.00</td>
+        </tr>
+        <tr style="font-weight: 600; border-top: 2px solid var(--primary);">
+          <td style="padding: 12px 0 4px; font-size: 16px;">New All-In Monthly Retainer</td>
+          <td class="right" style="padding: 12px 0 4px; font-size: 16px;">R10,500.00 / month</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <h3>Third-Party Services (Unchanged — Billed Directly by Providers)</h3>
+      <p style="font-size: 13px; color: var(--muted); margin-bottom: 0;">
+        As with your previous arrangement, this retainer covers OWD Solutions' time only. It does not include the
+        dedicated server, Supabase, AI/LLM token usage, or Meta WhatsApp messaging costs, all of which continue to
+        be billed directly to FX Group by their respective providers. The Botsailor subscription can be cancelled
+        once the core platform is live.
+      </p>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <h3>Terms & Conditions</h3>
+      <ul style="margin: 8px 0 0 16px; padding-left: 8px; font-size: 13px; color: var(--muted);">
+        <li>This addendum supersedes the previous R5,000/month retainer arrangement in full</li>
+        <li>New retainer takes effect from the Core Platform go-live date; first invoice due on that date, then monthly in advance</li>
+        <li>Includes up to 5 AI/workflow changes per month; additional changes, bug fixes, or ad hoc work outside this scope billed at R500/hour</li>
+        <li>Weekly Benoni visit is included at the estimated ~10 hours/month above; visits skipped by FX Group are not refunded, but repeated changes in visit frequency may prompt a review of this fee</li>
+        <li>30 days' written notice required from either party to cancel or materially change this retainer</li>
+        <li>May be reviewed after 3 months once actual support volume and visit frequency are established</li>
+        <li>OWD Solutions is not liable for business decisions made based on AI-generated responses, reports, or coaching recommendations produced under this retainer</li>
+      </ul>
+    </div>
+
+    <div class="row" style="margin-top: 16px;">
+      <div class="card">
+        <h3>Payment Details</h3>
+        <p><strong>Bank:</strong> Nedbank</p>
+        <p><strong>Account Name:</strong> M A Osman</p>
+        <p><strong>Account Number:</strong> 1012196151</p>
+        <p><strong>Branch Code:</strong> 131326</p>
+        <p><strong>Reference:</strong> RA-2026-0715-FXG</p>
+      </div>
+      <div class="card">
+        <h3>Contact</h3>
+        <p>For any queries regarding this addendum, contact:</p>
+        <p><strong>Mohamed Osman</strong></p>
+        <p>Email: mohamed@owdsolutions.co.za</p>
+        <p>Phone: 0658475289</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 16px; page-break-inside: avoid;">
+      <h3>Acceptance</h3>
+      <p style="font-size: 13px; color: var(--text); margin-bottom: 16px;">
+        By signing below, the undersigned accepts this retainer addendum, which replaces the previous R5,000/month
+        arrangement from the effective date above.
+      </p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px;">
+        <div>
+          <p style="margin: 0 0 4px; font-size: 13px; color: var(--muted);"><strong>Accepted By:</strong></p>
+          <div style="border-bottom: 1px solid var(--border); height: 40px; margin-bottom: 8px;"></div>
+          <p style="margin: 0; font-size: 13px; color: var(--muted);">Signature</p>
+          <p style="margin: 16px 0 0; font-size: 13px; color: var(--text);"><strong>Name:</strong> _________________________________</p>
+          <p style="margin: 8px 0 0; font-size: 13px; color: var(--text);"><strong>Company:</strong> FX Group</p>
+          <p style="margin: 8px 0 0; font-size: 13px; color: var(--text);"><strong>Date:</strong> _________________________________</p>
+        </div>
+        <div>
+          <p style="margin: 0 0 4px; font-size: 13px; color: var(--muted);"><strong>Provided By:</strong></p>
+          <div style="border-bottom: 1px solid var(--border); height: 40px; margin-bottom: 8px; display: flex; align-items: flex-end; padding-bottom: 4px;">
+            <span style="font-family: 'Dancing Script', cursive; font-size: 38px; font-weight: 700; color: #1a1a2e; letter-spacing: 1px; line-height: 1;">A Osman</span>
+          </div>
+          <p style="margin: 0; font-size: 13px; color: var(--muted);">Signature</p>
+          <p style="margin: 16px 0 0; font-size: 13px; color: var(--text);"><strong>Name:</strong> Mohamed Osman</p>
+          <p style="margin: 8px 0 0; font-size: 13px; color: var(--text);"><strong>Company:</strong> OWD Solutions</p>
+          <p style="margin: 8px 0 0; font-size: 13px; color: var(--text);"><strong>Date:</strong> 15 July 2026</p>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div>Thank you for your business.</div>
+      <div>Generated: 15 Jul 2026</div>
+    </footer>
+  </div>
+
+  <script>
+    function downloadHTML() {
+      const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'retainer_addendum_fxgroup_2026-07-15.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

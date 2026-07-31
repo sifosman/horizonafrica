@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Weekend Lead Response — Solution Overview</title>
+<style>
+  :root {
+    --primary: #0b1f3b;
+    --primary-light: #14335c;
+    --accent: #0a84ff;
+    --accent-soft: #e7f1ff;
+    --text: #202124;
+    --muted: #5f6368;
+    --border: #e0e0e0;
+    --bg: #ffffff;
+    --tint-a: #f7f9fc;
+    --tint-b: #eef4ff;
+    --good: #1a8a5a;
+    --good-soft: #e6f6ee;
+    --warn: #b3541e;
+    --warn-soft: #fdf0e6;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5; height: 100%; overflow: hidden;
+  }
+  section {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    padding: 64px 24px 100px; margin: 0; display: flex; align-items: flex-start;
+    overflow-y: auto; opacity: 0; pointer-events: none; transition: opacity 0.35s ease;
+  }
+  section .wrap { margin-top: auto; margin-bottom: auto; }
+  section.active { opacity: 1; pointer-events: auto; z-index: 2; }
+  .wrap { max-width: 980px; margin: 0 auto; width: 100%; }
+  .kicker {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 14px;
+  }
+  h1 { font-size: 44px; line-height: 1.15; margin: 0 0 18px; color: var(--primary); letter-spacing: -0.01em; }
+  h2 { font-size: 32px; line-height: 1.2; margin: 0 0 16px; color: var(--primary); letter-spacing: -0.01em; }
+  h3 { font-size: 18px; margin: 0 0 8px; color: var(--primary); }
+  p { margin: 0 0 14px; color: var(--muted); font-size: 17px; }
+  .lede { font-size: 20px; color: var(--muted); max-width: 720px; }
+  .grid { display: grid; gap: 18px; }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 780px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    h1 { font-size: 32px; }
+    h2 { font-size: 26px; }
+    section { padding: 48px 18px 110px; }
+  }
+
+  .card {
+    background: #fff; border: 1px solid var(--border); border-radius: 14px;
+    padding: 22px 22px 20px; box-shadow: 0 1px 2px rgba(11,31,59,0.04);
+  }
+  .icon {
+    width: 40px; height: 40px; border-radius: 10px; background: var(--accent-soft);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 14px; flex-shrink: 0;
+  }
+  .icon svg { width: 20px; height: 20px; stroke: var(--accent); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .icon.warn { background: var(--warn-soft); }
+  .icon.warn svg { stroke: var(--warn); }
+  .icon.good { background: var(--good-soft); }
+  .icon.good svg { stroke: var(--good); }
+
+  /* HERO */
+  #hero {
+    background: linear-gradient(160deg, var(--primary) 0%, var(--primary-light) 55%, #0d2c52 100%);
+    color: #fff; overflow: hidden;
+  }
+  #hero::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at 80% 15%, rgba(10,132,255,0.25), transparent 45%);
+  }
+  #hero .wrap { position: relative; z-index: 1; }
+  #hero .kicker { color: #8ec2ff; }
+  #hero h1 { color: #fff; font-size: 56px; max-width: 820px; }
+  #hero .lede { color: #c9d6ea; }
+  .badge-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 30px; }
+  .badge {
+    border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.06);
+    color: #dce8fb; padding: 8px 14px; border-radius: 999px; font-size: 13px;
+  }
+  .scroll-cue { margin-top: 46px; color: #9db6dd; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+  .scroll-cue svg { width: 14px; height: 14px; stroke: #9db6dd; fill: none; stroke-width: 2; animation: bob 1.6s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform: translateX(0); } 50% { transform: translateX(5px); } }
+
+  /* DECK NAVIGATION */
+  .deck-progress { position: fixed; top: 0; left: 0; width: 100%; height: 3px; background: var(--border); z-index: 20; }
+  .deck-progress-bar { height: 100%; width: 0%; background: var(--accent); transition: width 0.3s ease; }
+  .deck-nav {
+    position: fixed; right: 20px; bottom: 18px; z-index: 20; display: flex; align-items: center; gap: 12px;
+    background: #fff; border: 1px solid var(--border); border-radius: 999px; padding: 6px 10px;
+    box-shadow: 0 4px 16px rgba(11,31,59,0.12);
+  }
+  .nav-btn {
+    width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border); background: #fff;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;
+  }
+  .nav-btn svg { width: 15px; height: 15px; stroke: var(--primary); fill: none; stroke-width: 2.4; }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .deck-counter { font-size: 13px; color: var(--muted); font-weight: 600; min-width: 40px; text-align: center; }
+
+  /* PROBLEM */
+  #problem { background: var(--tint-a); }
+
+  /* PILLARS */
+  #pillars { background: #fff; }
+  .pillar-num {
+    font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 6px;
+  }
+
+  /* HOW IT WORKS */
+  #how, #how-detail { background: var(--tint-b); }
+  .flow { display: flex; flex-direction: column; gap: 0; margin-top: 24px; }
+  .flow-step {
+    display: flex; gap: 16px; align-items: flex-start; background: #fff; border: 1px solid var(--border);
+    border-radius: 14px; padding: 18px 20px; position: relative;
+  }
+  .flow-step + .flow-step { margin-top: 26px; }
+  .flow-connector {
+    display: flex; justify-content: center; margin: -12px 0 -12px; position: relative; z-index: 2;
+  }
+  .flow-connector svg { width: 18px; height: 22px; stroke: var(--accent); fill: none; stroke-width: 2; }
+  .flow-badge {
+    flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; background: var(--primary);
+    color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+  }
+  .flow-branch { margin-top: 10px; padding-left: 24px; border-left: 2px dashed var(--border); }
+  .flow-branch-item { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
+  .flow-branch-item .dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 7px; flex-shrink: 0; }
+  .dot.good { background: var(--good); }
+  .dot.warn { background: var(--warn); }
+  .callout {
+    margin-top: 28px; background: var(--primary); color: #fff; border-radius: 14px;
+    padding: 22px 24px; display: flex; gap: 16px; align-items: flex-start;
+  }
+  .callout .icon { background: rgba(255,255,255,0.12); }
+  .callout .icon svg { stroke: #fff; }
+  .callout strong { color: #fff; }
+  .callout p { color: #cdddf3; margin: 4px 0 0; font-size: 15px; }
+  .footnote { margin-top: 16px; font-size: 13px; color: var(--muted); background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+
+  .diagram { margin: 26px auto 32px; max-width: 760px; }
+  .diagram-node {
+    background: #fff; border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 18px; font-size: 15px; color: var(--text); text-align: center;
+  }
+  .diagram-node.source { background: var(--tint-a); color: var(--muted); font-size: 14px; }
+  .diagram-node.highlight { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 600; }
+  .diagram-node.label-good, .diagram-node.label-warn {
+    font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 8px 14px; border-width: 1.5px;
+  }
+  .diagram-node.label-good { border-color: var(--good); color: var(--good); }
+  .diagram-node.label-warn { border-color: var(--warn); color: var(--warn); }
+  .flow-trunk { width: 2px; height: 26px; background: var(--border); margin: 0 auto; }
+  .branch-wrap {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    border-top: 2px solid var(--border); border-bottom: 2px solid var(--border);
+    padding: 26px 0; position: relative;
+  }
+  .branch-col { position: relative; display: flex; flex-direction: column; gap: 10px; }
+  .branch-col::before, .branch-col::after {
+    content: ""; position: absolute; left: 50%; width: 2px; height: 26px;
+    background: var(--border); transform: translateX(-1px);
+  }
+  .branch-col::before { top: -26px; }
+  .branch-col::after { bottom: -26px; }
+  @media (max-width: 780px) {
+    .branch-wrap { grid-template-columns: 1fr; border-top: none; border-bottom: none; border-left: 2px solid var(--border); padding: 4px 0 4px 18px; margin-left: 9px; gap: 16px; }
+    .branch-col::before, .branch-col::after { display: none; }
+  }
+
+  /* TEAM */
+  #team { background: #fff; }
+  .check-list { list-style: none; margin: 0; padding: 0; }
+  .check-list li { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
+  .check-list svg { width: 20px; height: 20px; stroke: var(--good); fill: none; stroke-width: 2.4; flex-shrink: 0; margin-top: 2px; }
+  .check-list span { color: var(--text); font-size: 16px; }
+
+  /* CRM */
+  #crm { background: var(--tint-a); }
+  .pipeline { display: flex; gap: 10px; margin-top: 26px; flex-wrap: wrap; }
+  .stage { flex: 1; min-width: 140px; background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
+  .stage .label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 700; margin-bottom: 6px; }
+  .stage .desc { font-size: 13px; color: var(--muted); }
+  .stage-arrow { display: flex; align-items: center; color: var(--border); }
+  .stage-arrow svg { width: 16px; height: 16px; stroke: var(--accent); fill: none; stroke-width: 2; }
+  @media (max-width: 780px) { .pipeline { flex-direction: column; } .stage-arrow { display: none; } }
+
+  /* SPEED */
+  #speed { background: #fff; }
+
+  /* OUTCOMES */
+  #outcomes { background: var(--primary); color: #fff; }
+  #outcomes h2 { color: #fff; }
+  #outcomes .lede { color: #c9d6ea; }
+  #outcomes .card { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); }
+  #outcomes .card p, #outcomes .card h3 { color: #fff; }
+  #outcomes .icon { background: rgba(255,255,255,0.12); }
+  #outcomes .icon svg { stroke: #fff; }
+
+  footer {
+    position: fixed; left: 20px; bottom: 18px; z-index: 20;
+    color: var(--muted); font-size: 12px; background: #fff;
+    border: 1px solid var(--border); border-radius: 999px; padding: 7px 16px;
+    box-shadow: 0 4px 16px rgba(11,31,59,0.12);
+  }
+  footer strong { color: var(--primary); }
+
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<section id="hero">
+  <div class="wrap">
+    <div class="kicker">
+      <svg width="14" height="14" viewBox="0 0 24 24" stroke="#8ec2ff" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Reply Window &middot; Interface &middot; Speed
+    </div>
+    <h1>Fixing the reply window, the interface, and the lag.</h1>
+    <p class="lede">The 24-hour reply window keeps expiring before your team is back. The current inbox is slow to work in. Messages take too long to land. Here's the fix — built inside your existing scope, no extra headcount required.</p>
+    <div class="badge-row">
+      <span class="badge">24-hour reply window</span>
+      <span class="badge">Faster, cleaner inbox</span>
+      <span class="badge">Instant message delivery</span>
+    </div>
+    <div class="scroll-cue">
+      <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+      Use the arrow keys or the buttons below to continue
+    </div>
+  </div>
+</section>
+
+<section id="problem">
+  <div class="wrap reveal">
+    <div class="kicker">The Problem Today</div>
+    <h2>Three things are slowing your team down right now.</h2>
+    <p class="lede">Not lead volume, not tracking — the exact issues you've raised.</p>
+    <div class="grid grid-3" style="margin-top:28px;">
+      <div class="card">
+        <div class="icon warn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <h3>The 24-hour reply window</h3>
+        <p>WhatsApp only allows free replies for 24 hours after the customer's last message. Once the team is offline over a weekend, that window closes before anyone gets back to them.</p>
+      </div>
+      <div class="card">
+        <div class="icon warn"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+        <h3>A slow, clunky interface</h3>
+        <p>The current inbox is dense and takes too many clicks to find and reply to a conversation — it slows a 10-person team down instead of speeding them up.</p>
+      </div>
+      <div class="card">
+        <div class="icon warn"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg></div>
+        <h3>Messages take too long to land</h3>
+        <p>Even during business hours, notifications and incoming messages lag — so replies are slower than they should be, on a good day.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pillars">
+  <div class="wrap reveal">
+    <div class="kicker">The Approach</div>
+    <h2>Three fixes, matched to the three problems above.</h2>
+    <div class="grid grid-3" style="margin-top:32px;">
+      <div class="card">
+        <div class="pillar-num">01</div>
+        <div class="icon good"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <h3>A reply that resets the window, every time</h3>
+        <p>An AI assistant answers instantly, 24/7 — which resets WhatsApp's 24-hour window automatically, so it never quietly expires again.</p>
+      </div>
+      <div class="card">
+        <div class="pillar-num">02</div>
+        <div class="icon good"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+        <h3>A faster, cleaner inbox</h3>
+        <p>A modern interface built for speed — fewer clicks, a clear conversation view, on desktop and a mobile app your team will actually enjoy using.</p>
+      </div>
+      <div class="card">
+        <div class="pillar-num">03</div>
+        <div class="icon good"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg></div>
+        <h3>Infrastructure built for instant delivery</h3>
+        <p>Resources sized specifically for your business, so messages and notifications arrive the moment they're sent — even during peak traffic.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap reveal">
+    <div class="kicker">How It Works</div>
+    <h2>The 24-hour reply window only becomes a problem when nobody replies. So something always replies.</h2>
+    <p class="lede">WhatsApp resets that 24-hour window every time the customer gets <em>any</em> reply — it doesn't have to be from a human. That's the entire mechanism behind this solution.</p>
+
+    <div class="diagram">
+      <div class="diagram-node source">Facebook Ad / WhatsApp message — any time, any day</div>
+      <div class="flow-trunk"></div>
+      <div class="diagram-node highlight">AI Assistant replies instantly (24/7) — window stays open</div>
+      <div class="branch-wrap">
+        <div class="branch-col">
+          <div class="diagram-node label-good">Simple / standard query</div>
+          <div class="diagram-node">AI answers directly — sends a quote itself for catalogue-priced items</div>
+        </div>
+        <div class="branch-col">
+          <div class="diagram-node label-warn">Ready-to-buy or custom lead</div>
+          <div class="diagram-node">Flagged into your team's inbox with full context already captured</div>
+        </div>
+      </div>
+      <div class="flow-trunk"></div>
+      <div class="diagram-node highlight">Monday: a sorted queue, not a mess</div>
+    </div>
+  </div>
+</section>
+
+<section id="how-detail">
+  <div class="wrap reveal">
+    <div class="kicker">And How Monday Changes</div>
+    <h2>From the first message to a sorted Monday morning queue.</h2>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-badge">1</div>
+        <div>
+          <h3>Lead messages on WhatsApp — any time, any day</h3>
+          <p style="margin:0;">Triggered by a Facebook ad click, a saved number, or a walk-in enquiry. Doesn't matter if it's 11pm Friday or midday Tuesday.</p>
+        </div>
+      </div>
+      <div class="flow-connector"><svg viewBox="0 0 12 16"><path d="M6 0v14M1 9l5 5 5-5"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-badge">2</div>
+        <div>
+          <h3>AI replies instantly — the window stays open</h3>
+          <p style="margin:0;">Answers questions on board types, sizes, materials, stock and delivery, and asks the qualifying questions a rep would ask.</p>
+        </div>
+      </div>
+      <div class="flow-connector"><svg viewBox="0 0 12 16"><path d="M6 0v14M1 9l5 5 5-5"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-badge">3</div>
+        <div style="width:100%;">
+          <h3>The AI keeps working the lead, not just auto-replying</h3>
+          <div class="flow-branch">
+            <div class="flow-branch-item"><span class="dot good"></span><span>Standard, catalogue-priced items: the AI can generate and <strong>send an indicative quote itself</strong>, same day — no waiting for Monday.</span></div>
+            <div class="flow-branch-item"><span class="dot warn"></span><span>Ready-to-buy or custom/complex requests: flagged straight into your team's shared inbox with the full conversation and details already captured.</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="flow-connector"><svg viewBox="0 0 12 16"><path d="M6 0v14M1 9l5 5 5-5"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-badge">4</div>
+        <div>
+          <h3>Monday morning: a queue, not a mess</h3>
+          <p style="margin:0;">Your team opens the inbox to pre-qualified leads — some already quoted — sorted by how ready they are to buy, instead of a pile of unread weekend messages.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="icon"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></div>
+      <div>
+        <strong>Outcome by Monday</strong>
+        <p>Instead of a pile of unanswered weekend messages, your team finds a sorted queue of qualified leads — some already quoted — ready to confirm and close.</p>
+      </div>
+    </div>
+
+    <div class="footnote">
+      Honest limit: if a customer goes quiet for 24+ hours without replying to the AI either, WhatsApp still requires an approved template message to restart that specific chat — same rule as today. It just rarely triggers, because the AI is always the one keeping the conversation alive.
+    </div>
+  </div>
+</section>
+
+<section id="team">
+  <div class="wrap reveal">
+    <div class="kicker">Same Team, Faster Tool</div>
+    <h2>Same inbox habit, upgraded underneath.</h2>
+    <div class="grid grid-2" style="margin-top:8px; align-items:center;">
+      <div>
+        <ul class="check-list">
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Fewer clicks to open and reply to a conversation.</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>A clean, modern layout that's easy to scan even at high message volume.</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Messages and notifications arrive instantly — no lag, even during busy periods.</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Works on desktop in the office and on a mobile app on the road.</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Any of the 10 team members can still pick up any lead — nothing changes there.</span></li>
+        </ul>
+      </div>
+      <div class="card" style="background:var(--tint-b); border:none;">
+        <h3>Same team. Same daily workflow. Faster tool underneath.</h3>
+        <p style="margin:0;">Your team keeps working the way they already know — replying to customers on WhatsApp-style chats — just on a cleaner interface, with quicker message delivery.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="crm">
+  <div class="wrap reveal">
+    <div class="kicker">An Added Bonus</div>
+    <h2>Something you didn't ask for, but comes with it anyway.</h2>
+    <p class="lede">You haven't flagged lead tracking as a problem — but since everything flows through one system now, this comes along at no extra complexity.</p>
+    <div class="pipeline">
+      <div class="stage"><div class="label">New</div><div class="desc">Lead messages in, AI starts qualifying</div></div>
+      <div class="stage-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="stage"><div class="label">Contacted</div><div class="desc">AI or team member has engaged</div></div>
+      <div class="stage-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="stage"><div class="label">Follow-Up</div><div class="desc">Automatic reminder if it's gone quiet</div></div>
+      <div class="stage-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="stage"><div class="label">Won / Lost</div><div class="desc">Outcome logged for reporting</div></div>
+    </div>
+    <div class="grid grid-2" style="margin-top:30px;">
+      <div class="card">
+        <div class="icon good"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <h3>Automatic follow-up alerts</h3>
+        <p style="margin:0;">If a lead goes quiet, the system nudges the assigned team member to check back in — instead of relying on memory.</p>
+      </div>
+      <div class="card">
+        <div class="icon good"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></div>
+        <h3>Full visibility for management</h3>
+        <p style="margin:0;">See lead volume, response speed, and conversion for the first time — across all 10 team members, in one place.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="speed">
+  <div class="wrap reveal">
+    <div class="kicker">Speed, In Practice</div>
+    <h2>Why messages have been slow to land — and how that changes.</h2>
+    <div class="grid grid-2" style="align-items:center;">
+      <p class="lede" style="margin:0;">Delayed message delivery usually comes down to shared, under-resourced infrastructure. This runs on a dedicated environment sized specifically for your business — not a shared, general-purpose setup — so messages and notifications land instantly.</p>
+      <div class="card" style="background:var(--tint-a); border:none;">
+        <h3>What that means in practice</h3>
+        <ul class="check-list" style="margin-top:10px;">
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Consistent, instant delivery during peak traffic, not just quiet periods.</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Built to scale with your ad spend, not slow down because of it.</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>No competing with other unrelated accounts for resources.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="outcomes">
+  <div class="wrap reveal">
+    <div class="kicker">What Actually Changes</div>
+    <h2>The three problems, resolved — plus one you get for free.</h2>
+    <div class="grid grid-2" style="margin-top:28px;">
+      <div class="card">
+        <div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <h3>The reply window stops being a risk</h3>
+        <p style="margin:0;">Every message gets an instant reply, so the 24-hour window never quietly expires again.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+        <h3>A tool the team isn't fighting</h3>
+        <p style="margin:0;">Less time wrestling with the interface, more time actually replying to customers.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg></div>
+        <h3>Messages arrive the moment they're sent</h3>
+        <p style="margin:0;">No more lag between a customer messaging and your team seeing it.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></div>
+        <h3>Bonus: full lead visibility, at no extra complexity</h3>
+        <p style="margin:0;">Not something you asked for, but since it's all one system, you get tracking and follow-up reminders built in.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Prepared by <strong>OWD Solutions</strong>
+</footer>
+
+<div class="deck-progress"><div class="deck-progress-bar" id="progressBar"></div></div>
+<div class="deck-nav">
+  <button class="nav-btn" id="prevBtn" aria-label="Previous slide" type="button"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+  <div class="deck-counter"><span id="slideCurrent">1</span> / <span id="slideTotal">1</span></div>
+  <button class="nav-btn" id="nextBtn" aria-label="Next slide" type="button"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+</div>
+
+<script>
+  (function () {
+    var slides = Array.prototype.slice.call(document.querySelectorAll('body > section'));
+    var current = 0;
+    var prevBtn = document.getElementById('prevBtn');
+    var nextBtn = document.getElementById('nextBtn');
+    var slideCurrent = document.getElementById('slideCurrent');
+    var slideTotal = document.getElementById('slideTotal');
+    var progressBar = document.getElementById('progressBar');
+
+    slideTotal.textContent = slides.length;
+
+    function render() {
+      slides.forEach(function (slide, i) {
+        var isActive = i === current;
+        slide.classList.toggle('active', isActive);
+        if (isActive) {
+          slide.scrollTop = 0;
+          var reveal = slide.querySelector('.reveal');
+          if (reveal) {
+            reveal.classList.remove('in');
+            requestAnimationFrame(function () {
+              requestAnimationFrame(function () { reveal.classList.add('in'); });
+            });
+          }
+        }
+      });
+      slideCurrent.textContent = current + 1;
+      progressBar.style.width = (current / (slides.length - 1)) * 100 + '%';
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === slides.length - 1;
+    }
+
+    function goTo(i) {
+      if (i < 0 || i >= slides.length) { return; }
+      current = i;
+      render();
+    }
+
+    prevBtn.addEventListener('click', function () { goTo(current - 1); });
+    nextBtn.addEventListener('click', function () { goTo(current + 1); });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+        e.preventDefault(); goTo(current + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+        e.preventDefault(); goTo(current - 1);
+      }
+    });
+
+    render();
+  })();
+</script>
+
+</body>
+</html>

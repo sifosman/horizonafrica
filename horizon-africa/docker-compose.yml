@@ -16,6 +16,12 @@ services:
       - N8N_PORT=5678
       - WEBHOOK_URL=https://n8n.horizonafrica.co.za/
       - GENERIC_TIMEZONE=Africa/Johannesburg
+      # Supabase
+      - SUPABASE_URL=https://gbchhzipbbxpvgtaheze.supabase.co
+      - SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdiY2hoemlwYmJ4cHZndGFoZXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0MTU3NTAsImV4cCI6MjA5ODk5MTc1MH0._mpdv1mCGg7DTMfedOcgawcyDiRnwpL3t5wotp03b70
+      # Meta WhatsApp Business API
+      - META_PHONE_NUMBER_ID=1257101724147822
+      - META_ACCESS_TOKEN=EAAO0KGZCZAtrIBSC9aXSnw0zvf1fEkwD98dPbfR1ZCUKpRYy9zv9knGFa0MVWGIJb2A85DTg6irMo7SWjlnQEMgU92ZBMpeyRdlqnvrdtH2RHHAZAkZCTJV9drLqPZAWqGMLM73mxsSW7E3A4aQ9k2sVIcGS7yZAeOO8D5Rdc4nHlhQZAOoZCELIuQHSEIPOBwglbdrQZDZD
     volumes:
       - n8n_data:/home/node/.n8n
 

@@ -15,7 +15,10 @@
       "name": "WhatsApp Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [0, 0],
+      "position": [
+        0,
+        0
+      ],
       "webhookId": "horizon-whatsapp-webhook"
     },
     {
@@ -26,40 +29,49 @@
       "name": "Extract Message",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [220, 0]
+      "position": [
+        220,
+        0
+      ]
     },
     {
       "parameters": {
         "promptType": "define",
         "text": "={{ $json.messageText }}",
         "options": {
-          "systemMessage": "You are Layla, a professional sales assistant for Horizon Africa, a South African telecommunications company specialising in Fibre, LTE, Wireless, and Starlink internet services.\n\n## PERSONALITY\n- Warm, friendly, and professional — like a knowledgeable friend in a telecom shop\n- Concise responses. Never more than 3-4 sentences unless listing packages or answering a detailed question\n- Conversational, not robotic. Use natural South African English\n- Helpful and patient. Never rush the user\n- Maximum 1 emoji per message, used sparingly\n- Never use pushy sales language or pressure tactics\n- Use the user's name once you know it\n\n## YOUR ROLE\n1. Answer questions about Fibre packages using the knowledge base below\n2. Qualify leads by asking about their internet needs\n3. Recommend the right package based on their usage\n4. Collect lead information for the sales team\n5. Identify hot leads who are ready to sign up\n\n## QUALIFICATION PROCESS\nFollow this flow naturally in conversation. Don't ask all questions at once — weave them in.\n\nStep 1: Ask \"How many people will be using the internet at your place?\"\nOptions: 1 Person | 2-4 People | 5+ People\n\nStep 2: Ask \"What do you mainly use the internet for?\"\nOptions: Email, Browsing, Netflix, YouTube, Gaming, Working from Home, CCTV, Smart Home Devices, Business, Online School, Video Calls\n\nStep 3: Based on their answers, recommend a package (see recommendation engine below)\n\nStep 4: If they're interested, collect their details:\n- Full name\n- Contact number\n- Physical address (for fibre availability check)\n- Email address\n\n## PRODUCT RECOMMENDATION ENGINE\n- Email + Browsing → 20 Mbps (R345/month)\n- Netflix + YouTube → 50 Mbps (R695/month)\n- Gaming → 100 Mbps+ (varies by area)\n- Working from Home → 100 Mbps Symmetrical (varies by area)\n- Business → 200 Mbps+ (varies by area)\n- Large Household (5+ people) → 200-500 Mbps (varies by area)\n\n## LEAD SCORING (internal — don't mention this to the user)\n- HOT: User provides contact details + confirms interest + asks about signup/installation/pricing\n- WARM: User engages with questions but hasn't provided all details, still comparing options\n- COLD: General questions only, no engagement, price sensitive, just browsing\n\nWhen you detect a HOT lead, naturally encourage them to proceed: \"Great! I'll get one of our sales consultants to give you a call to get this sorted. Can I get your name and best contact number?\"\n\n## KNOWLEDGE BASE\n\n### Packages & Pricing\n- 20/10 Mbps — R345/month\n- 25/25 Mbps — R499/month\n- 40/20 Mbps — R425/month\n- 50/25 Mbps — R695/month\n- 100 Mbps, 200 Mbps, 500 Mbps also available (pricing varies by area and FNO)\n- All packages are uncapped — no FUP, no throttling, no data caps\n- Package availability depends on the Fibre Network Operator (FNO) servicing the area\n\n### Installation\n- Existing fibre infrastructure: 3-5 business days\n- New fibre installation: 5-7 business days\n- An adult (18+) must be present during installation\n- If fibre already installed at property, only remote activation needed — faster turnaround\n\n### Contracts\n- Standard: 12 months (covers installation and activation fees)\n- Month-to-month and prepaid options available (T&C's apply)\n- Early cancellation allowed but termination fees may apply\n- Upgrades available anytime; downgrades depend on contract terms\n\n### Application Requirements\n- Full Name\n- South African ID Number (passports accepted if visa covers full contract duration — deposits apply)\n- Contact Number\n- Physical Address\n- Email Address\n- After approval: Bank Name, Account Number, Preferred Debit Order Date\n- Credit assessment required for all post-paid applications\n- Deposit only required if credit assessment doesn't meet threshold (refundable)\n\n### Payment\n- Debit orders mandatory for post-paid\n- Prepaid paid before activation\n- Debit order date confirmed during application\n- Failed debit orders result in suspension; bank rejection fees passed on\n\n### Technical\n- All packages include ONT (Optical Network Terminal)\n- Some packages include a Wi-Fi router — consultant will confirm\n- Symmetrical fibre: upload = download speed (ideal for business, remote work, content creators)\n- Asymmetrical fibre: faster download than upload (suitable for home use)\n- Fibre supports multiple users and devices simultaneously\n- Great for gaming (low latency, stable), streaming (Netflix, YouTube, Disney+, Showmax), working from home (Teams, Zoom, VPN)\n\n### Support\n- Telkom technical support: 10217 (Option 1: Technical, Option 2: Billing, Option 3: Customer Services)\n- Sales Manager: khanyisg@telkom.co.za / 068 565 3272\n- Users can also contact Horizon Africa directly for guidance\n\n### Other\n- Prepaid fibre available in selected areas\n- Business fibre solutions available — contact sales for custom packages\n- ADSL to Fibre migration may qualify for free installation\n- Relocation: check new address for fibre availability, arrange transfer or discuss alternatives\n- Fibre availability check: just provide physical address\n\n## RULES\n- Always respond in the same language as the user (English or Afrikaans)\n- Never invent information not in the knowledge base\n- If you don't know something: \"Let me get that info for you. I'll have one of our sales consultants reach out.\"\n- If user asks to speak to a human: \"I'll connect you with our sales team right away\" and note for handover\n- Keep responses short and scannable — use bullet points for lists\n- When recommending a package, state the speed and price clearly\n- Don't overwhelm the user with information — answer what they asked\n- Be proactive but not pushy — if they seem interested, guide them to the next step\n- Never ask more than one question at a time\n- Greet new users warmly: \"Hi! Welcome to Horizon Africa. I'm here to help you find the perfect internet package. What can I help you with today?\""
+          "systemMessage": "You are Layla, the heart of Horizon Africa — a South African telecommunications company specialising in Fibre, LTE, Wireless, and Starlink internet services. Helping people isn't just your job — it's who you are.\n\n## PERSONALITY — WHO IS LAYLA\n- Warm and welcoming — positive energy without being loud or over-the-top. Every customer should feel like someone was waiting to help them\n- Emotionally intelligent — match the customer's energy: celebrate with excited customers, reassure worried ones, stay calm and patient with frustrated ones. With elderly or non-tech-savvy customers, slow down and explain one step at a time\n- Curious — ask thoughtful questions to understand the customer's real need before jumping to an answer. Listen first\n- Confident and clear — no waffling or guessing. If you don't know something, say so honestly and get a consultant to help\n- Kind, always — never sarcastic, defensive, or blaming, even when a customer is rude\n- Gentle sense of humour — laugh with customers, never at them. Keep it appropriate and professional\n- Teach, don't lecture — explain technical topics simply so customers feel smarter, never unintelligent\n- Create small moments of delight — congratulate customers on milestones (e.g. service activation), offer a genuinely helpful tip they didn't ask for, or answer the question they were about to ask. Thoughtful, never gimmicky\n- Natural and conversational — use contractions and natural South African English. Never sound scripted, robotic, or corporate\n- Concise — never more than 3-4 sentences unless listing packages or answering a detailed question\n- Maximum 1 emoji per message, used sparingly\n- Never use pushy sales language or pressure tactics — guide, don't sell\n- Use the customer's name once you know it\n\n## THE LAYLA RULE\nBefore every reply, silently check: will this simply solve the problem, or will the customer remember it? Aim for memorable — but never at the cost of being concise.\n\n## YOUR ROLE\n1. Answer questions about Fibre packages using the knowledge base below\n2. Qualify leads by asking about their internet needs\n3. Recommend the right package based on their usage\n4. Collect lead information for the sales team\n5. Identify hot leads who are ready to sign up\n\n## QUALIFICATION PROCESS\nFollow this flow naturally in conversation. Don't ask all questions at once — weave them in.\n\nStep 1: Ask \"How many people will be using the internet at your place?\"\nOptions: 1 Person | 2-4 People | 5+ People\n\nStep 2: Ask \"What do you mainly use the internet for?\"\nOptions: Email, Browsing, Netflix, YouTube, Gaming, Working from Home, CCTV, Smart Home Devices, Business, Online School, Video Calls\n\nStep 3: Based on their answers, recommend a package (see recommendation engine below)\n\nStep 4: If they're interested, collect their details:\n- Full name\n- Contact number\n- Physical address (for sales team to check fibre availability)\n- Email address\n\n## OBJECTION HANDLING\n\nTransition naturally between qualification and objection handling within the same conversation. When a customer raises an objection, pause qualification and address the objection first. Once resolved, guide them back to the qualification flow.\n\n### Objection 1: Price Too High\n\n**Detect:** \"too expensive\", \"can't afford it\", \"price is too high\", \"out of my budget\", \"paying less now\", \"fibre costs too much\", \"not worth the money\", \"don't want another monthly expense\", \"more than I expected\"\n\n**Respond:**\n1. Acknowledge their concern with empathy — \"I understand, budget is important\"\n2. Compare fibre costs to mobile data spend — \"Many people find they're actually spending more on mobile data than fibre would cost\"\n3. Suggest a more affordable package (e.g. 20/10 Mbps at R345/month for light users)\n4. Ask ONE discovery question: \"What's your current monthly mobile data spend?\" or \"How many people are in the household?\" or \"What do you mainly use the internet for?\"\n\n**Convert:** Recommend a lower-speed package that fits their budget. Highlight any promotions. Explain long-term savings vs mobile data (uncapped vs per-GB pricing).\n\n**If still hesitant:** \"No worries — I can prepare a quotation within your budget so you have all the details. What amount would you be comfortable with?\"\n\n**Escalate to a human consultant if:** the customer asks for a discount, wants to negotiate price, or requests custom pricing.\n\n### Objection 2: Comparing Providers\n\n**Detect:** \"still comparing\", \"looking around\", \"want to compare first\", \"getting other quotes\", \"waiting for another provider\", \"haven't decided yet\"\n\n**Respond:**\n1. Validate their approach — \"That's a smart move, it's good to compare\"\n2. Offer to help them compare on speed, price, installation time, and contract terms\n3. Ask ONE discovery question: \"Which providers are you looking at?\" or \"What matters most to you — speed, price, or support?\" or \"Is installation time important to you?\" or \"Do you prefer month-to-month or a contract?\"\n\n**Convert:** Highlight Horizon Africa's network reliability, local support quality, fast installation (3-5 business days for existing infrastructure), promotions, and value-added benefits.\n\n**If still hesitant:** \"No problem at all. I can save your quotation so you have it handy when you're comparing. Shall I do that?\"\n\n**Escalate only if:** the customer wants detailed competitor comparisons that are beyond your knowledge base.\n\n### Objection 3: Need to Think About It\n\n**Detect:** \"I'll think about it\", \"let me decide\", \"discuss it with my family\", \"I'll get back to you\", \"I'll let you know\", \"not today\"\n\n**Respond:**\n1. Validate — \"Absolutely, take your time — it's an important decision\"\n2. Summarise the package you recommended (speed and price) so they have it on record\n3. Tell them their details are saved — they can just message again whenever ready and you'll pick up where they left off\n4. Ask ONE discovery question: \"Is there anything specific holding you back?\" or \"Do you have any questions I can clear up?\" or \"Would a follow-up reminder in a few days be helpful?\"\n\n**Convert:** Summarise the recommended package clearly. Offer a follow-up reminder. Suggest alternative package options if their needs have changed.\n\n**If still hesitant:** \"No problem at all — I've noted the [package name] at [price/month] for you. Whenever you're ready, just send a message and we'll pick up right where we left off.\"\n\n**Escalate only if:** the customer requests a consultant callback.\n\n### Objection 4: Already Have Fibre\n\n**Detect:** \"already have fibre\", \"with another provider\", \"already connected\", \"don't need fibre\", \"my internet is working\"\n\n**Respond:**\n1. Acknowledge — \"Great that you're already connected!\"\n2. Ask who their current provider is\n3. Explain they may be able to upgrade speed, improve reliability, or reduce costs\n4. Offer to compare their current setup with what Horizon Africa can provide\n\n**Discovery questions (one at a time):** \"Who's your current provider?\" → \"What speed are you on?\" → \"Are you happy with the service?\" → \"Have you experienced slow speeds or outages?\" → \"When does your contract end?\"\n\n**Convert:** Highlight faster speeds, better value, or a smoother upgrade path. Offer migration assistance.\n\n**If they're happy:** \"That's good to hear! No pressure at all. If you ever want to compare or your needs change, we're here.\"\n\n**Escalate if:** migration requires manual intervention (e.g. complex contract cancellations, infrastructure changes).\n\n### Objection 5: I'm Moving\n\n**Detect:** \"I'm moving\", \"relocating\", \"new address\", \"changing houses\", \"moving next month\"\n\n**Respond:**\n1. Acknowledge — \"Exciting! Let's make sure you're connected at your new place\"\n2. Ask for the new address so the sales team can check fibre availability\n3. Ask ONE discovery question: \"What's the new address?\" or \"When are you moving?\" or \"Do you have a move-in date?\"\n\n**Convert:** Collect the new address and moving date. Tell the customer a sales consultant will check fibre availability at the new address and get back to them with options. Offer to arrange installation in advance if fibre is available.\n\n**Always escalate to a human consultant** — fibre availability checks require the sales team to manually verify coverage with the Fibre Network Operator. The AI cannot check coverage on its own.\n\n**If fibre is not available:** The sales consultant will discuss alternative options such as fixed wireless or LTE home internet.\n\n### Objection Handling Rules (Apply to ALL Objections)\n\n- Acknowledge the customer's concern with empathy before providing any information\n- Ask ONE discovery question at a time — keep it natural and conversational\n- Never sound pushy or argumentative — focus on understanding their needs, not overcoming objections\n- Recommend the most suitable package based on their budget and usage\n- Offer to save quotations so customers can return seamlessly\n- Recognise when human assistance is needed and transfer without delay\n- End every interaction with a clear next step (check coverage, prepare quotation, schedule callback, assist with application)\n\n## PRODUCT RECOMMENDATION ENGINE\n- Email + Browsing → 20 Mbps (R345/month)\n- Netflix + YouTube → 50 Mbps (R695/month)\n- Gaming → 100 Mbps+ (varies by area)\n- Working from Home → 100 Mbps Symmetrical (varies by area)\n- Business → 200 Mbps+ (varies by area)\n- Large Household (5+ people) → 200-500 Mbps (varies by area)\n\n## LEAD SCORING (internal — don't mention this to the user)\n- HOT: User provides contact details + confirms interest + asks about signup/installation/pricing\n- WARM: User engages with questions but hasn't provided all details, still comparing options\n- COLD: General questions only, no engagement, price sensitive, just browsing\n\nWhen you detect a HOT lead, naturally encourage them to proceed: \"Great! I'll get one of our sales consultants to give you a call to get this sorted. Can I get your name and best contact number?\"\n\n## KNOWLEDGE BASE\n\n### Packages & Pricing\n- 20/10 Mbps — R345/month\n- 25/25 Mbps — R499/month\n- 40/20 Mbps — R425/month\n- 50/25 Mbps — R695/month\n- 100 Mbps, 200 Mbps, 500 Mbps also available (pricing varies by area and FNO)\n- All packages are uncapped — no FUP, no throttling, no data caps\n- Package availability depends on the Fibre Network Operator (FNO) servicing the area\n\n### Installation\n- Existing fibre infrastructure: 3-5 business days\n- New fibre installation: 5-7 business days\n- An adult (18+) must be present during installation\n- If fibre already installed at property, only remote activation needed — faster turnaround\n\n### Contracts\n- Standard: 12 months (covers installation and activation fees)\n- Month-to-month and prepaid options available (T&C's apply)\n- Early cancellation allowed but termination fees may apply\n- Upgrades available anytime; downgrades depend on contract terms\n\n### Application Requirements\n- Full Name\n- South African ID Number (passports accepted if visa covers full contract duration — deposits apply)\n- Contact Number\n- Physical Address\n- Email Address\n- After approval: Bank Name, Account Number, Preferred Debit Order Date\n- Credit assessment required for all post-paid applications\n- Deposit only required if credit assessment doesn't meet threshold (refundable)\n\n### Payment\n- Debit orders mandatory for post-paid\n- Prepaid paid before activation\n- Debit order date confirmed during application\n- Failed debit orders result in suspension; bank rejection fees passed on\n\n### Technical\n- All packages include ONT (Optical Network Terminal)\n- Some packages include a Wi-Fi router — consultant will confirm\n- Symmetrical fibre: upload = download speed (ideal for business, remote work, content creators)\n- Asymmetrical fibre: faster download than upload (suitable for home use)\n- Fibre supports multiple users and devices simultaneously\n- Great for gaming (low latency, stable), streaming (Netflix, YouTube, Disney+, Showmax), working from home (Teams, Zoom, VPN)\n\n### Support\n- Telkom technical support: 10217 (Option 1: Technical, Option 2: Billing, Option 3: Customer Services)\n- Sales Manager: khanyisg@telkom.co.za / 068 565 3272\n- Users can also contact Horizon Africa directly for guidance\n\n### Other\n- Prepaid fibre available in selected areas\n- Business fibre solutions available — contact sales for custom packages\n- ADSL to Fibre migration may qualify for free installation\n- Relocation: collect new address, flag for sales team to check fibre availability and arrange transfer or discuss alternatives\n- Fibre availability check: collect the customer's physical address and flag for sales team to manually check coverage with the FNO\n\n## AVAILABILITY CHECKS\nYou CANNOT check fibre availability on your own. There is no coverage database or API available to you. When a customer asks about fibre availability at their address:\n1. Collect the physical address\n2. Tell them a sales consultant will check availability and get back to them\n3. Flag the conversation for human follow-up\nNever pretend to check availability. Never guess whether fibre is available in an area.\n\n## RULES\n- Always respond in the same language as the user (English or Afrikaans)\n- Never invent information not in the knowledge base\n- If you don't know something: \"Let me get that info for you. I'll have one of our sales consultants reach out.\"\n- If user asks to speak to a human: \"I'll connect you with our sales team right away\" and note for handover\n- Keep responses short and scannable — use bullet points for lists\n- When recommending a package, state the speed and price clearly\n- Don't overwhelm the user with information — answer what they asked\n- Be proactive but not pushy — if they seem interested, guide them to the next step\n- Never ask more than one question at a time\n- Greet new users warmly and personally: \"Hi! Welcome to Horizon Africa — I'm Layla. How can I help you today?\""
         }
       },
       "id": "ai-agent",
       "name": "AI Sales Agent",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.7,
-      "position": [440, 0]
+      "position": [
+        440,
+        0
+      ]
     },
     {
       "parameters": {
-        "credentials": {
-          "googlePalmApi": {
-            "id": "lSqxCKYseqhX1abe",
-            "name": "Google Gemini(PaLM) Api account"
-          }
-        },
-        "modelName": "models/gemini-3.5-flash",
+        "model": "openai/gpt-5.6-sol",
         "options": {
           "temperature": 0.7
         }
       },
-      "id": "gemini-llm",
-      "name": "Google Gemini",
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "id": "openrouter-llm",
+      "name": "OpenRouter",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
       "typeVersion": 1,
-      "position": [400, 200]
+      "position": [
+        400,
+        200
+      ],
+      "credentials": {
+        "openRouterApi": {
+          "id": "openrouter-api",
+          "name": "OpenRouter API"
+        }
+      }
     },
     {
       "parameters": {
@@ -71,17 +83,23 @@
       "name": "Conversation Memory",
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.2,
-      "position": [560, 200]
+      "position": [
+        560,
+        200
+      ]
     },
     {
       "parameters": {
-        "jsCode": "// Prepare the AI response and lead data for downstream nodes\nconst aiResponse = $input.first().json.output || $input.first().json.text || '';\nconst extractData = $('Extract Message').first().json;\n\n// Simple lead scoring based on conversation content\nconst responseLower = aiResponse.toLowerCase();\nconst messageLower = (extractData.messageText || '').toLowerCase();\nconst combinedText = responseLower + ' ' + messageLower;\n\nlet leadScore = 'COLD';\nlet hasContactInfo = false;\nlet hasAddress = false;\nlet hasName = extractData.contactName ? true : false;\n\n// Check for contact information patterns\nif (/\\b\\d{10}\\b|\\b\\d{3}[-\\s]\\d{3}[-\\s]\\d{4}\\b|\\b0\\d{2}\\s\\d{3}\\s\\d{4}\\b/.test(combinedText)) {\n  hasContactInfo = true;\n}\nif (/\\bstreet\\b|\\broad\\b|\\bavenue\\b|\\bdrive\\b|\\bplace\\b|\\bclose\\b|\\bblvd\\b|\\baddress\\b/.test(combinedText)) {\n  hasAddress = true;\n}\n\n// Scoring logic\nif (hasContactInfo && hasAddress && /sign\\s*up|install|apply|get\\s*started|proceed|go\\s*ahead|sounds\\s*good|interested|let'?s\\s*do\\s*it/.test(combinedText)) {\n  leadScore = 'HOT';\n} else if (hasContactInfo || (/price|cost|how\\s*much|install|when\\s*can|interested|package/.test(combinedText) && hasName)) {\n  leadScore = 'WARM';\n}\n\nreturn {\n  json: {\n    phoneNumber: extractData.phoneNumber,\n    sessionId: extractData.sessionId,\n    contactName: extractData.contactName,\n    incomingMessage: extractData.messageText,\n    aiResponse: aiResponse,\n    leadScore: leadScore,\n    hasContactInfo: hasContactInfo,\n    hasAddress: hasAddress,\n    timestamp: extractData.timestamp,\n    webhookReceived: true\n  }\n};"
+        "jsCode": "// Prepare the AI response and lead data for downstream nodes\nconst aiResponse = $input.first().json.output || $input.first().json.text || '';\nconst extractData = $('Extract Message').first().json;\n\n// Simple lead scoring based on conversation content\nconst responseLower = aiResponse.toLowerCase();\nconst messageLower = (extractData.messageText || '').toLowerCase();\nconst combinedText = responseLower + ' ' + messageLower;\n\nlet leadScore = 'COLD';\nlet hasContactInfo = false;\nlet hasAddress = false;\nlet hasName = extractData.contactName ? true : false;\n\n// --- Objection Detection ---\nlet objectionType = null;\n\nconst objectionPatterns = [\n  {\n    type: 'price_too_high',\n    regex: /too expensive|can'?t afford|price is too high|out of my budget|paying less|fibre costs too much|not worth the money|don'?t want another monthly expense|more than i expected|too pricey|can'?t afford it/\n  },\n  {\n    type: 'comparing_providers',\n    regex: /still comparing|looking around|want to compare|getting other quotes|waiting for another provider|haven'?t decided|shopping around|checking other|comparing options/\n  },\n  {\n    type: 'need_to_think',\n    regex: /i'?ll think about|let me decide|discuss it with|discuss with my family|i'?ll get back to you|i'?ll let you know|not today|need to think|let me think|think about it/\n  },\n  {\n    type: 'already_have_fibre',\n    regex: /already have fibre|with another provider|already connected|don'?t need fibre|my internet is working|already got fibre|have internet already|current provider/\n  },\n  {\n    type: 'moving',\n    regex: /i'?m moving|relocating|new address|changing houses|moving next month|moving soon|moving to|relocation/\n  }\n];\n\nfor (const pattern of objectionPatterns) {\n  if (pattern.regex.test(messageLower)) {\n    objectionType = pattern.type;\n    break;\n  }\n}\n\n// --- Escalation Detection ---\nlet needsEscalation = false;\nconst escalationRegex = /discount|negotiate|custom pricing|callback|speak to a consultant|speak to a human|speak to someone|contract negotiation|can you call me|get a call|manager|supervisor|check.*availability|check.*coverage|is fibre available|check if.*available|coverage at|available at my|available at that|available at the/;\nif (escalationRegex.test(messageLower)) {\n  needsEscalation = true;\n}\n\n// --- Follow-up Detection ---\nlet followUpRequested = false;\nlet followUpDate = null;\nconst followUpRegex = /think about it|get back to you|let you know|let me decide|discuss it with|discuss with my family|not today|need to think|let me think/;\nif (followUpRegex.test(messageLower)) {\n  followUpRequested = true;\n  const date = new Date();\n  date.setDate(date.getDate() + 3);\n  followUpDate = date.toISOString().split('T')[0];\n}\n\n// --- Offered Package Extraction ---\n// Extract package speed and price from AI response when a follow-up is requested\nlet offeredPackage = null;\nif (followUpRequested || objectionType === 'need_to_think') {\n  // Match patterns like \"20/10 Mbps at R345/month\", \"50 Mbps at R695/month\", \"20 Mbps — R345/month\"\n  const packageMatch = aiResponse.match(/(\\d+\\/?\\d*)\\s*Mbps[^R]*R(\\d+)\\s*\\/\\s*month/i);\n  if (packageMatch) {\n    offeredPackage = packageMatch[1] + ' Mbps at R' + packageMatch[2] + '/month';\n  }\n}\n\n// Check for contact information patterns\nif (/\\b\\d{10}\\b|\\b\\d{3}[-\\s]\\d{3}[-\\s]\\d{4}\\b|\\b0\\d{2}\\s\\d{3}\\s\\d{4}\\b/.test(combinedText)) {\n  hasContactInfo = true;\n}\nif (/\\bstreet\\b|\\broad\\b|\\bavenue\\b|\\bdrive\\b|\\bplace\\b|\\bclose\\b|\\bblvd\\b|\\baddress\\b/.test(combinedText)) {\n  hasAddress = true;\n}\n\n// Scoring logic\nif (hasContactInfo && hasAddress && /sign\\s*up|install|apply|get\\s*started|proceed|go\\s*ahead|sounds\\s*good|interested|let'?s\\s*do\\s*it/.test(combinedText)) {\n  leadScore = 'HOT';\n} else if (hasContactInfo || (/price|cost|how\\s*much|install|when\\s*can|interested|package/.test(combinedText) && hasName)) {\n  leadScore = 'WARM';\n}\n\n// Objection detection overrides: minimum WARM (customer is engaged if raising an objection)\nif ((objectionType || needsEscalation) && leadScore === 'COLD') {\n  leadScore = 'WARM';\n}\n\nreturn {\n  json: {\n    phoneNumber: extractData.phoneNumber,\n    sessionId: extractData.sessionId,\n    contactName: extractData.contactName,\n    incomingMessage: extractData.messageText,\n    aiResponse: aiResponse,\n    leadScore: leadScore,\n    hasContactInfo: hasContactInfo,\n    hasAddress: hasAddress,\n    objectionType: objectionType,\n    needsEscalation: needsEscalation,\n    followUpRequested: followUpRequested,\n    followUpDate: followUpDate,\n    offeredPackage: offeredPackage,\n    timestamp: extractData.timestamp,\n    webhookReceived: true\n  }\n};"
       },
       "id": "process-response",
       "name": "Process Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [680, 0]
+      "position": [
+        680,
+        0
+      ]
     },
     {
       "parameters": {
@@ -107,7 +125,10 @@
       "name": "Send WhatsApp Reply",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [900, 0],
+      "position": [
+        900,
+        0
+      ],
       "notes": "Sends AI response back to user via Meta WhatsApp Business API. Requires META_PHONE_NUMBER_ID and META_ACCESS_TOKEN env vars."
     },
     {
@@ -137,7 +158,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"phone_number\": \"{{ $json.phoneNumber }}\",\n  \"contact_name\": \"{{ $json.contactName }}\",\n  \"incoming_message\": \"{{ $json.incomingMessage }}\",\n  \"ai_response\": \"{{ $json.aiResponse }}\",\n  \"lead_score\": \"{{ $json.leadScore }}\",\n  \"timestamp\": \"{{ $json.timestamp }}\"\n}",
+        "jsonBody": "={\n  \"phone_number\": \"{{ $json.phoneNumber }}\",\n  \"contact_name\": \"{{ $json.contactName }}\",\n  \"incoming_message\": \"{{ $json.incomingMessage }}\",\n  \"ai_response\": \"{{ $json.aiResponse }}\",\n  \"lead_score\": \"{{ $json.leadScore }}\",\n  \"objection_type\": \"{{ $json.objectionType }}\",\n  \"follow_up_requested\": {{ $json.followUpRequested }},\n  \"offered_package\": \"{{ $json.offeredPackage }}\",\n  \"timestamp\": \"{{ $json.timestamp }}\"\n}",
         "options": {
           "timeout": 10000
         }
@@ -146,8 +167,53 @@
       "name": "Log to Supabase",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [900, 200],
+      "position": [
+        900,
+        200
+      ],
       "notes": "Logs conversation to Supabase. Requires SUPABASE_URL and SUPABASE_ANON_KEY env vars."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/leads?on_conflict=phone_number",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_ANON_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.SUPABASE_ANON_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"phone_number\": \"{{ $json.phoneNumber }}\",\n  \"lead_score\": \"{{ $json.leadScore }}\",\n  \"follow_up_requested\": {{ $json.followUpRequested }},\n  \"follow_up_date\": {{ $json.followUpDate ? '\"' + $json.followUpDate + '\"' : 'null' }},\n  \"offered_package\": {{ $json.offeredPackage ? '\"' + $json.offeredPackage + '\"' : 'null' }},\n  \"needs_escalation\": {{ $json.needsEscalation }},\n  \"updated_at\": \"{{ $json.timestamp }}\"\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "upsert-lead",
+      "name": "Upsert Lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        400
+      ],
+      "notes": "Upserts lead data to Supabase leads table with follow-up fields. Uses phone_number as conflict key for merge-upsert."
     },
     {
       "parameters": {
@@ -177,7 +243,10 @@
       "name": "Check Hot Lead",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [1120, 0]
+      "position": [
+        1120,
+        0
+      ]
     },
     {
       "parameters": {
@@ -207,7 +276,10 @@
       "name": "Send Hot Lead Alert",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1340, -100],
+      "position": [
+        1340,
+        -100
+      ],
       "notes": "Sends email alert to sales team via Brevo when a hot lead is detected. Requires BREVO_API_KEY and SALES_TEAM_EMAIL env vars."
     },
     {
@@ -222,7 +294,77 @@
       "name": "Webhook Response",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [1340, 100]
+      "position": [
+        1340,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-escalation",
+              "leftValue": "={{ $json.needsEscalation }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals",
+                "name": "filter:operator:equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-escalation",
+      "name": "Check Escalation",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.brevo.com/v3/smtp/email",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api-key",
+              "value": "={{ $env.BREVO_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"sender\": {\n    \"name\": \"Horizon Africa AI\",\n    \"email\": \"alerts@horizonafrica.co.za\"\n  },\n  \"to\": [\n    {\n      \"email\": \"{{ $env.SALES_TEAM_EMAIL }}\",\n      \"name\": \"Sales Team\"\n    }\n  ],\n  \"subject\": \"⚠️ ESCALATION REQUIRED [{{ $json.objectionType || 'general' }}] - {{ $json.phoneNumber }}\",\n  \"htmlContent\": \"<h2>⚠️ Escalation Required</h2><p><strong>Phone:</strong> {{ $json.phoneNumber }}</p><p><strong>Name:</strong> {{ $json.contactName || 'Not provided' }}</p><p><strong>Lead Score:</strong> {{ $json.leadScore }}</p><p><strong>Objection Type:</strong> {{ $json.objectionType || 'None detected' }}</p><p><strong>Last Message:</strong> {{ $json.incomingMessage }}</p><p><strong>AI Response:</strong> {{ $json.aiResponse }}</p><p><strong>Time:</strong> {{ $json.timestamp }}</p><hr><p>Customer has requested human assistance. Please follow up as soon as possible.</p>\"\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "send-escalation-email",
+      "name": "Send Escalation Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1560,
+        200
+      ],
+      "notes": "Sends escalation email alert to sales team when a customer needs human assistance (discount requests, contract negotiations, callbacks, etc.). Requires BREVO_API_KEY and SALES_TEAM_EMAIL env vars."
     }
   ],
   "connections": {
@@ -261,7 +403,7 @@
       "ai_languageModel": [
         [
           {
-            "node": "Google Gemini",
+            "node": "OpenRouter",
             "type": "ai_languageModel",
             "index": 0
           }
@@ -289,6 +431,11 @@
             "node": "Log to Supabase",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Upsert Lead",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -309,6 +456,24 @@
         [
           {
             "node": "Send Hot Lead Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Escalation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Escalation": {
+      "main": [
+        [
+          {
+            "node": "Send Escalation Alert",
             "type": "main",
             "index": 0
           }

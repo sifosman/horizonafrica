@@ -1,0 +1,1713 @@
+{
+  "id": "kW4ELXolGnYx2AvB",
+  "name": "Horizon Africa - Inbound AI Lead Qualification",
+  "active": true,
+  "isArchived": false,
+  "versionId": "7735a1f9-b1eb-4359-bb99-46e04d54542f",
+  "activeVersionId": "7735a1f9-b1eb-4359-bb99-46e04d54542f",
+  "triggerCount": 2,
+  "createdAt": "2026-07-07T10:09:45.675Z",
+  "updatedAt": "2026-07-31T16:02:33.317Z",
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "connections": {
+    "WhatsApp Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Message": {
+      "main": [
+        [
+          {
+            "node": "Fetch Conversation History",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Build OpenRouter Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Response": {
+      "main": [
+        [
+          {
+            "node": "Prepare Log Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Upsert Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Conversation": {
+      "main": [
+        [
+          {
+            "node": "Prepare WhatsApp Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check Hot Lead",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check Escalation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send WhatsApp Reply": {
+      "main": [
+        []
+      ]
+    },
+    "Check Hot Lead": {
+      "main": [
+        [
+          {
+            "node": "Prepare Hot Lead Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Prepare Log Data": {
+      "main": [
+        [
+          {
+            "node": "Log Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare WhatsApp Data": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Hot Lead Alert": {
+      "main": [
+        []
+      ]
+    },
+    "Prepare Hot Lead Email": {
+      "main": [
+        [
+          {
+            "node": "Send Hot Lead Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Verification": {
+      "main": [
+        [
+          {
+            "node": "Verify Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Token": {
+      "main": [
+        [
+          {
+            "node": "Respond to Verification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build OpenRouter Request": {
+      "main": [
+        [
+          {
+            "node": "Call OpenRouter API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call OpenRouter API": {
+      "main": [
+        [
+          {
+            "node": "Process Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Escalation": {
+      "main": [
+        [
+          {
+            "node": "Prepare Chatwoot Handover",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Chatwoot Handover": {
+      "main": [
+        [
+          {
+            "node": "Create Chatwoot Contact",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prepare Escalation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Chatwoot Contact": {
+      "main": [
+        [
+          {
+            "node": "Create Chatwoot Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Chatwoot Conversation": {
+      "main": [
+        [
+          {
+            "node": "Send Chatwoot Handover Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Escalation Email": {
+      "main": [
+        [
+          {
+            "node": "Send Escalation Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-webhook",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "WhatsApp Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "horizon-whatsapp-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract message data from Meta WhatsApp webhook payload\nconst webhookData = $input.first().json;\nconst body = webhookData.body || webhookData;\n\nlet phoneNumber = '';\nlet messageText = '';\nlet messageId = '';\nlet contactName = '';\n\nif (body.entry && body.entry[0] && body.entry[0].changes && body.entry[0].changes[0]) {\n  const change = body.entry[0].changes[0];\n  if (change.value && change.value.messages && change.value.messages[0]) {\n    const msg = change.value.messages[0];\n    phoneNumber = msg.from || '';\n    messageId = msg.id || '';\n    messageText = msg.text?.body || msg.button?.text || msg.interactive?.button_reply?.title || '';\n    \n    if (change.value.contacts && change.value.contacts[0]) {\n      contactName = change.value.contacts[0].profile?.name || '';\n    }\n  }\n}\n\n// Skip status update webhooks (delivered, read) that have no message content\nif (!phoneNumber || !messageText) {\n  return [];\n}\n\nconst sessionId = phoneNumber.replace(/[^0-9]/g, '');\n\nreturn {\n  json: {\n    phoneNumber,\n    sessionId,\n    messageText,\n    messageId,\n    contactName,\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "id": "extract-message",
+      "name": "Extract Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://gbchhzipbbxpvgtaheze.supabase.co/rest/v1/conversations",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "phone_number",
+              "value": "=eq.{{ $('Extract Message').first().json.phoneNumber }}"
+            },
+            {
+              "name": "order",
+              "value": "timestamp.desc"
+            },
+            {
+              "name": "limit",
+              "value": "10"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "SUPABASE_ANON_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "Authorization",
+              "value": "SUPABASE_ANON_KEY_PLACEHOLDER"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "fetch-history",
+      "name": "Fetch Conversation History",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const systemPrompt = `You are Layla, the heart of Horizon Africa \u2014 a South African telecommunications company specialising in Fibre, LTE, Wireless, and Starlink internet services. Helping people isn't just your job \u2014 it's who you are.\n\n## PERSONALITY \u2014 WHO IS LAYLA\n- Warm and welcoming \u2014 positive energy without being loud or over-the-top. Every customer should feel like someone was waiting to help them\n- Emotionally intelligent \u2014 match the customer's energy: celebrate with excited customers, reassure worried ones, stay calm and patient with frustrated ones. With elderly or non-tech-savvy customers, slow down and explain one step at a time\n- Curious \u2014 ask thoughtful questions to understand the customer's real need before jumping to an answer. Listen first\n- Confident and clear \u2014 no waffling or guessing. If you don't know something, say so honestly and get a consultant to help\n- Kind, always \u2014 never sarcastic, defensive, or blaming, even when a customer is rude\n- Gentle sense of humour \u2014 laugh with customers, never at them. Keep it appropriate and professional\n- Teach, don't lecture \u2014 explain technical topics simply so customers feel smarter, never unintelligent\n- Create small moments of delight \u2014 congratulate customers on milestones (e.g. service activation), offer a genuinely helpful tip they didn't ask for, or answer the question they were about to ask. Thoughtful, never gimmicky\n- Natural and conversational \u2014 use contractions and natural South African English. Never sound scripted, robotic, or corporate\n- Concise \u2014 never more than 3-4 sentences unless listing packages or answering a detailed question\n- Maximum 1 emoji per message, used sparingly\n- Never use pushy sales language or pressure tactics \u2014 guide, don't sell\n- Use the customer's name once you know it\n- Never break character. You are always Layla. Never say \"I'm an AI\" or \"as a language model\" \u2014 you're a person named Layla who works at Horizon Africa\n\n## THE LAYLA RULE\nBefore every reply, silently check: will this simply solve the problem, or will the customer remember it? Aim for memorable \u2014 but never at the cost of being concise.\n\n## YOUR ROLE\n1. Answer questions about Fibre packages using the knowledge base below\n2. Qualify leads by asking about their internet needs\n3. Recommend the right package based on their usage\n4. Collect lead information for the sales team\n5. Identify hot leads who are ready to sign up\n\n## QUALIFICATION PROCESS\nFollow this flow naturally in conversation. Don't ask all questions at once \u2014 weave them in.\n\nStep 1: Ask \"How many people will be using the internet at your place?\"\nOptions: 1 Person | 2-4 People | 5+ People\n\nStep 2: Ask \"What do you mainly use the internet for?\"\nOptions: Email, Browsing, Netflix, YouTube, Gaming, Working from Home, CCTV, Smart Home Devices, Business, Online School, Video Calls\n\nStep 3: Based on their answers, recommend a package (see recommendation engine below)\n\nStep 4: If they're interested, collect their details:\n- Full name\n- Contact number\n- Physical address (for fibre availability check)\n- Email address\n\n## OBJECTION HANDLING\n\nTransition naturally between qualification and objection handling within the same conversation. When a customer raises an objection, pause qualification and address the objection first. Once resolved, guide them back to the qualification flow.\n\n### Objection 1: Price Too High\n\n**Detect:** \"too expensive\", \"can't afford it\", \"price is too high\", \"out of my budget\", \"paying less now\", \"fibre costs too much\", \"not worth the money\", \"don't want another monthly expense\", \"more than I expected\"\n\n**Respond:**\n1. Acknowledge their concern with empathy \u2014 \"I understand, budget is important\"\n2. Compare fibre costs to mobile data spend \u2014 \"Many people find they're actually spending more on mobile data than fibre would cost\"\n3. Suggest a more affordable package (e.g. 20/10 Mbps at R345/month for light users)\n4. Ask ONE discovery question: \"What's your current monthly mobile data spend?\" or \"How many people are in the household?\" or \"What do you mainly use the internet for?\"\n\n**Convert:** Recommend a lower-speed package that fits their budget. Highlight any promotions. Explain long-term savings vs mobile data (uncapped vs per-GB pricing).\n\n**If still hesitant:** \"No worries \u2014 I can put together a quote that fits your budget. What amount would you be comfortable with?\"\n\n**Escalate to a human consultant if:** the customer asks for a discount, wants to negotiate price, or requests custom pricing.\n\n### Objection 2: Comparing Providers\n\n**Detect:** \"still comparing\", \"looking around\", \"want to compare first\", \"getting other quotes\", \"waiting for another provider\", \"haven't decided yet\"\n\n**Respond:**\n1. Validate their approach \u2014 \"That's a smart move, it's always good to compare\"\n2. Offer to help them compare on speed, price, installation time, and contract terms\n3. Ask ONE discovery question: \"Which providers are you looking at?\" or \"What matters most to you \u2014 speed, price, or support?\" or \"Is installation time important to you?\" or \"Do you prefer month-to-month or a contract?\"\n\n**Convert:** Highlight Horizon Africa's network reliability, local support quality, fast installation (3-5 business days for existing infrastructure), promotions, and value-added benefits.\n\n**If still hesitant:** \"No problem at all. I can save your quote so you have it handy when you're comparing. Shall I do that?\"\n\n**Escalate only if:** the customer wants detailed competitor comparisons that are beyond your knowledge base.\n\n### Objection 3: Need to Think About It\n\n**Detect:** \"I'll think about it\", \"let me decide\", \"discuss it with my family\", \"I'll get back to you\", \"I'll let you know\", \"not today\"\n\n**Respond:**\n1. Validate \u2014 \"Absolutely, take your time \u2014 it's an important decision\"\n2. Summarise the package you recommended (speed and price) so they have it on record\n3. Tell them their details are saved \u2014 they can just message again whenever ready and you'll pick up where you left off\n4. Ask ONE discovery question: \"Is there anything specific holding you back?\" or \"Do you have any questions I can clear up?\" or \"Would a follow-up reminder in a few days be helpful?\"\n\n**Convert:** Save the quotation. Offer a follow-up reminder. Suggest alternative package options if their needs have changed.\n\n**If still hesitant:** \"No problem at all \u2014 I've noted the package for you. Whenever you're ready, just send a message and we'll pick up right where we left off.\"\n\n**Escalate only if:** the customer requests a consultant callback.\n\n### Objection 4: Already Have Fibre\n\n**Detect:** \"already have fibre\", \"with another provider\", \"already connected\", \"don't need fibre\", \"my internet is working\"\n\n**Respond:**\n1. Acknowledge \u2014 \"Great that you're already connected!\"\n2. Ask who their current provider is\n3. Explain they may be able to upgrade speed, improve reliability, or reduce costs\n4. Offer to compare their current setup with what Horizon Africa can provide\n\n**Discovery questions (one at a time):** \"Who's your current provider?\" then \"What speed are you on?\" then \"Are you happy with the service?\" then \"Have you experienced slow speeds or outages?\" then \"When does your contract end?\"\n\n**Convert:** Highlight faster speeds, better value, or a smoother upgrade path. Offer migration assistance.\n\n**If they're happy:** \"That's good to hear! No pressure at all. If things ever change or you want to compare, we're here.\"\n\n**Escalate if:** migration requires manual intervention (e.g. complex contract cancellations, infrastructure changes).\n\n### Objection 5: I'm Moving\n\n**Detect:** \"I'm moving\", \"relocating\", \"new address\", \"changing houses\", \"moving next month\", \"moving soon\", \"moving to\"\n\n**Respond:**\n1. Acknowledge \u2014 \"Exciting! Let's make sure you're connected at your new place\"\n2. Ask for the new address to check fibre availability\n3. Explain the relocation process \u2014 we can check what's available at the new address and arrange a transfer or new installation\n4. If fibre is available: \"Great news \u2014 we can get you sorted at the new place!\"\n5. If fibre is not available: \"No fibre there yet, but let's look at LTE or wireless options so you're not left without internet\"\n\n**Convert:** Book the relocation or new installation. Offer to check multiple addresses if they're still house-hunting.\n\n## KNOWLEDGE BASE\n\n### Packages & Pricing\n- 20/10 Mbps \u2014 R345/month\n- 25/25 Mbps \u2014 R499/month\n- 40/20 Mbps \u2014 R425/month\n- 50/25 Mbps \u2014 R695/month\n- 100 Mbps, 200 Mbps, 500 Mbps also available (pricing varies by area and FNO)\n- All packages are uncapped \u2014 no FUP, no throttling, no data caps\n- Package availability depends on the Fibre Network Operator (FNO) servicing the area\n\n### Installation\n- Existing fibre infrastructure: 3-5 business days\n- New fibre installation: 5-7 business days\n- An adult (18+) must be present during installation\n- If fibre already installed at property, only remote activation needed \u2014 faster turnaround\n\n### Contracts\n- Standard: 12 months (covers installation and activation fees)\n- Month-to-month and prepaid options available (T&C's apply)\n- Early cancellation allowed but termination fees may apply\n- Upgrades available anytime; downgrades depend on contract terms\n\n### Application Requirements\n- Full Name\n- South African ID Number (passports accepted if visa covers full contract duration \u2014 deposits apply)\n- Contact Number\n- Physical Address\n- Email Address\n- After approval: Bank Name, Account Number, Preferred Debit Order Date\n- Credit assessment required for all post-paid applications\n- Deposit only required if credit assessment doesn't meet threshold (refundable)\n\n### Payment\n- Debit orders mandatory for post-paid\n- Prepaid paid before activation\n- Debit order date confirmed during application\n- Failed debit orders result in suspension; bank rejection fees passed on\n\n### Technical\n- All packages include ONT (Optical Network Terminal)\n- Some packages include a Wi-Fi router \u2014 consultant will confirm\n- Symmetrical fibre: upload = download speed (ideal for business, remote work, content creators)\n- Asymmetrical fibre: faster download than upload (suitable for home use)\n- Fibre supports multiple users and devices simultaneously\n- Great for gaming (low latency, stable), streaming (Netflix, YouTube, Disney+, Showmax), working from home (Teams, Zoom, VPN)\n\n### Support\n- Telkom technical support: 10217 (Option 1: Technical, Option 2: Billing, Option 3: Customer Services)\n- Sales Manager: khanyisg@telkom.co.za / 068 565 3272\n- Users can also contact Horizon Africa directly for guidance\n\n### Other\n- Prepaid fibre available in selected areas\n- Business fibre solutions available \u2014 contact sales for custom packages\n- ADSL to Fibre migration may qualify for free installation\n- Relocation: check new address for fibre availability, arrange transfer or discuss alternatives\n- Fibre availability check: just provide physical address\n\n## RULES\n- Always respond in the same language as the user (English or Afrikaans)\n- Never invent information not in the knowledge base\n- If you don't know something: \"Let me get that info for you. I'll have one of our sales consultants reach out.\"\n- If user asks to speak to a human: \"I'll connect you with our sales team right away\" and note for handover\n- Keep responses short and scannable \u2014 use bullet points for lists\n- When recommending a package, state the speed and price clearly\n- Don't overwhelm the user with information \u2014 answer what they asked\n- Be proactive but not pushy \u2014 if they seem interested, guide them to the next step\n- Never ask more than one question at a time\n- Greet new users warmly: \"Hi! Welcome to Horizon Africa \u2014 I'm Layla. How can I help you today?\"\n- Never break character. You are Layla, always.`;\n\nconst msg = $('Extract Message').first().json;\nconst history = $('Fetch Conversation History').all().map(i => i.json);\n\n// Build conversation messages in chronological order (oldest first)\nconst messages = [];\n\n// Add system message\nmessages.push({ role: 'system', content: systemPrompt });\n\n// Add recent history\nhistory.slice().reverse().forEach(h => {\n  if (h.incoming_message) {\n    messages.push({ role: 'user', content: h.incoming_message });\n  }\n  if (h.ai_response) {\n    messages.push({ role: 'assistant', content: h.ai_response });\n  }\n});\n\n// Add current user message\nmessages.push({ role: 'user', content: msg.messageText });\n\nreturn {\n  json: {\n    phoneNumber: msg.phoneNumber,\n    sessionId: msg.sessionId,\n    messageText: msg.messageText,\n    messageId: msg.messageId,\n    contactName: msg.contactName,\n    timestamp: msg.timestamp,\n    openrouterRequest: {\n      model: 'openai/gpt-5.6-sol',\n      messages,\n      temperature: 0.8\n    }\n  }\n};"
+      },
+      "id": "build-gemini-request",
+      "name": "Build OpenRouter Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $env.OPENROUTER_API_KEY ? 'Bearer ' + $env.OPENROUTER_API_KEY : '' }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "jsonBody": "={{ JSON.stringify($json.openrouterRequest) }}",
+        "method": "POST",
+        "options": {
+          "maxTries": 3,
+          "neverError": false,
+          "retryOnFail": true,
+          "timeout": 30000,
+          "waitBetweenTries": 5000
+        },
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "url": "https://openrouter.ai/api/v1/chat/completions"
+      },
+      "id": "call-gemini",
+      "name": "Call OpenRouter API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse OpenRouter response and score lead\nconst openrouterResult = $input.first().json;\nconst aiResponse = openrouterResult.choices?.[0]?.message?.content || 'Sorry, I did not understand that.';\nconst req = $('Build OpenRouter Request').first().json;\n\nconst messageLower = (req.messageText || '').toLowerCase();\n\nlet leadScore = 'COLD';\n\n// Detect contact info in CURRENT USER MESSAGE only (not history, not AI response)\nlet hasPhone = /\\b\\d{10}\\b|\\b0\\d{2}[\\s-]?\\d{3}[\\s-]?\\d{4}\\b|\\b\\+\\d{1,3}\\s?\\d{6,}\\b/.test(messageLower);\nlet hasEmail = /[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}/i.test(req.messageText || '');\nlet hasAddress = /\\bstreet\\b|\\broad\\b|\\bavenue\\b|\\bdrive\\b|\\bplace\\b|\\bclose\\b|\\bblvd\\b|\\baddress\\b|\\bsuburb\\b|\\bunit\\b|\\bno\\.?\\s\\d/.test(messageLower);\nlet hasName = !!(req.contactName && req.contactName.length > 0);\n\nlet hasContactInfo = hasPhone || hasEmail;\n\n// Sign-up intent keywords \u2014 check USER MESSAGE ONLY (not AI response)\nconst signUpIntent = /sign\\s*up|install|apply|get\\s*started|proceed|go\\s*ahead|sounds\\s*good|interested|let'?s\\s*do\\s*it|how\\s*do\\s*i\\s*sign|ready\\s*to\\s*sign|let'?s\\s*get\\s*this|want\\s*to\\s*sign|go\\s*for\\s*it|sounds\\s*perfect|that'?s\\s*perfect/.test(messageLower);\n\n// HOT: Current message shows explicit sign-up intent AND provides new contact info\n// OR: Current message shows sign-up intent AND user already has name (from Meta profile)\nif (signUpIntent && (hasContactInfo || hasAddress || hasName)) {\n  leadScore = 'HOT';\n} else if (hasContactInfo || hasAddress || (/price|cost|how\\s*much|install|when\\s*can|interested|package|sign\\s*up/.test(messageLower) && hasName)) {\n  leadScore = 'WARM';\n} else if (/fibre|internet|broadband|wifi|data|lte|starlink/.test(messageLower)) {\n  leadScore = 'WARM';\n}\n\n// --- Objection Detection ---\nlet objectionType = null;\nconst objectionPatterns = [\n  { type: 'price_too_high', regex: /too expensive|can'?t afford|price is too high|out of my budget|paying less|fibre costs too much|not worth the money|don'?t want another monthly expense|more than i expected|too pricey|can'?t afford it/ },\n  { type: 'comparing_providers', regex: /still comparing|looking around|want to compare|getting other quotes|waiting for another provider|haven'?t decided|shopping around|checking other|comparing options/ },\n  { type: 'need_to_think', regex: /i'?ll think about|let me decide|discuss it with|discuss with my family|i'?ll get back to you|i'?ll let you know|not today|need to think|let me think|think about it/ },\n  { type: 'already_have_fibre', regex: /already have fibre|with another provider|already connected|don'?t need fibre|my internet is working|already got fibre|have internet already|current provider/ },\n  { type: 'moving', regex: /i'?m moving|relocating|new address|changing houses|moving next month|moving soon|moving to|relocation/ }\n];\nfor (const p of objectionPatterns) { if (p.regex.test(messageLower)) { objectionType = p.type; break; } }\n\n// --- Escalation Detection ---\nlet needsEscalation = false;\nconst escalationRegex = /discount|negotiate|custom pricing|callback|speak to a consultant|speak to a human|speak to someone|contract negotiation|can you call me|get a call|manager|supervisor|check.*availability|check.*coverage|is fibre available|check if.*available|coverage at|available at my|available at that|available at the/;\nif (escalationRegex.test(messageLower)) { needsEscalation = true; }\n\n// --- Follow-up Detection ---\nlet followUpRequested = false;\nlet followUpDate = null;\nconst followUpRegex = /think about it|get back to you|let you know|let me decide|discuss it with|discuss with my family|not today|need to think|let me think/;\nif (followUpRegex.test(messageLower)) {\n  followUpRequested = true;\n  const d = new Date(); d.setDate(d.getDate() + 3);\n  followUpDate = d.toISOString().split('T')[0];\n}\n\n// Objection or escalation bumps COLD to WARM minimum\nif ((objectionType || needsEscalation) && leadScore === 'COLD') { leadScore = 'WARM'; }\n\nreturn {\n  json: {\n    phoneNumber: req.phoneNumber,\n    sessionId: req.sessionId,\n    contactName: req.contactName,\n    incomingMessage: req.messageText,\n    aiResponse: aiResponse,\n    leadScore: leadScore,\n    hasContactInfo: hasContactInfo,\n    hasAddress: hasAddress,\n    objectionType: objectionType,\n    needsEscalation: needsEscalation,\n    followUpRequested: followUpRequested,\n    followUpDate: followUpDate,\n    timestamp: req.timestamp\n  }\n};"
+      },
+      "id": "process-response",
+      "name": "Process Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const p = $('Process Response').first().json;\nreturn { json: { messaging_product: 'whatsapp', to: p.phoneNumber, type: 'text', text: { body: p.aiResponse }, phoneNumber: p.phoneNumber, aiResponse: p.aiResponse, leadScore: p.leadScore, contactName: p.contactName, incomingMessage: p.incomingMessage, timestamp: p.timestamp } };"
+      },
+      "id": "prepare-wa-data",
+      "name": "Prepare WhatsApp Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1540,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "none",
+        "contentType": "json",
+        "curlImport": "",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "META_ACCESS_TOKEN_PLACEHOLDER"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "infoMessage": "",
+        "jsonBody": "={{ JSON.stringify({ messaging_product: $json.messaging_product, to: $json.to, type: $json.type, text: { body: $json.text.body } }) }}",
+        "method": "POST",
+        "options": {
+          "timeout": 10000
+        },
+        "provideSslCertificates": false,
+        "sendBody": true,
+        "sendHeaders": true,
+        "sendQuery": false,
+        "specifyBody": "json",
+        "specifyHeaders": "keypair",
+        "url": "https://graph.facebook.com/v21.0/1257101724147822/messages"
+      },
+      "id": "send-whatsapp-reply",
+      "name": "Send WhatsApp Reply",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1760,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const p = $('Process Response').first().json;\nreturn { json: { phone_number: p.phoneNumber, contact_name: p.contactName, incoming_message: p.incomingMessage, ai_response: p.aiResponse, lead_score: p.leadScore, objection_type: p.objectionType, follow_up_requested: p.followUpRequested, follow_up_date: p.followUpDate, needs_escalation: p.needsEscalation, timestamp: p.timestamp } };"
+      },
+      "id": "prepare-log-data",
+      "name": "Prepare Log Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gbchhzipbbxpvgtaheze.supabase.co/rest/v1/conversations",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "SUPABASE_ANON_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "Authorization",
+              "value": "SUPABASE_ANON_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "log-conversation",
+      "name": "Log Conversation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1540,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-hot-lead",
+              "leftValue": "={{ $('Process Response').first().json.leadScore }}",
+              "rightValue": "HOT",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter:operator:equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-hot-lead",
+      "name": "Check Hot Lead",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1540,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.brevo.com/v3/smtp/email",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api-key",
+              "value": "BREVO_API_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ sender: $json.sender, to: $json.to, subject: $json.subject, htmlContent: $json.htmlContent }) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "send-hot-lead-email",
+      "name": "Send Hot Lead Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1760,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const p = $('Process Response').first().json;\nconst history = $('Fetch Conversation History').all().map(i => i.json);\n\n// Build conversation summary\nlet convoSummary = '';\nlet allMessages = [];\n\n// Add history messages\nhistory.forEach((h, idx) => {\n  if (h.incoming_message && h.ai_response) {\n    allMessages.push({ role: 'Client', text: h.incoming_message, response: h.ai_response });\n  }\n});\n\n// Add current message\nallMessages.push({ role: 'Client', text: p.incomingMessage, response: p.aiResponse });\n\n// Build readable conversation\nconvoSummary = allMessages.map((m, i) => \n  `<tr><td style=\"padding:8px;border-bottom:1px solid #eee;background:#f9f9f9;\"><strong>Client:</strong> ${m.text}</td></tr>` +\n  `<tr><td style=\"padding:8px;border-bottom:1px solid #eee;\"><strong>Layla AI:</strong> ${m.response}</td></tr>`\n).join('');\n\n// Extract collected info from conversation\nconst allText = allMessages.map(m => m.text + ' ' + m.response).join(' ');\nconst emailMatch = allText.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}/i);\nconst phoneMatch = allText.match(/\\b0\\d{2}[\\s-]?\\d{3}[\\s-]?\\d{4}\\b|\\b\\d{10}\\b/);\nconst addressMatch = allText.match(/(?:\\d+\\s+)?(?:[A-Z][a-z]+\\s)+(?:Street|Road|Avenue|Drive|Place|Close|Boulevard|Blvd|Suburb|Unit|No)/i);\n\n// Detect package interest\nlet packageInterest = 'Not specifically mentioned';\nconst pkgMatch = allText.match(/(\\d{2,3})\\s*\\s*mbps|(\\d{2,3})\\s*\\s*mb/i);\nif (pkgMatch) packageInterest = pkgMatch[0] + ' package';\nconst priceMatch = allText.match(/R(\\d{3,4})/);\n\n// Detect usage patterns\nlet usagePattern = 'General browsing';\nif (/netflix|streaming|youtube/i.test(allText)) usagePattern = 'Streaming (Netflix, YouTube)';\nif (/gaming/i.test(allText)) usagePattern += ', Gaming';\nif (/work.*home|wfh|remote.*work/i.test(allText)) usagePattern += ', Working from home';\nif (/browsing|email/i.test(allText)) usagePattern += ', Browsing';\n\n// Build closing recommendations\nlet closingTips = [];\nclosingTips.push('Call the client within 15 minutes while interest is highest');\nclosingTips.push('Reference their specific needs: ' + usagePattern);\nif (packageInterest !== 'Not specifically mentioned') {\n  closingTips.push('Confirm availability of the ' + packageInterest + ' at their address');\n}\nclosingTips.push('Have installation time slots ready to offer');\nclosingTips.push('Mention any current promotions or free installation offers');\nif (priceMatch) {\n  closingTips.push('Confirm pricing: R' + priceMatch[1] + '/month - be ready to offer a discount for upfront payment');\n}\nclosingTips.push('If no answer, send a WhatsApp message referencing this conversation');\n\nconst htmlContent = `\n<div style=\"font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;\">\n  <div style=\"background: linear-gradient(135deg, #ff6b35, #f7931e); padding: 20px; border-radius: 10px 10px 0 0; text-align: center;\">\n    <h1 style=\"color: white; margin: 0;\">\ud83d\udd25 HOT LEAD ALERT</h1>\n    <p style=\"color: white; margin: 5px 0 0 0;\">This lead is ready to convert \u2014 follow up immediately!</p>\n  </div>\n  \n  <div style=\"padding: 20px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 10px 10px;\">\n    \n    <h2 style=\"color: #333; border-bottom: 2px solid #ff6b35; padding-bottom: 10px;\">\ud83d\udccb Lead Details</h2>\n    <table style=\"width: 100%; border-collapse: collapse;\">\n      <tr><td style=\"padding: 8px; font-weight: bold; width: 150px;\">Name:</td><td style=\"padding: 8px;\">${p.contactName || 'Not provided'}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Phone (WhatsApp):</td><td style=\"padding: 8px;\">${p.phoneNumber}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Email:</td><td style=\"padding: 8px;\">${emailMatch ? emailMatch[0] : 'Not yet collected'}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Address:</td><td style=\"padding: 8px;\">${addressMatch ? addressMatch[0] : 'Not yet collected'}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Lead Score:</td><td style=\"padding: 8px;\"><span style=\"background: #ff6b35; color: white; padding: 3px 10px; border-radius: 5px; font-weight: bold;\">HOT</span></td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Package Interest:</td><td style=\"padding: 8px;\">${packageInterest}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Usage Pattern:</td><td style=\"padding: 8px;\">${usagePattern}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Time:</td><td style=\"padding: 8px;\">${p.timestamp}</td></tr>\n    </table>\n    \n    <h2 style=\"color: #333; border-bottom: 2px solid #ff6b35; padding-bottom: 10px; margin-top: 30px;\">\ud83d\udcac Conversation Summary</h2>\n    <table style=\"width: 100%; border-collapse: collapse;\">\n      ${convoSummary}\n    </table>\n    \n    <h2 style=\"color: #333; border-bottom: 2px solid #ff6b35; padding-bottom: 10px; margin-top: 30px;\">\ud83c\udfaf How to Close This Lead</h2>\n    <ul style=\"padding-left: 20px;\">\n      ${closingTips.map(t => `<li style=\"padding: 5px 0;\">${t}</li>`).join('')}\n    </ul>\n    \n    <div style=\"background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 8px; margin-top: 20px;\">\n      <p style=\"margin: 0; color: #856404;\"><strong>\u23f0 Time is critical!</strong> Leads contacted within 5 minutes are 9x more likely to convert. Pick up the phone now!</p>\n    </div>\n    \n    <hr style=\"margin-top: 20px; border: none; border-top: 1px solid #ddd;\">\n    <p style=\"color: #999; font-size: 12px; text-align: center;\">This alert was generated automatically by the Horizon Africa WhatsApp AI Assistant (Layla)</p>\n  </div>\n</div>`;\n\nreturn { json: {\n  sender: { name: 'Horizon Africa AI', email: 'keshlan@horizonafrica.co.za' },\n  to: [{ email: 'mohamed@owdsolutions.co.za', name: 'Sales Team' }],\n  subject: '\ud83d\udd25 HOT LEAD - ' + (p.contactName || p.phoneNumber) + ' wants fibre!',\n  htmlContent: htmlContent,\n  phoneNumber: p.phoneNumber,\n  leadScore: p.leadScore\n} };"
+      },
+      "id": "prepare-hot-email",
+      "name": "Prepare Hot Lead Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        -200
+      ]
+    },
+    {
+      "id": "meta-verify-webhook",
+      "name": "Meta Verification",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "httpMethod": "GET",
+        "options": {},
+        "path": "whatsapp-webhook",
+        "responseMode": "responseNode"
+      },
+      "webhookId": "1e64526a-0419-4c49-adab-282e11ffacbd"
+    },
+    {
+      "id": "verify-token",
+      "name": "Verify Token",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "jsCode": "const query = $input.first().json.query || {};\nconst mode = query['hub.mode'] || '';\nconst token = query['hub.verify_token'] || '';\nconst challenge = query['hub.challenge'] || '';\nconst EXPECTED_TOKEN = 'horizon_africa_verify_2026';\nif (mode === 'subscribe' && token === EXPECTED_TOKEN) {\n  return { json: { challenge: challenge, verified: true } };\n}\nreturn { json: { challenge: '', verified: false } };"
+      }
+    },
+    {
+      "id": "respond-verification",
+      "name": "Respond to Verification",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        },
+        "respondWith": "text",
+        "responseBody": "={{ $json.challenge }}"
+      }
+    },
+    {
+      "id": "upsert-lead",
+      "name": "Upsert Lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        680,
+        400
+      ],
+      "parameters": {
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "SUPABASE_ANON_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "Authorization",
+              "value": "SUPABASE_ANON_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=minimal"
+            }
+          ]
+        },
+        "jsonBody": "={{ JSON.stringify($json.leadUpsertBody) }}",
+        "method": "POST",
+        "options": {
+          "timeout": 10000
+        },
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "url": "=https://gbchhzipbbxpvgtaheze.supabase.co/rest/v1/leads?on_conflict=phone_number"
+      },
+      "notes": "Upserts lead data to Supabase leads table with follow-up fields. Uses phone_number as conflict key."
+    },
+    {
+      "id": "d94bae47-c92c-4af5-ae03-e8e4e5e65dfc",
+      "name": "Check Escalation",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1540,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "condition-escalation",
+              "leftValue": "={{ $('Process Response').first().json.needsEscalation }}",
+              "operator": {
+                "name": "filter:operator:true",
+                "operation": "true",
+                "type": "boolean"
+              },
+              "rightValue": true
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          }
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "15e5c69b-fd7a-4580-8dae-87a75695f239",
+      "name": "Prepare Chatwoot Handover",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        300
+      ],
+      "parameters": {
+        "jsCode": "// Build Chatwoot contact and conversation payload from lead data\nconst p = $('Process Response').first().json;\n\n// Get conversation history to extract lead details\nconst history = $('Fetch Conversation History').all().map(i => i.json);\n\n// Extract email, address, name from conversation history\nlet email = null;\nlet address = null;\nlet contactName = p.contactName || null;\nlet recommendedPackage = null;\n\n// Search through conversation history for contact details\nhistory.forEach(h => {\n  const text = (h.incoming_message || '') + ' ' + (h.ai_response || '');\n  \n  // Extract email\n  if (!email) {\n    const emailMatch = text.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}/i);\n    if (emailMatch) email = emailMatch[0];\n  }\n  \n  // Extract address (look for road/street/avenue patterns in user messages)\n  if (!address && h.incoming_message) {\n    const addrMatch = h.incoming_message.match(/\\d+\\s+\\w+\\s+(?:road|street|avenue|drive|place|close|blvd)\\s*,?\\s*\\w+/i);\n    if (addrMatch) address = addrMatch[0];\n  }\n  \n  // Extract package recommendation from AI responses\n  if (!recommendedPackage && h.ai_response) {\n    const pkgMatch = h.ai_response.match(/(\\d+\\/?\\d*\\s*Mbps[^]*?R\\d+\\/month)/i);\n    if (pkgMatch) recommendedPackage = pkgMatch[0];\n  }\n});\n\n// Build conversation summary for Chatwoot\nconst recentMessages = history.slice(0, 5).reverse();\nlet conversationSummary = `--- ESCALATION LEAD - Needs Human Handover ---\\n\\n`;\nconversationSummary += `Phone: ${p.phoneNumber}\\n`;\nif (contactName) conversationSummary += `Name: ${contactName}\\n`;\nif (email) conversationSummary += `Email: ${email}\\n`;\nif (address) conversationSummary += `Address: ${address}\\n`;\nif (recommendedPackage) conversationSummary += `Package: ${recommendedPackage}\\n`;\nconversationSummary += `Lead Score: ${p.leadScore}\\n`;\nconversationSummary += `Escalation Reason: Customer asked for fibre availability / human assistance\\n\\n`;\nconversationSummary += `--- Recent Conversation ---\\n`;\nrecentMessages.forEach(h => {\n  if (h.incoming_message) conversationSummary += `Customer: ${h.incoming_message}\\n`;\n  if (h.ai_response) conversationSummary += `Layla: ${h.ai_response}\\n`;\n});\nconversationSummary += `\\nCustomer's latest message: ${p.incomingMessage}\\n`;\nconversationSummary += `Layla's response: ${p.aiResponse}\\n`;\n\n// Format phone number for Chatwoot (ensure + prefix)\nlet chatwootPhone = p.phoneNumber;\nif (!chatwootPhone.startsWith('+')) {\n  chatwootPhone = '+' + chatwootPhone;\n}\n\nreturn {\n  json: {\n    phoneNumber: chatwootPhone,\n    contactName: contactName || 'Unknown',\n    email: email,\n    address: address,\n    recommendedPackage: recommendedPackage,\n    leadScore: p.leadScore,\n    conversationSummary: conversationSummary,\n    inboxId: 1,\n    accountId: 1\n  }\n};"
+      }
+    },
+    {
+      "id": "32a8e67e-bba0-4ae7-9071-3c83b9ce50ab",
+      "name": "Create Chatwoot Contact",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1980,
+        300
+      ],
+      "parameters": {
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "CHATWOOT_API_TOKEN_PLACEHOLDER"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "jsonBody": "={\n  \"name\": \"{{ $json.contactName }}\",\n  \"phone_number\": \"{{ $json.phoneNumber }}\",\n  \"email\": {{ $json.email ? '\"' + $json.email + '\"' : 'null' }},\n  \"identifier\": \"{{ $json.phoneNumber }}\"\n}",
+        "method": "POST",
+        "options": {
+          "timeout": 10000
+        },
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "url": "http://localhost:3000/api/v1/accounts/1/contacts"
+      }
+    },
+    {
+      "id": "806d2b5d-4084-4e91-8628-544a3b016c26",
+      "name": "Create Chatwoot Conversation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2200,
+        300
+      ],
+      "parameters": {
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "CHATWOOT_API_TOKEN_PLACEHOLDER"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "jsonBody": "={\n  \"inbox_id\": {{ $json.inboxId }},\n  \"source_id\": \"{{ $json.phoneNumber }}\",\n  \"contact\": {\n    \"name\": \"{{ $json.contactName }}\",\n    \"phone_number\": \"{{ $json.phoneNumber }}\",\n    \"email\": {{ $json.email ? '\"' + $json.email + '\"' : 'null' }}\n  },\n  \"status\": \"open\",\n  \"assignee_id\": null\n}",
+        "method": "POST",
+        "options": {
+          "timeout": 10000
+        },
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "url": "=http://localhost:3000/api/v1/accounts/1/conversations"
+      }
+    },
+    {
+      "id": "0bf7a4a6-abac-4f64-a4e5-26e73c733316",
+      "name": "Send Chatwoot Handover Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2420,
+        300
+      ],
+      "parameters": {
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "CHATWOOT_API_TOKEN_PLACEHOLDER"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "jsonBody": "={\n  \"content\": \"{{ $('Prepare Chatwoot Handover').first().json.conversationSummary }}\",\n  \"message_type\": \"outgoing\",\n  \"private\": true\n}",
+        "method": "POST",
+        "options": {
+          "timeout": 10000
+        },
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "url": "=http://localhost:3000/api/v1/accounts/1/conversations/{{ $json.id }}/messages"
+      }
+    },
+    {
+      "id": "40fdb6ba-3885-457c-a6b1-deb1e5f5a743",
+      "name": "Prepare Escalation Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        500
+      ],
+      "parameters": {
+        "jsCode": "const p = $('Prepare Chatwoot Handover').first().json;\nconst proc = $('Process Response').first().json;\n\n// Get conversation history for summary\nconst history = $('Fetch Conversation History').all().map(i => i.json);\nconst recentMessages = history.slice(0, 5).reverse();\n\nlet convoSummary = '';\nrecentMessages.forEach((h, i) => {\n  if (h.incoming_message) convoSummary += `<tr><td style=\"padding: 8px; vertical-align: top; font-weight: bold; color: #0066cc; width: 80px;\">Customer:</td><td style=\"padding: 8px;\">${h.incoming_message}</td></tr>`;\n  if (h.ai_response) convoSummary += `<tr><td style=\"padding: 8px; vertical-align: top; font-weight: bold; color: #ff6b35; width: 80px;\">Layla:</td><td style=\"padding: 8px;\">${h.ai_response}</td></tr>`;\n});\n\nconst htmlContent = `<div style=\"font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;\">\n  <div style=\"background: linear-gradient(135deg, #0066cc, #0099ff); padding: 20px; border-radius: 10px 10px 0 0; text-align: center;\">\n    <h1 style=\"color: white; margin: 0;\">\ud83d\udd14 ESCALATION ALERT</h1>\n    <p style=\"color: white; margin: 5px 0 0 0;\">Customer needs human assistance \u2014 please follow up!</p>\n  </div>\n  \n  <div style=\"padding: 20px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 10px 10px;\">\n    <h2 style=\"color: #333; border-bottom: 2px solid #0066cc; padding-bottom: 10px;\">Lead Details</h2>\n    <table style=\"width: 100%; border-collapse: collapse;\">\n      <tr><td style=\"padding: 8px; font-weight: bold; width: 150px;\">Name:</td><td style=\"padding: 8px;\">${p.contactName || 'Not provided'}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Phone (WhatsApp):</td><td style=\"padding: 8px;\">${p.phoneNumber}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Email:</td><td style=\"padding: 8px;\">${p.email || 'Not yet collected'}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Address:</td><td style=\"padding: 8px;\">${p.address || 'Not yet collected'}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Lead Score:</td><td style=\"padding: 8px;\"><span style=\"background: #0066cc; color: white; padding: 3px 10px; border-radius: 5px; font-weight: bold;\">${p.leadScore}</span></td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Package:</td><td style=\"padding: 8px;\">${p.recommendedPackage || 'Not yet recommended'}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Escalation Reason:</td><td style=\"padding: 8px;\">Customer asked for fibre availability check / human assistance</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Time:</td><td style=\"padding: 8px;\">${proc.timestamp}</td></tr>\n    </table>\n    \n    <h2 style=\"color: #333; border-bottom: 2px solid #0066cc; padding-bottom: 10px; margin-top: 30px;\">Conversation Summary</h2>\n    <table style=\"width: 100%; border-collapse: collapse;\">\n      ${convoSummary}\n    </table>\n    \n    <h2 style=\"color: #333; border-bottom: 2px solid #0066cc; padding-bottom: 10px; margin-top: 30px;\">Action Required</h2>\n    <ul style=\"padding-left: 20px;\">\n      <li style=\"padding: 5px 0;\">Check fibre availability at the customer's address</li>\n      <li style=\"padding: 5px 0;\">Contact the customer via WhatsApp or phone with the results</li>\n      <li style=\"padding: 5px 0;\">This lead has also been handed over to Chatwoot \u2014 check the WhatsApp Business inbox</li>\n    </ul>\n    \n    <div style=\"background: #d1ecf1; border: 1px solid #bee5eb; padding: 15px; border-radius: 8px; margin-top: 20px;\">\n      <p style=\"margin: 0; color: #0c5460;\"><strong>\ud83d\udccb Chatwoot Handover:</strong> A conversation has been created in Chatwoot with the full lead context. Check https://chat.horizonafrica.co.za</p>\n    </div>\n    \n    <hr style=\"margin-top: 20px; border: none; border-top: 1px solid #ddd;\">\n    <p style=\"color: #999; font-size: 12px; text-align: center;\">This alert was generated automatically by the Horizon Africa WhatsApp AI Assistant (Layla)</p>\n  </div>\n</div>`;\n\nreturn { json: {\n  sender: { name: 'Horizon Africa AI', email: 'keshlan@horizonafrica.co.za' },\n  to: [{ email: 'mohamed@owdsolutions.co.za', name: 'Mohamed' }],\n  subject: '\ud83d\udd14 ESCALATION - ' + (p.contactName || p.phoneNumber) + ' needs human assistance',\n  htmlContent: htmlContent\n} };"
+      }
+    },
+    {
+      "id": "58684ddf-e731-455b-a160-5761c1c4dc54",
+      "name": "Send Escalation Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1980,
+        500
+      ],
+      "parameters": {
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api-key",
+              "value": "BREVO_API_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "jsonBody": "={{ JSON.stringify({ sender: $json.sender, to: $json.to, subject: $json.subject, htmlContent: $json.htmlContent }) }}",
+        "method": "POST",
+        "options": {
+          "timeout": 10000
+        },
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "url": "https://api.brevo.com/v3/smtp/email"
+      }
+    }
+  ],
+  "nodeGroups": [],
+  "activeVersion": {
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "whatsapp-webhook",
+          "responseMode": "onReceived",
+          "options": {}
+        },
+        "id": "webhook-trigger",
+        "name": "WhatsApp Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          0,
+          0
+        ],
+        "webhookId": "horizon-whatsapp-webhook"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Extract message data from Meta WhatsApp webhook payload\nconst webhookData = $input.first().json;\nconst body = webhookData.body || webhookData;\n\nlet phoneNumber = '';\nlet messageText = '';\nlet messageId = '';\nlet contactName = '';\n\nif (body.entry && body.entry[0] && body.entry[0].changes && body.entry[0].changes[0]) {\n  const change = body.entry[0].changes[0];\n  if (change.value && change.value.messages && change.value.messages[0]) {\n    const msg = change.value.messages[0];\n    phoneNumber = msg.from || '';\n    messageId = msg.id || '';\n    messageText = msg.text?.body || msg.button?.text || msg.interactive?.button_reply?.title || '';\n    \n    if (change.value.contacts && change.value.contacts[0]) {\n      contactName = change.value.contacts[0].profile?.name || '';\n    }\n  }\n}\n\n// Skip status update webhooks (delivered, read) that have no message content\nif (!phoneNumber || !messageText) {\n  return [];\n}\n\nconst sessionId = phoneNumber.replace(/[^0-9]/g, '');\n\nreturn {\n  json: {\n    phoneNumber,\n    sessionId,\n    messageText,\n    messageId,\n    contactName,\n    timestamp: new Date().toISOString()\n  }\n};"
+        },
+        "id": "extract-message",
+        "name": "Extract Message",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          220,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "method": "GET",
+          "url": "https://gbchhzipbbxpvgtaheze.supabase.co/rest/v1/conversations",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "phone_number",
+                "value": "=eq.{{ $('Extract Message').first().json.phoneNumber }}"
+              },
+              {
+                "name": "order",
+                "value": "timestamp.desc"
+              },
+              {
+                "name": "limit",
+                "value": "10"
+              }
+            ]
+          },
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "apikey",
+                "value": "SUPABASE_ANON_KEY_PLACEHOLDER"
+              },
+              {
+                "name": "Authorization",
+                "value": "Bearer SUPABASE_ANON_KEY_PLACEHOLDER"
+              }
+            ]
+          },
+          "options": {
+            "timeout": 10000
+          }
+        },
+        "id": "fetch-history",
+        "name": "Fetch Conversation History",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          440,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const systemPrompt = `You are Layla, the heart of Horizon Africa \u2014 a South African telecommunications company specialising in Fibre, LTE, Wireless, and Starlink internet services. Helping people isn't just your job \u2014 it's who you are.\n\n## PERSONALITY \u2014 WHO IS LAYLA\n- Warm and welcoming \u2014 positive energy without being loud or over-the-top. Every customer should feel like someone was waiting to help them\n- Emotionally intelligent \u2014 match the customer's energy: celebrate with excited customers, reassure worried ones, stay calm and patient with frustrated ones. With elderly or non-tech-savvy customers, slow down and explain one step at a time\n- Curious \u2014 ask thoughtful questions to understand the customer's real need before jumping to an answer. Listen first\n- Confident and clear \u2014 no waffling or guessing. If you don't know something, say so honestly and get a consultant to help\n- Kind, always \u2014 never sarcastic, defensive, or blaming, even when a customer is rude\n- Gentle sense of humour \u2014 laugh with customers, never at them. Keep it appropriate and professional\n- Teach, don't lecture \u2014 explain technical topics simply so customers feel smarter, never unintelligent\n- Create small moments of delight \u2014 congratulate customers on milestones (e.g. service activation), offer a genuinely helpful tip they didn't ask for, or answer the question they were about to ask. Thoughtful, never gimmicky\n- Natural and conversational \u2014 use contractions and natural South African English. Never sound scripted, robotic, or corporate\n- Concise \u2014 never more than 3-4 sentences unless listing packages or answering a detailed question\n- Maximum 1 emoji per message, used sparingly\n- Never use pushy sales language or pressure tactics \u2014 guide, don't sell\n- Use the customer's name once you know it\n- Never break character. You are always Layla. Never say \"I'm an AI\" or \"as a language model\" \u2014 you're a person named Layla who works at Horizon Africa\n\n## THE LAYLA RULE\nBefore every reply, silently check: will this simply solve the problem, or will the customer remember it? Aim for memorable \u2014 but never at the cost of being concise.\n\n## YOUR ROLE\n1. Answer questions about Fibre packages using the knowledge base below\n2. Qualify leads by asking about their internet needs\n3. Recommend the right package based on their usage\n4. Collect lead information for the sales team\n5. Identify hot leads who are ready to sign up\n\n## QUALIFICATION PROCESS\nFollow this flow naturally in conversation. Don't ask all questions at once \u2014 weave them in.\n\nStep 1: Ask \"How many people will be using the internet at your place?\"\nOptions: 1 Person | 2-4 People | 5+ People\n\nStep 2: Ask \"What do you mainly use the internet for?\"\nOptions: Email, Browsing, Netflix, YouTube, Gaming, Working from Home, CCTV, Smart Home Devices, Business, Online School, Video Calls\n\nStep 3: Based on their answers, recommend a package (see recommendation engine below)\n\nStep 4: If they're interested, collect their details:\n- Full name\n- Contact number\n- Physical address (for fibre availability check)\n- Email address\n\n## OBJECTION HANDLING\n\nTransition naturally between qualification and objection handling within the same conversation. When a customer raises an objection, pause qualification and address the objection first. Once resolved, guide them back to the qualification flow.\n\n### Objection 1: Price Too High\n\n**Detect:** \"too expensive\", \"can't afford it\", \"price is too high\", \"out of my budget\", \"paying less now\", \"fibre costs too much\", \"not worth the money\", \"don't want another monthly expense\", \"more than I expected\"\n\n**Respond:**\n1. Acknowledge their concern with empathy \u2014 \"I understand, budget is important\"\n2. Compare fibre costs to mobile data spend \u2014 \"Many people find they're actually spending more on mobile data than fibre would cost\"\n3. Suggest a more affordable package (e.g. 20/10 Mbps at R345/month for light users)\n4. Ask ONE discovery question: \"What's your current monthly mobile data spend?\" or \"How many people are in the household?\" or \"What do you mainly use the internet for?\"\n\n**Convert:** Recommend a lower-speed package that fits their budget. Highlight any promotions. Explain long-term savings vs mobile data (uncapped vs per-GB pricing).\n\n**If still hesitant:** \"No worries \u2014 I can put together a quote that fits your budget. What amount would you be comfortable with?\"\n\n**Escalate to a human consultant if:** the customer asks for a discount, wants to negotiate price, or requests custom pricing.\n\n### Objection 2: Comparing Providers\n\n**Detect:** \"still comparing\", \"looking around\", \"want to compare first\", \"getting other quotes\", \"waiting for another provider\", \"haven't decided yet\"\n\n**Respond:**\n1. Validate their approach \u2014 \"That's a smart move, it's always good to compare\"\n2. Offer to help them compare on speed, price, installation time, and contract terms\n3. Ask ONE discovery question: \"Which providers are you looking at?\" or \"What matters most to you \u2014 speed, price, or support?\" or \"Is installation time important to you?\" or \"Do you prefer month-to-month or a contract?\"\n\n**Convert:** Highlight Horizon Africa's network reliability, local support quality, fast installation (3-5 business days for existing infrastructure), promotions, and value-added benefits.\n\n**If still hesitant:** \"No problem at all. I can save your quote so you have it handy when you're comparing. Shall I do that?\"\n\n**Escalate only if:** the customer wants detailed competitor comparisons that are beyond your knowledge base.\n\n### Objection 3: Need to Think About It\n\n**Detect:** \"I'll think about it\", \"let me decide\", \"discuss it with my family\", \"I'll get back to you\", \"I'll let you know\", \"not today\"\n\n**Respond:**\n1. Validate \u2014 \"Absolutely, take your time \u2014 it's an important decision\"\n2. Summarise the package you recommended (speed and price) so they have it on record\n3. Tell them their details are saved \u2014 they can just message again whenever ready and you'll pick up where you left off\n4. Ask ONE discovery question: \"Is there anything specific holding you back?\" or \"Do you have any questions I can clear up?\" or \"Would a follow-up reminder in a few days be helpful?\"\n\n**Convert:** Save the quotation. Offer a follow-up reminder. Suggest alternative package options if their needs have changed.\n\n**If still hesitant:** \"No problem at all \u2014 I've noted the package for you. Whenever you're ready, just send a message and we'll pick up right where we left off.\"\n\n**Escalate only if:** the customer requests a consultant callback.\n\n### Objection 4: Already Have Fibre\n\n**Detect:** \"already have fibre\", \"with another provider\", \"already connected\", \"don't need fibre\", \"my internet is working\"\n\n**Respond:**\n1. Acknowledge \u2014 \"Great that you're already connected!\"\n2. Ask who their current provider is\n3. Explain they may be able to upgrade speed, improve reliability, or reduce costs\n4. Offer to compare their current setup with what Horizon Africa can provide\n\n**Discovery questions (one at a time):** \"Who's your current provider?\" then \"What speed are you on?\" then \"Are you happy with the service?\" then \"Have you experienced slow speeds or outages?\" then \"When does your contract end?\"\n\n**Convert:** Highlight faster speeds, better value, or a smoother upgrade path. Offer migration assistance.\n\n**If they're happy:** \"That's good to hear! No pressure at all. If things ever change or you want to compare, we're here.\"\n\n**Escalate if:** migration requires manual intervention (e.g. complex contract cancellations, infrastructure changes).\n\n### Objection 5: I'm Moving\n\n**Detect:** \"I'm moving\", \"relocating\", \"new address\", \"changing houses\", \"moving next month\", \"moving soon\", \"moving to\"\n\n**Respond:**\n1. Acknowledge \u2014 \"Exciting! Let's make sure you're connected at your new place\"\n2. Ask for the new address to check fibre availability\n3. Explain the relocation process \u2014 we can check what's available at the new address and arrange a transfer or new installation\n4. If fibre is available: \"Great news \u2014 we can get you sorted at the new place!\"\n5. If fibre is not available: \"No fibre there yet, but let's look at LTE or wireless options so you're not left without internet\"\n\n**Convert:** Book the relocation or new installation. Offer to check multiple addresses if they're still house-hunting.\n\n## KNOWLEDGE BASE\n\n### Packages & Pricing\n- 20/10 Mbps \u2014 R345/month\n- 25/25 Mbps \u2014 R499/month\n- 40/20 Mbps \u2014 R425/month\n- 50/25 Mbps \u2014 R695/month\n- 100 Mbps, 200 Mbps, 500 Mbps also available (pricing varies by area and FNO)\n- All packages are uncapped \u2014 no FUP, no throttling, no data caps\n- Package availability depends on the Fibre Network Operator (FNO) servicing the area\n\n### Installation\n- Existing fibre infrastructure: 3-5 business days\n- New fibre installation: 5-7 business days\n- An adult (18+) must be present during installation\n- If fibre already installed at property, only remote activation needed \u2014 faster turnaround\n\n### Contracts\n- Standard: 12 months (covers installation and activation fees)\n- Month-to-month and prepaid options available (T&C's apply)\n- Early cancellation allowed but termination fees may apply\n- Upgrades available anytime; downgrades depend on contract terms\n\n### Application Requirements\n- Full Name\n- South African ID Number (passports accepted if visa covers full contract duration \u2014 deposits apply)\n- Contact Number\n- Physical Address\n- Email Address\n- After approval: Bank Name, Account Number, Preferred Debit Order Date\n- Credit assessment required for all post-paid applications\n- Deposit only required if credit assessment doesn't meet threshold (refundable)\n\n### Payment\n- Debit orders mandatory for post-paid\n- Prepaid paid before activation\n- Debit order date confirmed during application\n- Failed debit orders result in suspension; bank rejection fees passed on\n\n### Technical\n- All packages include ONT (Optical Network Terminal)\n- Some packages include a Wi-Fi router \u2014 consultant will confirm\n- Symmetrical fibre: upload = download speed (ideal for business, remote work, content creators)\n- Asymmetrical fibre: faster download than upload (suitable for home use)\n- Fibre supports multiple users and devices simultaneously\n- Great for gaming (low latency, stable), streaming (Netflix, YouTube, Disney+, Showmax), working from home (Teams, Zoom, VPN)\n\n### Support\n- Telkom technical support: 10217 (Option 1: Technical, Option 2: Billing, Option 3: Customer Services)\n- Sales Manager: khanyisg@telkom.co.za / 068 565 3272\n- Users can also contact Horizon Africa directly for guidance\n\n### Other\n- Prepaid fibre available in selected areas\n- Business fibre solutions available \u2014 contact sales for custom packages\n- ADSL to Fibre migration may qualify for free installation\n- Relocation: check new address for fibre availability, arrange transfer or discuss alternatives\n- Fibre availability check: just provide physical address\n\n## RULES\n- Always respond in the same language as the user (English or Afrikaans)\n- Never invent information not in the knowledge base\n- If you don't know something: \"Let me get that info for you. I'll have one of our sales consultants reach out.\"\n- If user asks to speak to a human: \"I'll connect you with our sales team right away\" and note for handover\n- Keep responses short and scannable \u2014 use bullet points for lists\n- When recommending a package, state the speed and price clearly\n- Don't overwhelm the user with information \u2014 answer what they asked\n- Be proactive but not pushy \u2014 if they seem interested, guide them to the next step\n- Never ask more than one question at a time\n- Greet new users warmly: \"Hi! Welcome to Horizon Africa \u2014 I'm Layla. How can I help you today?\"\n- Never break character. You are Layla, always.`;\n\nconst msg = $('Extract Message').first().json;\nconst history = $('Fetch Conversation History').all().map(i => i.json);\n\n// Build conversation messages in chronological order (oldest first)\nconst messages = [];\n\n// Add system message\nmessages.push({ role: 'system', content: systemPrompt });\n\n// Add recent history\nhistory.slice().reverse().forEach(h => {\n  if (h.incoming_message) {\n    messages.push({ role: 'user', content: h.incoming_message });\n  }\n  if (h.ai_response) {\n    messages.push({ role: 'assistant', content: h.ai_response });\n  }\n});\n\n// Add current user message\nmessages.push({ role: 'user', content: msg.messageText });\n\nreturn {\n  json: {\n    phoneNumber: msg.phoneNumber,\n    sessionId: msg.sessionId,\n    messageText: msg.messageText,\n    messageId: msg.messageId,\n    contactName: msg.contactName,\n    timestamp: msg.timestamp,\n    openrouterRequest: {\n      model: 'openai/gpt-5.6-sol',\n      messages,\n      temperature: 0.8\n    }\n  }\n};"
+        },
+        "id": "build-gemini-request",
+        "name": "Build OpenRouter Request",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          660,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "={{ $env.OPENROUTER_API_KEY ? 'Bearer ' + $env.OPENROUTER_API_KEY : '' }}"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "jsonBody": "={{ JSON.stringify($json.openrouterRequest) }}",
+          "method": "POST",
+          "options": {
+            "maxTries": 3,
+            "neverError": false,
+            "retryOnFail": true,
+            "timeout": 30000,
+            "waitBetweenTries": 5000
+          },
+          "sendBody": true,
+          "sendHeaders": true,
+          "specifyBody": "json",
+          "url": "https://openrouter.ai/api/v1/chat/completions"
+        },
+        "id": "call-gemini",
+        "name": "Call OpenRouter API",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          880,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Parse OpenRouter response and score lead\nconst openrouterResult = $input.first().json;\nconst aiResponse = openrouterResult.choices?.[0]?.message?.content || 'Sorry, I did not understand that.';\nconst req = $('Build OpenRouter Request').first().json;\n\nconst messageLower = (req.messageText || '').toLowerCase();\n\nlet leadScore = 'COLD';\n\n// Detect contact info in CURRENT USER MESSAGE only (not history, not AI response)\nlet hasPhone = /\\b\\d{10}\\b|\\b0\\d{2}[\\s-]?\\d{3}[\\s-]?\\d{4}\\b|\\b\\+\\d{1,3}\\s?\\d{6,}\\b/.test(messageLower);\nlet hasEmail = /[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}/i.test(req.messageText || '');\nlet hasAddress = /\\bstreet\\b|\\broad\\b|\\bavenue\\b|\\bdrive\\b|\\bplace\\b|\\bclose\\b|\\bblvd\\b|\\baddress\\b|\\bsuburb\\b|\\bunit\\b|\\bno\\.?\\s\\d/.test(messageLower);\nlet hasName = !!(req.contactName && req.contactName.length > 0);\n\nlet hasContactInfo = hasPhone || hasEmail;\n\n// Sign-up intent keywords \u2014 check USER MESSAGE ONLY (not AI response)\nconst signUpIntent = /sign\\s*up|install|apply|get\\s*started|proceed|go\\s*ahead|sounds\\s*good|interested|let'?s\\s*do\\s*it|how\\s*do\\s*i\\s*sign|ready\\s*to\\s*sign|let'?s\\s*get\\s*this|want\\s*to\\s*sign|go\\s*for\\s*it|sounds\\s*perfect|that'?s\\s*perfect/.test(messageLower);\n\n// HOT: Current message shows explicit sign-up intent AND provides new contact info\n// OR: Current message shows sign-up intent AND user already has name (from Meta profile)\nif (signUpIntent && (hasContactInfo || hasAddress || hasName)) {\n  leadScore = 'HOT';\n} else if (hasContactInfo || hasAddress || (/price|cost|how\\s*much|install|when\\s*can|interested|package|sign\\s*up/.test(messageLower) && hasName)) {\n  leadScore = 'WARM';\n} else if (/fibre|internet|broadband|wifi|data|lte|starlink/.test(messageLower)) {\n  leadScore = 'WARM';\n}\n\n// --- Objection Detection ---\nlet objectionType = null;\nconst objectionPatterns = [\n  { type: 'price_too_high', regex: /too expensive|can'?t afford|price is too high|out of my budget|paying less|fibre costs too much|not worth the money|don'?t want another monthly expense|more than i expected|too pricey|can'?t afford it/ },\n  { type: 'comparing_providers', regex: /still comparing|looking around|want to compare|getting other quotes|waiting for another provider|haven'?t decided|shopping around|checking other|comparing options/ },\n  { type: 'need_to_think', regex: /i'?ll think about|let me decide|discuss it with|discuss with my family|i'?ll get back to you|i'?ll let you know|not today|need to think|let me think|think about it/ },\n  { type: 'already_have_fibre', regex: /already have fibre|with another provider|already connected|don'?t need fibre|my internet is working|already got fibre|have internet already|current provider/ },\n  { type: 'moving', regex: /i'?m moving|relocating|new address|changing houses|moving next month|moving soon|moving to|relocation/ }\n];\nfor (const p of objectionPatterns) { if (p.regex.test(messageLower)) { objectionType = p.type; break; } }\n\n// --- Escalation Detection ---\nlet needsEscalation = false;\nconst escalationRegex = /discount|negotiate|custom pricing|callback|speak to a consultant|speak to a human|speak to someone|contract negotiation|can you call me|get a call|manager|supervisor|check.*availability|check.*coverage|is fibre available|check if.*available|coverage at|available at my|available at that|available at the/;\nif (escalationRegex.test(messageLower)) { needsEscalation = true; }\n\n// --- Follow-up Detection ---\nlet followUpRequested = false;\nlet followUpDate = null;\nconst followUpRegex = /think about it|get back to you|let you know|let me decide|discuss it with|discuss with my family|not today|need to think|let me think/;\nif (followUpRegex.test(messageLower)) {\n  followUpRequested = true;\n  const d = new Date(); d.setDate(d.getDate() + 3);\n  followUpDate = d.toISOString().split('T')[0];\n}\n\n// Objection or escalation bumps COLD to WARM minimum\nif ((objectionType || needsEscalation) && leadScore === 'COLD') { leadScore = 'WARM'; }\n\nreturn {\n  json: {\n    phoneNumber: req.phoneNumber,\n    sessionId: req.sessionId,\n    contactName: req.contactName,\n    incomingMessage: req.messageText,\n    aiResponse: aiResponse,\n    leadScore: leadScore,\n    hasContactInfo: hasContactInfo,\n    hasAddress: hasAddress,\n    objectionType: objectionType,\n    needsEscalation: needsEscalation,\n    followUpRequested: followUpRequested,\n    followUpDate: followUpDate,\n    timestamp: req.timestamp\n  }\n};"
+        },
+        "id": "process-response",
+        "name": "Process Response",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1100,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const p = $('Process Response').first().json;\nreturn { json: { messaging_product: 'whatsapp', to: p.phoneNumber, type: 'text', text: { body: p.aiResponse }, phoneNumber: p.phoneNumber, aiResponse: p.aiResponse, leadScore: p.leadScore, contactName: p.contactName, incomingMessage: p.incomingMessage, timestamp: p.timestamp } };"
+        },
+        "id": "prepare-wa-data",
+        "name": "Prepare WhatsApp Data",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1540,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "authentication": "none",
+          "contentType": "json",
+          "curlImport": "",
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer META_ACCESS_TOKEN_PLACEHOLDER"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "infoMessage": "",
+          "jsonBody": "={{ JSON.stringify({ messaging_product: $json.messaging_product, to: $json.to, type: $json.type, text: { body: $json.text.body } }) }}",
+          "method": "POST",
+          "options": {
+            "timeout": 10000
+          },
+          "provideSslCertificates": false,
+          "sendBody": true,
+          "sendHeaders": true,
+          "sendQuery": false,
+          "specifyBody": "json",
+          "specifyHeaders": "keypair",
+          "url": "https://graph.facebook.com/v21.0/1257101724147822/messages"
+        },
+        "id": "send-whatsapp-reply",
+        "name": "Send WhatsApp Reply",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1760,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const p = $('Process Response').first().json;\nreturn { json: { phone_number: p.phoneNumber, contact_name: p.contactName, incoming_message: p.incomingMessage, ai_response: p.aiResponse, lead_score: p.leadScore, objection_type: p.objectionType, follow_up_requested: p.followUpRequested, follow_up_date: p.followUpDate, needs_escalation: p.needsEscalation, timestamp: p.timestamp } };"
+        },
+        "id": "prepare-log-data",
+        "name": "Prepare Log Data",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1320,
+          100
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://gbchhzipbbxpvgtaheze.supabase.co/rest/v1/conversations",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "apikey",
+                "value": "SUPABASE_ANON_KEY_PLACEHOLDER"
+              },
+              {
+                "name": "Authorization",
+                "value": "Bearer SUPABASE_ANON_KEY_PLACEHOLDER"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Prefer",
+                "value": "return=minimal"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify($json) }}",
+          "options": {
+            "timeout": 10000
+          }
+        },
+        "id": "log-conversation",
+        "name": "Log Conversation",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1540,
+          200
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "condition-hot-lead",
+                "leftValue": "={{ $('Process Response').first().json.leadScore }}",
+                "rightValue": "HOT",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter:operator:equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "check-hot-lead",
+        "name": "Check Hot Lead",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1540,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.brevo.com/v3/smtp/email",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "api-key",
+                "value": "BREVO_API_KEY_PLACEHOLDER"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ sender: $json.sender, to: $json.to, subject: $json.subject, htmlContent: $json.htmlContent }) }}",
+          "options": {
+            "timeout": 10000
+          }
+        },
+        "id": "send-hot-lead-email",
+        "name": "Send Hot Lead Alert",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1760,
+          -100
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const p = $('Process Response').first().json;\nconst history = $('Fetch Conversation History').all().map(i => i.json);\n\n// Build conversation summary\nlet convoSummary = '';\nlet allMessages = [];\n\n// Add history messages\nhistory.forEach((h, idx) => {\n  if (h.incoming_message && h.ai_response) {\n    allMessages.push({ role: 'Client', text: h.incoming_message, response: h.ai_response });\n  }\n});\n\n// Add current message\nallMessages.push({ role: 'Client', text: p.incomingMessage, response: p.aiResponse });\n\n// Build readable conversation\nconvoSummary = allMessages.map((m, i) => \n  `<tr><td style=\"padding:8px;border-bottom:1px solid #eee;background:#f9f9f9;\"><strong>Client:</strong> ${m.text}</td></tr>` +\n  `<tr><td style=\"padding:8px;border-bottom:1px solid #eee;\"><strong>Layla AI:</strong> ${m.response}</td></tr>`\n).join('');\n\n// Extract collected info from conversation\nconst allText = allMessages.map(m => m.text + ' ' + m.response).join(' ');\nconst emailMatch = allText.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}/i);\nconst phoneMatch = allText.match(/\\b0\\d{2}[\\s-]?\\d{3}[\\s-]?\\d{4}\\b|\\b\\d{10}\\b/);\nconst addressMatch = allText.match(/(?:\\d+\\s+)?(?:[A-Z][a-z]+\\s)+(?:Street|Road|Avenue|Drive|Place|Close|Boulevard|Blvd|Suburb|Unit|No)/i);\n\n// Detect package interest\nlet packageInterest = 'Not specifically mentioned';\nconst pkgMatch = allText.match(/(\\d{2,3})\\s*\\s*mbps|(\\d{2,3})\\s*\\s*mb/i);\nif (pkgMatch) packageInterest = pkgMatch[0] + ' package';\nconst priceMatch = allText.match(/R(\\d{3,4})/);\n\n// Detect usage patterns\nlet usagePattern = 'General browsing';\nif (/netflix|streaming|youtube/i.test(allText)) usagePattern = 'Streaming (Netflix, YouTube)';\nif (/gaming/i.test(allText)) usagePattern += ', Gaming';\nif (/work.*home|wfh|remote.*work/i.test(allText)) usagePattern += ', Working from home';\nif (/browsing|email/i.test(allText)) usagePattern += ', Browsing';\n\n// Build closing recommendations\nlet closingTips = [];\nclosingTips.push('Call the client within 15 minutes while interest is highest');\nclosingTips.push('Reference their specific needs: ' + usagePattern);\nif (packageInterest !== 'Not specifically mentioned') {\n  closingTips.push('Confirm availability of the ' + packageInterest + ' at their address');\n}\nclosingTips.push('Have installation time slots ready to offer');\nclosingTips.push('Mention any current promotions or free installation offers');\nif (priceMatch) {\n  closingTips.push('Confirm pricing: R' + priceMatch[1] + '/month - be ready to offer a discount for upfront payment');\n}\nclosingTips.push('If no answer, send a WhatsApp message referencing this conversation');\n\nconst htmlContent = `\n<div style=\"font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;\">\n  <div style=\"background: linear-gradient(135deg, #ff6b35, #f7931e); padding: 20px; border-radius: 10px 10px 0 0; text-align: center;\">\n    <h1 style=\"color: white; margin: 0;\">\ud83d\udd25 HOT LEAD ALERT</h1>\n    <p style=\"color: white; margin: 5px 0 0 0;\">This lead is ready to convert \u2014 follow up immediately!</p>\n  </div>\n  \n  <div style=\"padding: 20px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 10px 10px;\">\n    \n    <h2 style=\"color: #333; border-bottom: 2px solid #ff6b35; padding-bottom: 10px;\">\ud83d\udccb Lead Details</h2>\n    <table style=\"width: 100%; border-collapse: collapse;\">\n      <tr><td style=\"padding: 8px; font-weight: bold; width: 150px;\">Name:</td><td style=\"padding: 8px;\">${p.contactName || 'Not provided'}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Phone (WhatsApp):</td><td style=\"padding: 8px;\">${p.phoneNumber}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Email:</td><td style=\"padding: 8px;\">${emailMatch ? emailMatch[0] : 'Not yet collected'}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Address:</td><td style=\"padding: 8px;\">${addressMatch ? addressMatch[0] : 'Not yet collected'}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Lead Score:</td><td style=\"padding: 8px;\"><span style=\"background: #ff6b35; color: white; padding: 3px 10px; border-radius: 5px; font-weight: bold;\">HOT</span></td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Package Interest:</td><td style=\"padding: 8px;\">${packageInterest}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Usage Pattern:</td><td style=\"padding: 8px;\">${usagePattern}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Time:</td><td style=\"padding: 8px;\">${p.timestamp}</td></tr>\n    </table>\n    \n    <h2 style=\"color: #333; border-bottom: 2px solid #ff6b35; padding-bottom: 10px; margin-top: 30px;\">\ud83d\udcac Conversation Summary</h2>\n    <table style=\"width: 100%; border-collapse: collapse;\">\n      ${convoSummary}\n    </table>\n    \n    <h2 style=\"color: #333; border-bottom: 2px solid #ff6b35; padding-bottom: 10px; margin-top: 30px;\">\ud83c\udfaf How to Close This Lead</h2>\n    <ul style=\"padding-left: 20px;\">\n      ${closingTips.map(t => `<li style=\"padding: 5px 0;\">${t}</li>`).join('')}\n    </ul>\n    \n    <div style=\"background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 8px; margin-top: 20px;\">\n      <p style=\"margin: 0; color: #856404;\"><strong>\u23f0 Time is critical!</strong> Leads contacted within 5 minutes are 9x more likely to convert. Pick up the phone now!</p>\n    </div>\n    \n    <hr style=\"margin-top: 20px; border: none; border-top: 1px solid #ddd;\">\n    <p style=\"color: #999; font-size: 12px; text-align: center;\">This alert was generated automatically by the Horizon Africa WhatsApp AI Assistant (Layla)</p>\n  </div>\n</div>`;\n\nreturn { json: {\n  sender: { name: 'Horizon Africa AI', email: 'keshlan@horizonafrica.co.za' },\n  to: [{ email: 'mohamed@owdsolutions.co.za', name: 'Sales Team' }],\n  subject: '\ud83d\udd25 HOT LEAD - ' + (p.contactName || p.phoneNumber) + ' wants fibre!',\n  htmlContent: htmlContent,\n  phoneNumber: p.phoneNumber,\n  leadScore: p.leadScore\n} };"
+        },
+        "id": "prepare-hot-email",
+        "name": "Prepare Hot Lead Email",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1760,
+          -200
+        ]
+      },
+      {
+        "id": "meta-verify-webhook",
+        "name": "Meta Verification",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          0,
+          300
+        ],
+        "parameters": {
+          "httpMethod": "GET",
+          "options": {},
+          "path": "whatsapp-webhook",
+          "responseMode": "responseNode"
+        },
+        "webhookId": "1e64526a-0419-4c49-adab-282e11ffacbd"
+      },
+      {
+        "id": "verify-token",
+        "name": "Verify Token",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          220,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const query = $input.first().json.query || {};\nconst mode = query['hub.mode'] || '';\nconst token = query['hub.verify_token'] || '';\nconst challenge = query['hub.challenge'] || '';\nconst EXPECTED_TOKEN = 'horizon_africa_verify_2026';\nif (mode === 'subscribe' && token === EXPECTED_TOKEN) {\n  return { json: { challenge: challenge, verified: true } };\n}\nreturn { json: { challenge: '', verified: false } };"
+        }
+      },
+      {
+        "id": "respond-verification",
+        "name": "Respond to Verification",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.1,
+        "position": [
+          440,
+          300
+        ],
+        "parameters": {
+          "options": {
+            "responseCode": 200
+          },
+          "respondWith": "text",
+          "responseBody": "={{ $json.challenge }}"
+        }
+      },
+      {
+        "id": "upsert-lead",
+        "name": "Upsert Lead",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          680,
+          400
+        ],
+        "parameters": {
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "apikey",
+                "value": "SUPABASE_ANON_KEY_PLACEHOLDER"
+              },
+              {
+                "name": "Authorization",
+                "value": "Bearer SUPABASE_ANON_KEY_PLACEHOLDER"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Prefer",
+                "value": "resolution=merge-duplicates,return=minimal"
+              }
+            ]
+          },
+          "jsonBody": "={{ JSON.stringify($json.leadUpsertBody) }}",
+          "method": "POST",
+          "options": {
+            "timeout": 10000
+          },
+          "sendBody": true,
+          "sendHeaders": true,
+          "specifyBody": "json",
+          "url": "=https://gbchhzipbbxpvgtaheze.supabase.co/rest/v1/leads?on_conflict=phone_number"
+        },
+        "notes": "Upserts lead data to Supabase leads table with follow-up fields. Uses phone_number as conflict key."
+      },
+      {
+        "id": "d94bae47-c92c-4af5-ae03-e8e4e5e65dfc",
+        "name": "Check Escalation",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1540,
+          300
+        ],
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "condition-escalation",
+                "leftValue": "={{ $('Process Response').first().json.needsEscalation }}",
+                "operator": {
+                  "name": "filter:operator:true",
+                  "operation": "true",
+                  "type": "boolean"
+                },
+                "rightValue": true
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            }
+          },
+          "options": {}
+        }
+      },
+      {
+        "id": "15e5c69b-fd7a-4580-8dae-87a75695f239",
+        "name": "Prepare Chatwoot Handover",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1760,
+          300
+        ],
+        "parameters": {
+          "jsCode": "// Build Chatwoot contact and conversation payload from lead data\nconst p = $('Process Response').first().json;\n\n// Get conversation history to extract lead details\nconst history = $('Fetch Conversation History').all().map(i => i.json);\n\n// Extract email, address, name from conversation history\nlet email = null;\nlet address = null;\nlet contactName = p.contactName || null;\nlet recommendedPackage = null;\n\n// Search through conversation history for contact details\nhistory.forEach(h => {\n  const text = (h.incoming_message || '') + ' ' + (h.ai_response || '');\n  \n  // Extract email\n  if (!email) {\n    const emailMatch = text.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}/i);\n    if (emailMatch) email = emailMatch[0];\n  }\n  \n  // Extract address (look for road/street/avenue patterns in user messages)\n  if (!address && h.incoming_message) {\n    const addrMatch = h.incoming_message.match(/\\d+\\s+\\w+\\s+(?:road|street|avenue|drive|place|close|blvd)\\s*,?\\s*\\w+/i);\n    if (addrMatch) address = addrMatch[0];\n  }\n  \n  // Extract package recommendation from AI responses\n  if (!recommendedPackage && h.ai_response) {\n    const pkgMatch = h.ai_response.match(/(\\d+\\/?\\d*\\s*Mbps[^]*?R\\d+\\/month)/i);\n    if (pkgMatch) recommendedPackage = pkgMatch[0];\n  }\n});\n\n// Build conversation summary for Chatwoot\nconst recentMessages = history.slice(0, 5).reverse();\nlet conversationSummary = `--- ESCALATION LEAD - Needs Human Handover ---\\n\\n`;\nconversationSummary += `Phone: ${p.phoneNumber}\\n`;\nif (contactName) conversationSummary += `Name: ${contactName}\\n`;\nif (email) conversationSummary += `Email: ${email}\\n`;\nif (address) conversationSummary += `Address: ${address}\\n`;\nif (recommendedPackage) conversationSummary += `Package: ${recommendedPackage}\\n`;\nconversationSummary += `Lead Score: ${p.leadScore}\\n`;\nconversationSummary += `Escalation Reason: Customer asked for fibre availability / human assistance\\n\\n`;\nconversationSummary += `--- Recent Conversation ---\\n`;\nrecentMessages.forEach(h => {\n  if (h.incoming_message) conversationSummary += `Customer: ${h.incoming_message}\\n`;\n  if (h.ai_response) conversationSummary += `Layla: ${h.ai_response}\\n`;\n});\nconversationSummary += `\\nCustomer's latest message: ${p.incomingMessage}\\n`;\nconversationSummary += `Layla's response: ${p.aiResponse}\\n`;\n\n// Format phone number for Chatwoot (ensure + prefix)\nlet chatwootPhone = p.phoneNumber;\nif (!chatwootPhone.startsWith('+')) {\n  chatwootPhone = '+' + chatwootPhone;\n}\n\nreturn {\n  json: {\n    phoneNumber: chatwootPhone,\n    contactName: contactName || 'Unknown',\n    email: email,\n    address: address,\n    recommendedPackage: recommendedPackage,\n    leadScore: p.leadScore,\n    conversationSummary: conversationSummary,\n    inboxId: 1,\n    accountId: 1\n  }\n};"
+        }
+      },
+      {
+        "id": "32a8e67e-bba0-4ae7-9071-3c83b9ce50ab",
+        "name": "Create Chatwoot Contact",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1980,
+          300
+        ],
+        "parameters": {
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "api_access_token",
+                "value": "CHATWOOT_API_TOKEN_PLACEHOLDER"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "jsonBody": "={\n  \"name\": \"{{ $json.contactName }}\",\n  \"phone_number\": \"{{ $json.phoneNumber }}\",\n  \"email\": {{ $json.email ? '\"' + $json.email + '\"' : 'null' }},\n  \"identifier\": \"{{ $json.phoneNumber }}\"\n}",
+          "method": "POST",
+          "options": {
+            "timeout": 10000
+          },
+          "sendBody": true,
+          "sendHeaders": true,
+          "specifyBody": "json",
+          "url": "http://localhost:3000/api/v1/accounts/1/contacts"
+        }
+      },
+      {
+        "id": "806d2b5d-4084-4e91-8628-544a3b016c26",
+        "name": "Create Chatwoot Conversation",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          2200,
+          300
+        ],
+        "parameters": {
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "api_access_token",
+                "value": "CHATWOOT_API_TOKEN_PLACEHOLDER"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "jsonBody": "={\n  \"inbox_id\": {{ $json.inboxId }},\n  \"source_id\": \"{{ $json.phoneNumber }}\",\n  \"contact\": {\n    \"name\": \"{{ $json.contactName }}\",\n    \"phone_number\": \"{{ $json.phoneNumber }}\",\n    \"email\": {{ $json.email ? '\"' + $json.email + '\"' : 'null' }}\n  },\n  \"status\": \"open\",\n  \"assignee_id\": null\n}",
+          "method": "POST",
+          "options": {
+            "timeout": 10000
+          },
+          "sendBody": true,
+          "sendHeaders": true,
+          "specifyBody": "json",
+          "url": "=http://localhost:3000/api/v1/accounts/1/conversations"
+        }
+      },
+      {
+        "id": "0bf7a4a6-abac-4f64-a4e5-26e73c733316",
+        "name": "Send Chatwoot Handover Message",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          2420,
+          300
+        ],
+        "parameters": {
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "api_access_token",
+                "value": "CHATWOOT_API_TOKEN_PLACEHOLDER"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "jsonBody": "={\n  \"content\": \"{{ $('Prepare Chatwoot Handover').first().json.conversationSummary }}\",\n  \"message_type\": \"outgoing\",\n  \"private\": true\n}",
+          "method": "POST",
+          "options": {
+            "timeout": 10000
+          },
+          "sendBody": true,
+          "sendHeaders": true,
+          "specifyBody": "json",
+          "url": "=http://localhost:3000/api/v1/accounts/1/conversations/{{ $json.id }}/messages"
+        }
+      },
+      {
+        "id": "40fdb6ba-3885-457c-a6b1-deb1e5f5a743",
+        "name": "Prepare Escalation Email",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1760,
+          500
+        ],
+        "parameters": {
+          "jsCode": "const p = $('Prepare Chatwoot Handover').first().json;\nconst proc = $('Process Response').first().json;\n\n// Get conversation history for summary\nconst history = $('Fetch Conversation History').all().map(i => i.json);\nconst recentMessages = history.slice(0, 5).reverse();\n\nlet convoSummary = '';\nrecentMessages.forEach((h, i) => {\n  if (h.incoming_message) convoSummary += `<tr><td style=\"padding: 8px; vertical-align: top; font-weight: bold; color: #0066cc; width: 80px;\">Customer:</td><td style=\"padding: 8px;\">${h.incoming_message}</td></tr>`;\n  if (h.ai_response) convoSummary += `<tr><td style=\"padding: 8px; vertical-align: top; font-weight: bold; color: #ff6b35; width: 80px;\">Layla:</td><td style=\"padding: 8px;\">${h.ai_response}</td></tr>`;\n});\n\nconst htmlContent = `<div style=\"font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;\">\n  <div style=\"background: linear-gradient(135deg, #0066cc, #0099ff); padding: 20px; border-radius: 10px 10px 0 0; text-align: center;\">\n    <h1 style=\"color: white; margin: 0;\">\ud83d\udd14 ESCALATION ALERT</h1>\n    <p style=\"color: white; margin: 5px 0 0 0;\">Customer needs human assistance \u2014 please follow up!</p>\n  </div>\n  \n  <div style=\"padding: 20px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 10px 10px;\">\n    <h2 style=\"color: #333; border-bottom: 2px solid #0066cc; padding-bottom: 10px;\">Lead Details</h2>\n    <table style=\"width: 100%; border-collapse: collapse;\">\n      <tr><td style=\"padding: 8px; font-weight: bold; width: 150px;\">Name:</td><td style=\"padding: 8px;\">${p.contactName || 'Not provided'}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Phone (WhatsApp):</td><td style=\"padding: 8px;\">${p.phoneNumber}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Email:</td><td style=\"padding: 8px;\">${p.email || 'Not yet collected'}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Address:</td><td style=\"padding: 8px;\">${p.address || 'Not yet collected'}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Lead Score:</td><td style=\"padding: 8px;\"><span style=\"background: #0066cc; color: white; padding: 3px 10px; border-radius: 5px; font-weight: bold;\">${p.leadScore}</span></td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Package:</td><td style=\"padding: 8px;\">${p.recommendedPackage || 'Not yet recommended'}</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Escalation Reason:</td><td style=\"padding: 8px;\">Customer asked for fibre availability check / human assistance</td></tr>\n      <tr><td style=\"padding: 8px; font-weight: bold;\">Time:</td><td style=\"padding: 8px;\">${proc.timestamp}</td></tr>\n    </table>\n    \n    <h2 style=\"color: #333; border-bottom: 2px solid #0066cc; padding-bottom: 10px; margin-top: 30px;\">Conversation Summary</h2>\n    <table style=\"width: 100%; border-collapse: collapse;\">\n      ${convoSummary}\n    </table>\n    \n    <h2 style=\"color: #333; border-bottom: 2px solid #0066cc; padding-bottom: 10px; margin-top: 30px;\">Action Required</h2>\n    <ul style=\"padding-left: 20px;\">\n      <li style=\"padding: 5px 0;\">Check fibre availability at the customer's address</li>\n      <li style=\"padding: 5px 0;\">Contact the customer via WhatsApp or phone with the results</li>\n      <li style=\"padding: 5px 0;\">This lead has also been handed over to Chatwoot \u2014 check the WhatsApp Business inbox</li>\n    </ul>\n    \n    <div style=\"background: #d1ecf1; border: 1px solid #bee5eb; padding: 15px; border-radius: 8px; margin-top: 20px;\">\n      <p style=\"margin: 0; color: #0c5460;\"><strong>\ud83d\udccb Chatwoot Handover:</strong> A conversation has been created in Chatwoot with the full lead context. Check https://chat.horizonafrica.co.za</p>\n    </div>\n    \n    <hr style=\"margin-top: 20px; border: none; border-top: 1px solid #ddd;\">\n    <p style=\"color: #999; font-size: 12px; text-align: center;\">This alert was generated automatically by the Horizon Africa WhatsApp AI Assistant (Layla)</p>\n  </div>\n</div>`;\n\nreturn { json: {\n  sender: { name: 'Horizon Africa AI', email: 'keshlan@horizonafrica.co.za' },\n  to: [{ email: 'mohamed@owdsolutions.co.za', name: 'Mohamed' }],\n  subject: '\ud83d\udd14 ESCALATION - ' + (p.contactName || p.phoneNumber) + ' needs human assistance',\n  htmlContent: htmlContent\n} };"
+        }
+      },
+      {
+        "id": "58684ddf-e731-455b-a160-5761c1c4dc54",
+        "name": "Send Escalation Alert",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1980,
+          500
+        ],
+        "parameters": {
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "api-key",
+                "value": "BREVO_API_KEY_PLACEHOLDER"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "jsonBody": "={{ JSON.stringify({ sender: $json.sender, to: $json.to, subject: $json.subject, htmlContent: $json.htmlContent }) }}",
+          "method": "POST",
+          "options": {
+            "timeout": 10000
+          },
+          "sendBody": true,
+          "sendHeaders": true,
+          "specifyBody": "json",
+          "url": "https://api.brevo.com/v3/smtp/email"
+        }
+      }
+    ],
+    "connections": {
+      "WhatsApp Webhook": {
+        "main": [
+          [
+            {
+              "node": "Extract Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Message": {
+        "main": [
+          [
+            {
+              "node": "Fetch Conversation History",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Build OpenRouter Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Process Response": {
+        "main": [
+          [
+            {
+              "node": "Prepare Log Data",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Upsert Lead",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Log Conversation": {
+        "main": [
+          [
+            {
+              "node": "Prepare WhatsApp Data",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Check Hot Lead",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Check Escalation",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send WhatsApp Reply": {
+        "main": [
+          []
+        ]
+      },
+      "Check Hot Lead": {
+        "main": [
+          [
+            {
+              "node": "Prepare Hot Lead Email",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          []
+        ]
+      },
+      "Prepare Log Data": {
+        "main": [
+          [
+            {
+              "node": "Log Conversation",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare WhatsApp Data": {
+        "main": [
+          [
+            {
+              "node": "Send WhatsApp Reply",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send Hot Lead Alert": {
+        "main": [
+          []
+        ]
+      },
+      "Prepare Hot Lead Email": {
+        "main": [
+          [
+            {
+              "node": "Send Hot Lead Alert",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Meta Verification": {
+        "main": [
+          [
+            {
+              "node": "Verify Token",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Verify Token": {
+        "main": [
+          [
+            {
+              "node": "Respond to Verification",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build OpenRouter Request": {
+        "main": [
+          [
+            {
+              "node": "Call OpenRouter API",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call OpenRouter API": {
+        "main": [
+          [
+            {
+              "node": "Process Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Escalation": {
+        "main": [
+          [
+            {
+              "node": "Prepare Chatwoot Handover",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare Chatwoot Handover": {
+        "main": [
+          [
+            {
+              "node": "Create Chatwoot Contact",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Prepare Escalation Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Chatwoot Contact": {
+        "main": [
+          [
+            {
+              "node": "Create Chatwoot Conversation",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Chatwoot Conversation": {
+        "main": [
+          [
+            {
+              "node": "Send Chatwoot Handover Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare Escalation Email": {
+        "main": [
+          [
+            {
+              "node": "Send Escalation Alert",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": []
+  },
+  "tags": [],
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "parentFolderId": null,
+  "scopes": [
+    "execution:reveal",
+    "workflow:create",
+    "workflow:delete",
+    "workflow:disableRedaction",
+    "workflow:enableRedaction",
+    "workflow:execute",
+    "workflow:execute-chat",
+    "workflow:export",
+    "workflow:import",
+    "workflow:list",
+    "workflow:move",
+    "workflow:publish",
+    "workflow:read",
+    "workflow:share",
+    "workflow:unpublish",
+    "workflow:unshare",
+    "workflow:update"
+  ],
+  "canExecute": true
+}

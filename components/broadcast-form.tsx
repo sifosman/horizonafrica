@@ -1,17 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { BroadcastGroup, BroadcastContact } from "@/lib/types";
-import { Send, Loader2, CheckCircle2, XCircle, Info, Plus, Trash2 } from "lucide-react";
+import { Send, Loader2, CheckCircle2, XCircle, Info, Plus, Trash2, RefreshCw } from "lucide-react";
 
 interface BroadcastFormProps {
   groups: BroadcastGroup[];
 }
 
-const templates = [
+interface Template {
+  name: string;
+  label: string;
+  status: string;
+}
+
+const FALLBACK_TEMPLATES: Template[] = [
   { name: "hello_world", label: "Hello World (Test)", status: "approved" },
-  { name: "horizon_welcome_v1", label: "Welcome to Horizon Africa", status: "pending" },
-  { name: "horizon_followup_v5", label: "Follow-up Enquiry", status: "pending" },
 ];
 
 interface SendResult {
@@ -24,12 +28,37 @@ interface SendResult {
 
 export function BroadcastForm({ groups }: BroadcastFormProps) {
   const [groupId, setGroupId] = useState<string>("");
-  const [template, setTemplate] = useState<string>(templates[0].name);
+  const [templates, setTemplates] = useState<Template[]>(FALLBACK_TEMPLATES);
+  const [templatesLoading, setTemplatesLoading] = useState(true);
+  const [template, setTemplate] = useState<string>("hello_world");
   const [campaignName, setCampaignName] = useState("");
   const [testPhone, setTestPhone] = useState("");
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<SendResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const fetchTemplates = useCallback(async () => {
+    setTemplatesLoading(true);
+    try {
+      const res = await fetch("/api/broadcasts/templates");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.templates && data.templates.length > 0) {
+          setTemplates(data.templates);
+          if (!data.templates.some((t: Template) => t.name === template)) {
+            setTemplate(data.templates[0].name);
+          }
+        }
+      }
+    } catch {
+      // Keep fallback templates on error
+    }
+    setTemplatesLoading(false);
+  }, [template]);
+
+  useEffect(() => {
+    fetchTemplates();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const selectedTemplate = templates.find((t) => t.name === template);
   const isTestMode = testPhone.trim().length > 0;
@@ -88,12 +117,28 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
         </div>
 
         <div>
-          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Template</label>
+          <div className="mb-1.5 flex items-center justify-between">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Template</label>
+            <button
+              type="button"
+              onClick={fetchTemplates}
+              disabled={templatesLoading}
+              className="flex items-center gap-1 text-xs text-on-surface-variant transition hover:text-on-surface disabled:opacity-50"
+              title="Refresh templates"
+            >
+              <RefreshCw className={`h-3 w-3 ${templatesLoading ? "animate-spin" : ""}`} />
+              Refresh
+            </button>
+          </div>
           <select
             value={template}
             onChange={(e) => setTemplate(e.target.value)}
-            className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-secondary focus:outline-none"
+            disabled={templatesLoading}
+            className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-secondary focus:outline-none disabled:opacity-50"
           >
+            {templatesLoading && (
+              <option value="">Loading templates...</option>
+            )}
             {templates.map((t) => (
               <option key={t.name} value={t.name}>
                 {t.label} ({t.status})
@@ -104,6 +149,12 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
             <p className="mt-1.5 flex items-center gap-1 text-xs text-amber-600">
               <Info className="h-3 w-3" />
               This template is pending Meta approval. Use &quot;Hello World (Test)&quot; to test now.
+            </p>
+          )}
+          {selectedTemplate?.status === "rejected" && (
+            <p className="mt-1.5 flex items-center gap-1 text-xs text-red-600">
+              <XCircle className="h-3 w-3" />
+              This template was rejected by Meta and cannot be sent.
             </p>
           )}
         </div>

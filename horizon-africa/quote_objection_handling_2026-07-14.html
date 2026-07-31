@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quote - Objection Handling Module</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0b1f3b;
+      --accent: #0a84ff;
+      --text: #202124;
+      --muted: #5f6368;
+      --border: #e0e0e0;
+      --bg: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+    .container { max-width: 900px; margin: 24px auto; padding: 24px; background: #fff; border: 1px solid var(--border); border-radius: 10px; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-img { height: 88px; width: auto; border-radius: 8px; display: block; object-fit: contain; }
+    h1 { margin: 0; font-size: 28px; color: var(--primary); }
+    .meta { text-align: right; font-size: 14px; color: var(--muted); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .card { border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+    .card h3 { margin: 0 0 8px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    .card p { margin: 2px 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th, td { padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { text-align: left; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .right { text-align: right; }
+    .totals { margin-top: 12px; display: grid; grid-template-columns: 1fr 240px; }
+    .totals .label { text-align: right; color: var(--muted); }
+    .totals .value { text-align: right; font-weight: 600; }
+    .notes { margin-top: 18px; font-size: 13px; color: var(--muted); }
+    footer { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 12px; }
+    @media print {
+      body { background: #fff; }
+      .container { border: none; border-radius: 0; box-shadow: none; margin: 0; width: 100%; }
+      .no-print { display: none !important; }
+      a { color: currentColor; text-decoration: none; }
+      @page { size: A4; margin: 16mm; }
+      table, th, td { page-break-inside: avoid; }
+    }
+    .btns { display: flex; gap: 8px; justify-content: flex-end; margin: 0 0 10px; }
+    .btn { background: var(--primary); color: #fff; border: none; border-radius: 8px; padding: 10px 14px; cursor: pointer; font-weight: 600; }
+    .btn.secondary { background: #e9eef6; color: var(--primary); }
+    .muted { color: var(--muted); }
+    .scope-section { margin-top: 16px; }
+    .scope-section h4 { margin: 0 0 6px; font-size: 13px; color: var(--primary); }
+    .scope-section ul { margin: 0 0 12px; padding-left: 18px; font-size: 13px; color: var(--muted); }
+    .scope-section ul li { margin-bottom: 3px; }
+    .highlight { background: #f0f7ff; border: 1px solid #c9e0ff; border-radius: 8px; padding: 14px 16px; margin-top: 16px; }
+    .highlight h4 { margin: 0 0 8px; font-size: 14px; color: var(--primary); }
+    .highlight p { margin: 2px 0; font-size: 13px; color: var(--text); }
+    .ref-box { background: #f8f9fa; border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-top: 16px; font-size: 13px; color: var(--text); }
+    .ref-box strong { color: var(--primary); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="no-print btns">
+      <button class="btn" onclick="window.print()">Print / Save as PDF</button>
+      <button class="btn secondary" onclick="downloadHTML()">Download HTML</button>
+    </div>
+
+    <header>
+      <div class="logo">
+        <img src="logo.png" alt="OWD Solutions Logo" class="logo-img" />
+        <div>
+          <h1>QUOTE</h1>
+          <div class="muted">Objection Handling Module — Add-On</div>
+        </div>
+      </div>
+      <div class="meta">
+        <div><strong>Quote #</strong>: Q-2026-0714-HC-OBJ</div>
+        <div><strong>Date</strong>: 14 Jul 2026</div>
+        <div><strong>Valid Until</strong>: 14 Aug 2026</div>
+        <div><strong>Related To</strong>: Q-2026-0619-HC-Rev2</div>
+      </div>
+    </header>
+
+    <div class="row">
+      <div class="card">
+        <h3>From</h3>
+        <p><strong>OWD Solutions</strong></p>
+        <p>31 Acres, Eldo Lakes East</p>
+        <p>81 Campbell Road</p>
+        <p>Email: mohamed@owdsolutions.co.za</p>
+        <p>Phone: 0658475289</p>
+      </div>
+      <div class="card">
+        <h3>Quote To</h3>
+        <p><strong>Shavs Telecommunications 24 PTY Ltd T/a Horizon Africa</strong></p>
+        <p>Keshlan Naidoo</p>
+        <p>Phone: +27763710991</p>
+        <p>Email: keshlannaidoo@gmail.com</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Summary</h3>
+      <p style="font-size: 14px; color: var(--text); margin: 0;">
+        Add-on to the existing WhatsApp AI Platform. Teaches the AI sales assistant to detect and handle 5 common sales objections naturally within conversations.
+      </p>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <h3>Setup Fee</h3>
+      <table style="width: 100%; margin-top: 8px;">
+        <tr>
+          <td style="padding: 12px 0; border-bottom: 1px solid var(--border);">
+            <strong>Objection Handling Module</strong><br>
+            <span style="font-size: 13px; color: var(--muted);">Response content design for 5 objection types, integration into existing AI prompt, and testing.</span>
+          </td>
+          <td class="right" style="padding: 12px 0; border-bottom: 1px solid var(--border);">R3,500.00</td>
+        </tr>
+        <tr style="font-weight: 600; border-top: 2px solid var(--primary);">
+          <td style="padding: 12px 0 4px; font-size: 16px;">Total</td>
+          <td class="right" style="padding: 12px 0 4px; font-size: 16px;">R3,500.00</td>
+        </tr>
+      </table>
+
+      <div style="margin-top: 12px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; font-size: 13px;">
+        <p style="margin: 0 0 6px; color: var(--muted);"><strong>Optional Add-On:</strong></p>
+        <table style="width: 100%; margin-top: 4px;">
+          <tr>
+            <td style="padding: 8px 0;">
+              <strong>Automated Follow-Up Reminders</strong><br>
+              <span style="font-size: 13px; color: var(--muted);">Scheduled WhatsApp reminders for customers who need time to decide. Includes Meta template design and submission.</span>
+            </td>
+            <td class="right" style="padding: 8px 0;">+R2,000.00</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <h3>What's Included</h3>
+      <div class="scope-section">
+        <ul style="margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: var(--muted);">
+          <li><strong>Price Too High</strong> — Empathy response, mobile data comparison, budget-friendly package recommendations</li>
+          <li><strong>Comparing Providers</strong> — Helps compare on speed, price, installation, and contract terms</li>
+          <li><strong>Need to Think About It</strong> — Saves recommended package to database for follow-up, no pressure</li>
+          <li><strong>Already Have Fibre</strong> — Explores upgrades, better value, or migration assistance</li>
+          <li><strong>Relocating</strong> — Collects new address, escalates to sales team for coverage check</li>
+        </ul>
+      </div>
+      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 13px; color: var(--muted);">
+        <p style="margin: 0 0 4px;">Integrated into the existing AI workflow — no new accounts, services, or infrastructure required.</p>
+        <p style="margin: 0;"><strong>Timeline:</strong> 3-4 working days from acceptance. <strong>Payment:</strong> Full amount due on go-live.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <h3>Payment Details</h3>
+      <p><strong>Bank:</strong> Nedbank &nbsp; <strong>Account Name:</strong> M A Osman</p>
+      <p><strong>Account Number:</strong> 1012196151 &nbsp; <strong>Branch Code:</strong> 131326</p>
+      <p><strong>Reference:</strong> Q-2026-0714-HC-OBJ</p>
+    </div>
+
+    <div class="notes">
+      <ul>
+        <li>Quote valid for 30 days. Full payment due on go-live.</li>
+        <li>Add-on to original quote Q-2026-0619-HC-Rev2 — original terms unchanged.</li>
+        <li>1-month warranty from go-live covering bug fixes related to this module.</li>
+      </ul>
+    </div>
+
+    <div class="card" style="margin-top: 16px; page-break-inside: avoid;">
+      <h3>Quote Acceptance</h3>
+      <p style="font-size: 13px; color: var(--text); margin-bottom: 16px;">
+        By signing below, the undersigned accepts this quotation. Work will commence upon acceptance.
+      </p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px;">
+        <div>
+          <p style="margin: 0 0 4px; font-size: 13px; color: var(--muted);"><strong>Accepted By:</strong></p>
+          <div style="border-bottom: 1px solid var(--border); height: 40px; margin-bottom: 8px;"></div>
+          <p style="margin: 0; font-size: 13px; color: var(--muted);">Signature</p>
+          <p style="margin: 16px 0 0; font-size: 13px; color: var(--text);"><strong>Name:</strong> _________________________________</p>
+          <p style="margin: 8px 0 0; font-size: 13px; color: var(--text);"><strong>Company:</strong> Shavs Telecommunications 24 PTY Ltd T/a Horizon Africa</p>
+          <p style="margin: 8px 0 0; font-size: 13px; color: var(--text);"><strong>Date:</strong> _________________________________</p>
+        </div>
+        <div>
+          <p style="margin: 0 0 4px; font-size: 13px; color: var(--muted);"><strong>Provided By:</strong></p>
+          <div style="border-bottom: 1px solid var(--border); height: 40px; margin-bottom: 8px; display: flex; align-items: flex-end; padding-bottom: 4px;">
+            <span style="font-family: 'Dancing Script', cursive; font-size: 38px; font-weight: 700; color: #1a1a2e; letter-spacing: 1px; line-height: 1;">A Osman</span>
+          </div>
+          <p style="margin: 0; font-size: 13px; color: var(--muted);">Signature</p>
+          <p style="margin: 16px 0 0; font-size: 13px; color: var(--text);"><strong>Name:</strong> Mohamed Osman</p>
+          <p style="margin: 8px 0 0; font-size: 13px; color: var(--text);"><strong>Company:</strong> OWD Solutions</p>
+          <p style="margin: 8px 0 0; font-size: 13px; color: var(--text);"><strong>Date:</strong> 14 July 2026</p>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div>Thank you for your business.</div>
+      <div>Generated: 14 Jul 2026</div>
+    </footer>
+  </div>
+
+  <script>
+    function downloadHTML() {
+      const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'quote_objection_handling_2026-07-14.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

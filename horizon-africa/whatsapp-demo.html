@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhatsApp — Demo</title>
+<style>
+  :root{
+    --sans: 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  html[data-theme="light"]{
+    --bg-rail:#f0f2f5; --bg-panel:#ffffff; --bg-header:#f0f2f5; --bg-app:#f0f2f5;
+    --bg-chat:#efeae2; --bubble-in:#ffffff; --bubble-out:#d9fdd3;
+    --text-1:#111b21; --text-2:#667781; --text-3:#54656f;
+    --border:#e9edef; --hover:#f5f6f6; --active:#e9edef;
+    --accent:#00a884; --accent-2:#008069; --icon:#54656f;
+    --scrollbar:#d1d7db; --shadow: rgba(0,0,0,.08);
+    --input-bg:#ffffff; --panel-bg:#ffffff;
+    --wallpaper-opacity:.06;
+  }
+  html[data-theme="dark"]{
+    --bg-rail:#111b21; --bg-panel:#111b21; --bg-header:#202c33; --bg-app:#0b141a;
+    --bg-chat:#0b141a; --bubble-in:#202c33; --bubble-out:#005c4b;
+    --text-1:#e9edef; --text-2:#8696a0; --text-3:#8696a0;
+    --border:#222d34; --hover:#202c33; --active:#2a3942;
+    --accent:#00a884; --accent-2:#06cf9c; --icon:#aebac1;
+    --scrollbar:#374045; --shadow: rgba(0,0,0,.3);
+    --input-bg:#2a3942; --panel-bg:#111b21;
+    --wallpaper-opacity:.04;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--sans);background:#0000;color:var(--text-1);height:100vh;overflow:hidden;}
+  html,body{height:100%;}
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:4px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit;}
+  .app{display:flex;height:100vh;background:var(--bg-app);}
+
+  /* ===== Left icon rail ===== */
+  .rail{width:60px;background:var(--bg-header);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:12px 0;border-right:1px solid var(--border);flex-shrink:0;}
+  .rail-top,.rail-bottom{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .rail-btn{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--icon);position:relative;}
+  .rail-btn:hover{background:var(--hover);}
+  .rail-btn.active{background:var(--active);color:var(--text-1);}
+  .rail-btn.active svg{color:var(--accent);}
+  .rail-avatar{width:38px;height:38px;border-radius:50%;background:#6b7c85;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;overflow:hidden;}
+  .rail-badge{position:absolute;top:2px;right:2px;background:var(--accent);color:#fff;font-size:10px;border-radius:8px;min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+
+  /* ===== Sidebar ===== */
+  .sidebar{width:400px;min-width:320px;max-width:480px;background:var(--bg-panel);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+  .sidebar-header{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--bg-panel);}
+  .sidebar-header h1{font-size:19px;margin:0;font-weight:600;}
+  .header-icons{display:flex;gap:4px;}
+  .icon-btn{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--icon);position:relative;}
+  .icon-btn:hover{background:var(--hover);}
+  .search-wrap{padding:8px 12px;}
+  .search-box{display:flex;align-items:center;background:var(--input-bg);border-radius:8px;padding:0 10px;height:36px;gap:10px;}
+  .search-box svg{flex-shrink:0;color:var(--icon);}
+  .search-box input{border:none;background:transparent;outline:none;color:var(--text-1);width:100%;font-size:14px;}
+  .search-box input::placeholder{color:var(--text-2);}
+  .chips{display:flex;gap:8px;padding:0 12px 8px;}
+  .chip{padding:6px 12px;border-radius:16px;background:var(--input-bg);color:var(--text-1);font-size:13px;}
+  .chip.active{background:var(--accent);color:#fff;font-weight:600;}
+  .chat-list{flex:1;overflow-y:auto;}
+  .chat-row{display:flex;align-items:center;padding:10px 12px 10px 16px;gap:14px;cursor:pointer;border-bottom:1px solid transparent;position:relative;}
+  .chat-row:hover{background:var(--hover);}
+  .chat-row.selected{background:var(--active);}
+  .avatar{width:49px;height:49px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:16px;flex-shrink:0;}
+  .avatar.lg{width:200px;height:200px;font-size:56px;}
+  .avatar.md{width:80px;height:80px;font-size:28px;}
+  .chat-row-body{flex:1;min-width:0;border-bottom:1px solid var(--border);padding-bottom:11px;}
+  .chat-row:last-child .chat-row-body{border-bottom:none;}
+  .chat-row-top{display:flex;justify-content:space-between;align-items:baseline;}
+  .chat-row-top .name{font-size:16px;font-weight:400;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:5px;}
+  .chat-row-top .time{font-size:12px;color:var(--text-2);flex-shrink:0;}
+  .chat-row-top .time.unread{color:var(--accent);font-weight:600;}
+  .chat-row-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:3px;}
+  .preview{font-size:14px;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px;flex:1;min-width:0;}
+  .row-meta{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+  .unread-badge{background:var(--accent);color:#fff;font-size:12px;font-weight:600;border-radius:10px;min-width:20px;height:20px;display:flex;align-items:center;justify-content:center;padding:0 6px;}
+  .pin-icon,.mute-icon{color:var(--text-2);}
+  .row-more{position:absolute;right:10px;top:8px;width:32px;height:32px;border-radius:50%;display:none;align-items:center;justify-content:center;color:var(--icon);background:var(--bg-panel);}
+  .chat-row:hover .row-more{display:flex;}
+  .chat-row:hover .chat-row-top .time{display:none;}
+  .chat-row:hover .row-more ~ .chat-row-body .chat-row-top .time{display:none;}
+
+  /* ===== Main chat area ===== */
+  .main{flex:1;display:flex;flex-direction:column;min-width:0;position:relative;background:var(--bg-chat);}
+  .empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;background:var(--bg-panel);color:var(--text-2);text-align:center;padding:40px;}
+  .empty-state .logo{width:250px;height:250px;border-radius:50%;background:radial-gradient(circle at 30% 30%, #25d366, #128c7e);display:flex;align-items:center;justify-content:center;color:#fff;}
+  .empty-state h2{font-size:32px;font-weight:300;color:var(--text-1);margin:0;}
+  .empty-state p{max-width:460px;font-size:14px;line-height:1.5;}
+  .empty-state .encrypt{display:flex;align-items:center;gap:6px;font-size:13px;margin-top:30px;}
+
+  .chat-window{display:none;flex-direction:column;height:100%;}
+  .chat-header{height:60px;background:var(--bg-header);display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;border-bottom:1px solid var(--border);}
+  .chat-header-left{display:flex;align-items:center;gap:14px;cursor:pointer;min-width:0;}
+  .chat-header-left .info{min-width:0;}
+  .chat-header-left .info .name{font-size:16px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .chat-header-left .info .status{font-size:13px;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .chat-header-icons{display:flex;gap:4px;flex-shrink:0;}
+
+  .chat-messages{flex:1;overflow-y:auto;padding:20px 8%;display:flex;flex-direction:column;gap:2px;
+    background-image: radial-gradient(circle, #7d7d7d 1px, transparent 1px);
+    background-size: 22px 22px;
+    background-color: var(--bg-chat);
+    background-blend-mode: overlay;
+    opacity:1;
+  }
+  .date-sep{align-self:center;background:var(--bg-panel);color:var(--text-2);font-size:12.5px;padding:5px 12px;border-radius:8px;margin:14px 0;box-shadow:0 1px 1px var(--shadow);}
+  .msg-row{display:flex;margin:2px 0;}
+  .msg-row.out{justify-content:flex-end;}
+  .msg-row.in{justify-content:flex-start;}
+  .bubble{max-width:65%;padding:6px 9px 8px 9px;border-radius:8px;position:relative;box-shadow:0 1px .5px var(--shadow);font-size:14.2px;line-height:19px;}
+  .msg-row.out .bubble{background:var(--bubble-out);border-top-right-radius:0;}
+  .msg-row.in .bubble{background:var(--bubble-in);border-top-left-radius:0;}
+  .bubble .sender{font-size:13px;font-weight:600;margin-bottom:2px;display:block;}
+  .bubble .text{white-space:pre-wrap;word-break:break-word;color:var(--text-1);}
+  .bubble .meta{display:flex;justify-content:flex-end;gap:4px;margin-top:2px;float:right;margin-left:8px;}
+  .bubble .meta .time{font-size:11px;color:var(--text-2);}
+  .bubble .meta svg{width:16px;height:11px;}
+  .tick-read{color:#53bdeb;}
+  .tick-sent{color:var(--text-2);}
+  .img-bubble{width:260px;border-radius:6px;overflow:hidden;}
+  .img-bubble .ph{height:180px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-direction:column;gap:8px;}
+  .voice-bubble{display:flex;align-items:center;gap:10px;min-width:220px;padding:4px 4px 4px 4px;}
+  .voice-bubble .play-btn{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .voice-wave{flex:1;height:24px;display:flex;align-items:center;gap:2px;}
+  .voice-wave span{width:2px;background:var(--text-2);border-radius:2px;}
+  .voice-time{font-size:11px;color:var(--text-2);}
+
+  .chat-input-bar{background:var(--bg-header);padding:10px 16px;display:flex;align-items:center;gap:8px;flex-shrink:0;border-top:1px solid var(--border);position:relative;}
+  .chat-input-bar .icon-btn{color:var(--icon);}
+  .input-pill{flex:1;background:var(--input-bg);border-radius:8px;padding:9px 12px;display:flex;align-items:center;}
+  .input-pill [contenteditable]{outline:none;width:100%;font-size:15px;max-height:100px;overflow-y:auto;color:var(--text-1);}
+  .input-pill [contenteditable]:empty:before{content:attr(data-placeholder);color:var(--text-2);}
+  .send-btn{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--icon);}
+  .send-btn:hover{background:var(--hover);}
+
+  /* popups */
+  .popup{position:absolute;background:var(--bg-panel);border-radius:8px;box-shadow:0 2px 10px var(--shadow);z-index:50;display:none;overflow:hidden;}
+  .popup.show{display:block;}
+  .menu-popup{min-width:220px;padding:6px 0;bottom:64px;right:10px;}
+  .menu-item{display:flex;align-items:center;gap:12px;padding:10px 16px;font-size:14.5px;cursor:pointer;color:var(--text-1);}
+  .menu-item:hover{background:var(--hover);}
+  .menu-item svg{color:var(--icon);}
+  .menu-sep{height:1px;background:var(--border);margin:6px 0;}
+  .emoji-popup{width:320px;height:300px;bottom:64px;left:60px;padding:10px;}
+  .emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;overflow-y:auto;height:100%;}
+  .emoji-grid span{font-size:22px;text-align:center;padding:4px 0;border-radius:6px;cursor:pointer;}
+  .emoji-grid span:hover{background:var(--hover);}
+  .attach-popup{bottom:64px;left:110px;min-width:200px;padding:6px 0;}
+  .row-menu-popup{min-width:200px;padding:6px 0;}
+
+  /* right info panel */
+  .info-panel{width:400px;background:var(--bg-panel);border-left:1px solid var(--border);flex-shrink:0;display:flex;flex-direction:column;}
+  .info-header{display:flex;align-items:center;gap:24px;padding:16px;height:60px;background:var(--bg-header);}
+  .info-header .title{font-size:16px;font-weight:500;}
+  .info-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:24px 0;}
+  .info-body .name{font-size:22px;font-weight:500;margin-top:20px;}
+  .info-body .sub{color:var(--text-2);font-size:14px;margin-top:4px;}
+  .info-section{width:100%;margin-top:12px;background:var(--bg-panel);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:16px 24px;}
+  .info-section .label{color:var(--accent);font-size:13px;font-weight:600;margin-bottom:8px;}
+  .info-section .value{font-size:14.5px;color:var(--text-1);}
+  .media-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;}
+  .media-grid .cell{aspect-ratio:1;border-radius:6px;}
+  .toggle-row{display:flex;justify-content:space-between;align-items:center;padding:14px 24px;font-size:14.5px;}
+  .switch{width:44px;height:24px;border-radius:12px;background:var(--scrollbar);position:relative;flex-shrink:0;}
+  .switch.on{background:var(--accent);}
+  .switch .knob{width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:left .15s;}
+  .switch.on .knob{left:22px;}
+  .danger{color:#f15c6d;}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;z-index:200;opacity:0;transition:opacity .25s;pointer-events:none;}
+  .toast.show{opacity:1;}
+  .overlay-click{position:fixed;inset:0;z-index:40;display:none;}
+  .overlay-click.show{display:block;}
+</style>
+</head>
+<body>
+<div class="overlay-click" id="overlay"></div>
+<div class="toast" id="toast"></div>
+
+<div class="app" id="app">
+  <!-- LEFT ICON RAIL -->
+  <div class="rail">
+    <div class="rail-top">
+      <button class="rail-btn active" id="railChats" title="Chats"><span class="rail-badge" id="railUnreadBadge" style="display:none;"></span></button>
+      <button class="rail-btn" id="railStatus" title="Status"></button>
+      <button class="rail-btn" id="railChannels" title="Channels"></button>
+    </div>
+    <div class="rail-bottom">
+      <button class="rail-btn" id="railCommunities" title="Communities"></button>
+      <button class="rail-btn" id="railSettings" title="Settings"></button>
+      <button class="rail-btn" id="railProfile" title="Profile"><div class="rail-avatar">ME</div></button>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h1>Chats</h1>
+      <div class="header-icons">
+        <button class="icon-btn" id="btnStatusIcon" title="Status"></button>
+        <button class="icon-btn" id="btnNewChat" title="New chat"></button>
+        <button class="icon-btn" id="btnMenu" title="Menu"></button>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <div class="search-box">
+        <svg id="searchIconSlot" width="16" height="16" viewBox="0 0 24 24"></svg>
+        <input type="text" id="searchInput" placeholder="Search or start a new chat">
+      </div>
+    </div>
+    <div class="chips">
+      <div class="chip active" data-filter="all">All</div>
+      <div class="chip" data-filter="unread">Unread</div>
+      <div class="chip" data-filter="favourites">Favourites</div>
+      <div class="chip" data-filter="groups">Groups</div>
+    </div>
+    <div class="chat-list" id="chatList"></div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main" id="mainArea">
+    <div class="empty-state" id="emptyState">
+      <div class="logo"></div>
+      <h2>WhatsApp Web — Demo</h2>
+      <p>This is a static demo recreating the look and feel of WhatsApp Web/Desktop. Send and receive dummy messages, switch between chats, toggle dark mode, and explore the UI. Nothing here is connected to a real account.</p>
+      <div class="encrypt">🔒 Your dummy messages stay in this browser tab only.</div>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+      <div class="chat-header">
+        <div class="chat-header-left" id="chatHeaderInfo">
+          <div class="avatar" id="chatAvatar"></div>
+          <div class="info">
+            <div class="name" id="chatName"></div>
+            <div class="status" id="chatStatus"></div>
+          </div>
+        </div>
+        <div class="chat-header-icons">
+          <button class="icon-btn" title="Search"></button>
+          <button class="icon-btn" title="Video call"></button>
+          <button class="icon-btn" title="Voice call"></button>
+          <button class="icon-btn" id="btnChatMenu" title="Menu"></button>
+        </div>
+      </div>
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-input-bar">
+        <button class="icon-btn" id="btnEmoji" title="Emoji"></button>
+        <button class="icon-btn" id="btnAttach" title="Attach"></button>
+        <div class="input-pill">
+          <div contenteditable="true" id="msgInput" data-placeholder="Type a message"></div>
+        </div>
+        <button class="send-btn" id="btnSend" title="Send"></button>
+      </div>
+
+      <!-- Popups -->
+      <div class="popup emoji-popup" id="emojiPopup"><div class="emoji-grid" id="emojiGrid"></div></div>
+      <div class="popup attach-popup" id="attachPopup"></div>
+      <div class="popup menu-popup" id="chatMenuPopup"></div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR MENU POPUP (top-level, positioned near header) -->
+  <div class="popup" id="sidebarMenuPopup" style="top:56px; right:150px; min-width:240px; padding:6px 0;"></div>
+
+  <!-- INFO PANEL -->
+  <div class="info-panel" id="infoPanel" style="display:none;"></div>
+</div>
+
+<script>
+/* ============ ICONS ============ */
+const ICON_PATHS = {
+  search:'<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  chatsBubble:'<path d="M21 11.5a8.38 8.38 0 0 1-1.9 5.4 8.5 8.5 0 0 1-6.6 3.1 8.4 8.4 0 0 1-4-1L3 20l1-5.5a8.4 8.4 0 0 1-1-4A8.5 8.5 0 0 1 12 3a8.4 8.4 0 0 1 6 2.5A8.4 8.4 0 0 1 21 11.5z"/>',
+  status:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  channels:'<path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>',
+  communities:'<circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2"/><circle cx="18" cy="8" r="3"/><path d="M22 21v-1a4 4 0 0 0-3-3.87"/>',
+  settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  dots:'<circle cx="12" cy="5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="19" r="1.2"/>',
+  newchat:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>',
+  video:'<rect x="1" y="5" width="15" height="14" rx="2"/><path d="M16 9.5l6-3.5v12l-6-3.5"/>',
+  phone:'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.4-1.4a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.8 2.2z"/>',
+  emoji:'<circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9" y2="9.1"/><line x1="15" y1="9" x2="15" y2="9.1"/>',
+  attach:'<path d="M21.4 11.1l-8.8 8.8a5 5 0 0 1-7.1-7.1l8.5-8.5a3.5 3.5 0 0 1 5 5l-8.4 8.4a1.5 1.5 0 0 1-2.1-2.1l7.4-7.4"/>',
+  mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/>',
+  send:'<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+  checkSingle:'<polyline points="20 6 9 17 4 12"/>',
+  checkDouble:'<polyline points="18 6 8 16 3 11"/><polyline points="23 6 13 16 12 15"/>',
+  pin:'<path d="M12 2l1.5 5.5L19 9l-5 4 1 6-5-3-5 3 1-6-5-4 5.5-1.5z"/>',
+  mute:'<path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>',
+  back:'<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
+  close:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
+  doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+  camera:'<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3l2-3h6l2 3h3a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
+  contact:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.2" y1="4.2" x2="5.6" y2="5.6"/><line x1="18.4" y1="18.4" x2="19.8" y2="19.8"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.2" y1="19.8" x2="5.6" y2="18.4"/><line x1="18.4" y1="5.6" x2="19.8" y2="4.2"/>',
+  moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>',
+  star:'<polygon points="12 2 15.1 8.6 22.2 9.3 17 14.1 18.5 21.2 12 17.6 5.5 21.2 7 14.1 1.8 9.3 8.9 8.6 12 2"/>',
+  archive:'<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>',
+  trash:'<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  play:'<polygon points="5 3 19 12 5 21 5 3"/>',
+  info:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="8.1"/>',
+};
+function ico(name, size=20, stroke=1.8){
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${stroke}" stroke-linecap="round" stroke-linejoin="round">${ICON_PATHS[name]}</svg>`;
+}
+
+/* ============ DATA ============ */
+const PALETTE = ['#e17076','#ffa000','#7bc862','#4fc3f7','#7986cb','#f06292','#ba68c8','#4db6ac','#a1887f','#90a4ae'];
+function colorFor(str){let h=0;for(const c of str)h=(h*31+c.charCodeAt(0))>>>0;return PALETTE[h%PALETTE.length];}
+function initials(name){
+  const clean = name.replace(/[^\p{L}\p{N} ]/gu,'').trim();
+  const parts = clean.split(/\s+/).filter(Boolean);
+  if(parts.length===0) return '?';
+  if(parts.length===1) return parts[0].slice(0,2).toUpperCase();
+  return (parts[0][0]+parts[1][0]).toUpperCase();
+}
+function timeNow(offsetMin=0){
+  const d = new Date(Date.now()-offsetMin*60000);
+  return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+}
+
+let chats = [
+  {id:1,name:'Mom',isGroup:false,pinned:true,favourite:true,muted:false,online:true,statusText:'online',unread:2,
+   messages:[
+    {from:'them',text:'Have you eaten yet? 🍲',time:'09:12',status:'read'},
+    {from:'me',text:'Yes mom, just finished breakfast 😄',time:'09:14',status:'read'},
+    {from:'them',text:'Good. Don\'t forget to call your aunt today',time:'09:15',status:'read'},
+    {from:'me',text:'I will, promise ❤️',time:'09:16',status:'read'},
+    {from:'them',text:'Love you, take care',time:'09:20',status:'read'},
+    {from:'them',text:'Also your cousin is visiting next weekend 🎉',time:'14:30',status:'delivered'},
+    {from:'them',text:'Can you pick her up from the airport?',time:'14:32',status:'delivered'},
+   ]},
+  {id:2,name:'Dev Team 🚀',isGroup:true,pinned:false,favourite:false,muted:false,online:false,statusText:'Alex, Priya, Sam, You',unread:3,
+   members:{Alex:'#7986cb',Priya:'#f06292',Sam:'#4db6ac'},
+   messages:[
+    {from:'Alex',text:'Pushed the fix for the login bug',time:'11:02',status:'read'},
+    {from:'Priya',text:'Nice, deploying to staging now',time:'11:05',status:'read'},
+    {from:'me',text:'Can someone review PR #482?',time:'11:20',status:'read'},
+    {from:'Sam',text:'On it 👀',time:'11:22',status:'read'},
+    {from:'Sam',text:'LGTM, merged',time:'11:40',status:'read'},
+    {from:'Priya',text:'Standup moved to 3pm today',time:'13:02',status:'delivered'},
+    {from:'Alex',text:'noted 👍',time:'13:05',status:'delivered'},
+    {from:'Sam',text:'same',time:'13:06',status:'delivered'},
+   ]},
+  {id:3,name:'Sarah Connor',isGroup:false,pinned:false,favourite:false,muted:false,online:true,statusText:'online',unread:1,
+   messages:[
+    {from:'them',text:'Check this view from the hike yesterday!',time:'08:30',status:'read'},
+    {from:'them',type:'image',caption:'Sunrise at the summit 🌄',time:'08:31',status:'read'},
+    {from:'me',text:'Wow that\'s stunning!! 😍',time:'08:40',status:'read'},
+    {from:'them',text:'You should come next time',time:'08:41',status:'read'},
+    {from:'me',text:'Definitely, count me in',time:'08:45',status:'read'},
+    {from:'them',text:'Next hike is Saturday 7am, I will send details tonight',time:'15:10',status:'delivered'},
+   ]},
+  {id:4,name:'Fantasy Football',isGroup:true,pinned:false,favourite:false,muted:true,online:false,statusText:'Mike, Chris, Dan +4',unread:12,
+   members:{Mike:'#ffa000',Chris:'#7bc862',Dan:'#e17076'},
+   messages:[
+    {from:'Mike',text:'Trade offer sent, check your inbox',time:'Mon',status:'read'},
+    {from:'Chris',text:'no way I\'m trading my RB1 lol',time:'Mon',status:'read'},
+    {from:'Dan',text:'😂😂😂',time:'Mon',status:'read'},
+    {from:'me',text:'who\'s starting this week?',time:'Tue',status:'read'},
+    {from:'Mike',text:'benching my WR2, injury concern',time:'Tue',status:'delivered'},
+   ]},
+  {id:5,name:'James (Work)',isGroup:false,pinned:false,favourite:false,muted:false,online:false,statusText:'last seen today at 12:05',unread:1,
+   messages:[
+    {from:'them',text:'Hey, are we still on for the 3pm sync?',time:'12:00',status:'read'},
+    {from:'me',text:'Yes, sending the invite now',time:'12:02',status:'read'},
+    {from:'them',text:'Great, thanks',time:'12:05',status:'delivered'},
+   ]},
+  {id:6,name:'Alex',isGroup:false,pinned:false,favourite:false,muted:false,online:false,statusText:'last seen yesterday at 22:14',unread:0,
+   messages:[
+    {from:'them',text:'Voice message for you 🎤',time:'22:10',status:'read'},
+    {from:'them',type:'voice',duration:'0:18',time:'22:11',status:'read'},
+    {from:'me',text:'Got it, will listen tonight',time:'22:14',status:'read'},
+   ]},
+  {id:7,name:'Landlord',isGroup:false,pinned:false,favourite:false,muted:false,online:false,statusText:'last seen 2 days ago',unread:0,
+   messages:[
+    {from:'them',text:'Rent reminder: due on the 1st',time:'Sun',status:'read'},
+    {from:'me',text:'Transferred, thank you',time:'Sun',status:'read'},
+    {from:'them',text:'Received, thanks!',time:'Sun',status:'read'},
+   ]},
+  {id:8,name:'Grandma ❤️',isGroup:false,pinned:false,favourite:true,muted:false,online:false,statusText:'last seen today at 07:45',unread:3,
+   messages:[
+    {from:'them',text:'Good morning sweetheart 🌞',time:'07:40',status:'read'},
+    {from:'me',text:'Morning grandma! How are you? 😊',time:'07:42',status:'read'},
+    {from:'them',text:'All good, made your favourite cookies 🍪',time:'07:45',status:'read'},
+    {from:'me',text:'Yay!! Coming this weekend 🥰',time:'07:46',status:'read'},
+    {from:'them',text:'I also knit you a scarf for winter 🧣',time:'13:50',status:'delivered'},
+    {from:'them',text:'It is in your favourite colour, blue 💙',time:'13:51',status:'delivered'},
+    {from:'them',text:'Can not wait to see you! 🥰',time:'13:55',status:'delivered'},
+   ]},
+  {id:9,name:'Book Club',isGroup:true,pinned:false,favourite:false,muted:false,online:false,statusText:'Emma, Nina, Ola +2',unread:0,
+   members:{Emma:'#ba68c8',Nina:'#4fc3f7',Ola:'#a1887f'},
+   messages:[
+    {from:'Emma',text:'Next book: "The Midnight Library"',time:'Fri',status:'read'},
+    {from:'Nina',text:'Already halfway through!',time:'Fri',status:'read'},
+    {from:'me',text:'Ordering my copy today',time:'Sat',status:'read'},
+    {from:'Ola',text:'Discussion on the 15th, same time?',time:'Sat',status:'read'},
+    {from:'Emma',text:'Works for me 👍',time:'Sat',status:'read'},
+   ]},
+  {id:10,name:'Delivery Updates',isGroup:false,pinned:false,favourite:false,muted:false,online:false,statusText:'Business Account',unread:2,
+   messages:[
+    {from:'them',text:'Your package has shipped! 📦',time:'10:00',status:'read'},
+    {from:'them',type:'image',caption:'Order #4471 — Out for delivery',time:'10:01',status:'read'},
+    {from:'them',text:'Estimated arrival: Today, 4-6 PM',time:'10:02',status:'delivered'},
+   ]},
+  {id:11,name:'Thandiwe Nkosi',isGroup:false,pinned:false,favourite:false,muted:false,online:true,statusText:'online',unread:4,
+   messages:[
+    {from:'them',text:'Hi, I saw your ad for the skincare range on Instagram 😊',time:'14:20',status:'delivered'},
+    {from:'them',text:'Do you ship to Durban?',time:'14:21',status:'delivered'},
+    {from:'them',text:'Also interested in the bundle deal you posted',time:'14:22',status:'delivered'},
+    {from:'them',text:'Can you send me the price list please? 🙏',time:'14:25',status:'delivered'},
+   ]},
+  {id:12,name:'Sipho Dlamini',isGroup:false,pinned:false,favourite:false,muted:false,online:false,statusText:'last seen today at 13:40',unread:2,
+   messages:[
+    {from:'them',text:'Hello, I placed an order last week — order #4392',time:'13:15',status:'delivered'},
+    {from:'them',text:'Just checking if it has been dispatched yet?',time:'13:40',status:'delivered'},
+   ]},
+  {id:13,name:'Horizon Sales Team',isGroup:true,pinned:true,favourite:false,muted:false,online:false,statusText:'Lebo, Kofi, Amina, You',unread:7,
+   members:{Lebo:'#f06292',Kofi:'#4fc3f7',Amina:'#7bc862'},
+   messages:[
+    {from:'Lebo',text:'Morning team! We hit 50 leads this week 🎉',time:'08:30',status:'delivered'},
+    {from:'Kofi',text:'That\'s amazing! What\'s the conversion rate?',time:'08:32',status:'delivered'},
+    {from:'Lebo',text:'Currently at 32%, up from 28% last month',time:'08:34',status:'delivered'},
+    {from:'Amina',text:'The WhatsApp broadcast worked really well 👏',time:'08:35',status:'delivered'},
+    {from:'me',text:'Great work everyone, let\'s keep the momentum',time:'08:40',status:'read'},
+    {from:'Kofi',text:'I\'ve got 3 hot leads to follow up today',time:'09:15',status:'delivered'},
+    {from:'Amina',text:'Same, one is asking about bulk pricing for their salon',time:'09:18',status:'delivered'},
+   ]},
+  {id:14,name:'Naledi Moeketsi',isGroup:false,pinned:false,favourite:false,muted:false,online:true,statusText:'online',unread:1,
+   messages:[
+    {from:'them',text:'Hi! Do you have the new collagen serum in stock?',time:'15:02',status:'delivered'},
+   ]},
+  {id:15,name:'Supplier — Cape Cosmetics',isGroup:false,pinned:false,favourite:false,muted:false,online:false,statusText:'Business Account',unread:3,
+   messages:[
+    {from:'them',text:'Your restock order #SC-8821 has been processed',time:'11:30',status:'delivered'},
+    {from:'them',text:'Expected delivery: 3-5 working days',time:'11:31',status:'delivered'},
+    {from:'them',text:'Invoice attached, total: R12,450.00',time:'11:35',status:'delivered'},
+   ]},
+  {id:16,name:'Bongani Khumalo',isGroup:false,pinned:false,favourite:false,muted:false,online:false,statusText:'last seen today at 12:10',unread:5,
+   messages:[
+    {from:'them',text:'Hi, I\'m interested in becoming a reseller',time:'11:45',status:'delivered'},
+    {from:'them',text:'I have a small shop in Soweto',time:'11:46',status:'delivered'},
+    {from:'them',text:'What are your wholesale prices?',time:'11:48',status:'delivered'},
+    {from:'them',text:'And minimum order quantity?',time:'11:50',status:'delivered'},
+    {from:'them',text:'I can do a big first order if the margins work 🤝',time:'12:10',status:'delivered'},
+   ]},
+  {id:17,name:'Precious Molefe',isGroup:false,pinned:false,favourite:false,muted:false,online:false,statusText:'last seen 5 minutes ago',unread:2,
+   messages:[
+    {from:'them',text:'The products I received are amazing! Thank you 🌟',time:'15:30',status:'delivered'},
+    {from:'them',text:'Can I leave a review somewhere? My friends want to order too',time:'15:32',status:'delivered'},
+   ]},
+  {id:18,name:'Loyalty Program',isGroup:false,pinned:false,favourite:false,muted:false,online:false,statusText:'Business Account',unread:1,
+   messages:[
+    {from:'them',text:'🎉 You\'ve earned 500 loyalty points! Redeem for 10% off your next order. Reply REDEEM to claim.',time:'16:00',status:'delivered'},
+   ]},
+];
+
+let activeChatId = null;
+let currentFilter = 'all';
+let infoPanelOpen = false;
+let theme = localStorage.getItem('wa-demo-theme') || 'light';
+document.documentElement.setAttribute('data-theme', theme);
+
+/* ============ RENDER SIDEBAR ============ */
+function lastMsg(chat){ return chat.messages[chat.messages.length-1]; }
+function previewText(chat){
+  const m = lastMsg(chat);
+  if(!m) return '';
+  let prefix = '';
+  if(chat.isGroup && m.from!=='me') prefix = m.from+': ';
+  if(chat.isGroup && m.from==='me') prefix = 'You: ';
+  if(m.type==='image') return prefix+'📷 Photo';
+  if(m.type==='voice') return prefix+'🎤 Voice message';
+  return prefix+m.text;
+}
+function updateUnreadBadge(){
+  const total = chats.reduce((s,c)=>s+c.unread,0);
+  const badge = document.getElementById('railUnreadBadge');
+  if(!badge) return;
+  if(total>0){ badge.textContent = total>99?'99+':total; badge.style.display='flex'; }
+  else { badge.style.display='none'; }
+}
+function renderChatList(){
+  const list = document.getElementById('chatList');
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  updateUnreadBadge();
+  let items = chats.filter(c=>{
+    if(q && !c.name.toLowerCase().includes(q)) return false;
+    if(currentFilter==='unread' && c.unread<=0) return false;
+    if(currentFilter==='favourites' && !c.favourite) return false;
+    if(currentFilter==='groups' && !c.isGroup) return false;
+    return true;
+  });
+  items.sort((a,b)=> (b.pinned - a.pinned));
+  list.innerHTML = items.map(c=>{
+    const m = lastMsg(c);
+    const col = colorFor(c.name);
+    return `<div class="chat-row ${c.id===activeChatId?'selected':''}" data-id="${c.id}">
+      <div class="avatar" style="background:${col}">${initials(c.name)}</div>
+      <div class="chat-row-body">
+        <div class="chat-row-top">
+          <span class="name">${c.pinned?ico('pin',13):''}${escapeHtml(c.name)}</span>
+          <span class="time ${c.unread>0?'unread':''}">${m?m.time:''}</span>
+        </div>
+        <div class="chat-row-bottom">
+          <span class="preview">${c.muted?'':''}${escapeHtml(previewText(c))}</span>
+          <span class="row-meta">
+            ${c.muted?`<span class="mute-icon">${ico('mute',15)}</span>`:''}
+            ${c.unread>0?`<span class="unread-badge">${c.unread}</span>`:''}
+          </span>
+        </div>
+      </div>
+      <button class="row-more" data-id="${c.id}">${ico('dots',18)}</button>
+    </div>`;
+  }).join('') || `<div style="padding:24px;text-align:center;color:var(--text-2);font-size:14px;">No chats found</div>`;
+
+  list.querySelectorAll('.chat-row').forEach(row=>{
+    row.addEventListener('click', (e)=>{
+      if(e.target.closest('.row-more')) return;
+      selectChat(parseInt(row.dataset.id));
+    });
+  });
+  list.querySelectorAll('.row-more').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      openRowMenu(btn, parseInt(btn.dataset.id));
+    });
+  });
+}
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ============ CHAT WINDOW ============ */
+function selectChat(id){
+  activeChatId = id;
+  const chat = chats.find(c=>c.id===id);
+  chat.unread = 0;
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('chatWindow').style.display='flex';
+  const col = colorFor(chat.name);
+  document.getElementById('chatAvatar').style.background = col;
+  document.getElementById('chatAvatar').textContent = initials(chat.name);
+  document.getElementById('chatName').textContent = chat.name;
+  document.getElementById('chatStatus').textContent = chat.statusText;
+  renderMessages(chat);
+  renderChatList();
+  if(infoPanelOpen) renderInfoPanel(chat);
+}
+function bubbleMeta(m){
+  let tick = '';
+  if(m.from==='me'){
+    if(m.status==='read') tick = `<span class="tick-read">${ico('checkDouble',16,2.2)}</span>`;
+    else if(m.status==='delivered') tick = `<span class="tick-sent">${ico('checkDouble',16,2.2)}</span>`;
+    else tick = `<span class="tick-sent">${ico('checkSingle',16,2.2)}</span>`;
+  }
+  return `<span class="meta"><span class="time">${m.time}</span>${tick}</span>`;
+}
+function renderMessages(chat){
+  const box = document.getElementById('chatMessages');
+  let lastDate = '';
+  let html = '';
+  html += `<div class="date-sep">TODAY</div>`;
+  chat.messages.forEach(m=>{
+    const out = m.from==='me';
+    const senderColor = chat.isGroup && !out ? (chat.members[m.from]||colorFor(m.from)) : null;
+    let inner = '';
+    if(m.type==='image'){
+      const c = colorFor(m.caption||'img');
+      inner = `<div class="img-bubble"><div class="ph" style="background:linear-gradient(135deg, ${c}, #333)">${ico('image',36)}</div></div>
+        ${chat.isGroup && !out ? `<span class="sender" style="color:${senderColor}">${escapeHtml(m.from)}</span>`:''}
+        <div class="text">${escapeHtml(m.caption||'')}</div>${bubbleMeta(m)}`;
+    } else if(m.type==='voice'){
+      let bars = '';
+      for(let i=0;i<28;i++){ bars += `<span style="height:${6+Math.round(Math.random()*16)}px"></span>`; }
+      inner = `${chat.isGroup && !out ? `<span class="sender" style="color:${senderColor}">${escapeHtml(m.from)}</span>`:''}
+        <div class="voice-bubble">
+          <div class="play-btn">${ico('play',16)}</div>
+          <div class="voice-wave">${bars}</div>
+          <span class="voice-time">${m.duration}</span>
+        </div>${bubbleMeta(m)}`;
+    } else {
+      inner = `${chat.isGroup && !out ? `<span class="sender" style="color:${senderColor}">${escapeHtml(m.from)}</span>`:''}
+        <span class="text">${escapeHtml(m.text)}</span>${bubbleMeta(m)}`;
+    }
+    html += `<div class="msg-row ${out?'out':'in'}"><div class="bubble">${inner}</div></div>`;
+  });
+  box.innerHTML = html;
+  box.scrollTop = box.scrollHeight;
+}
+
+/* ============ SEND MESSAGE ============ */
+function sendMessage(){
+  const input = document.getElementById('msgInput');
+  const text = input.innerText.trim();
+  if(!text || activeChatId===null) return;
+  const chat = chats.find(c=>c.id===activeChatId);
+  const msg = {from:'me', text, time: timeNow(), status:'sent'};
+  chat.messages.push(msg);
+  input.innerHTML = '';
+  renderMessages(chat);
+  renderChatList();
+  setTimeout(()=>{ msg.status='delivered'; renderMessages(chat); }, 700);
+  setTimeout(()=>{ msg.status='read'; renderMessages(chat); }, 1600);
+}
+document.getElementById('btnSend').innerHTML = ico('send',22);
+document.getElementById('btnSend').addEventListener('click', sendMessage);
+const msgInputEl = document.getElementById('msgInput');
+msgInputEl.addEventListener('keydown', (e)=>{
+  if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMessage(); }
+});
+
+/* ============ TOAST ============ */
+let toastTimer=null;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ============ POPUPS ============ */
+const overlay = document.getElementById('overlay');
+function closeAllPopups(){
+  document.querySelectorAll('.popup').forEach(p=>p.classList.remove('show'));
+  overlay.classList.remove('show');
+}
+overlay.addEventListener('click', closeAllPopups);
+function openPopup(el){
+  closeAllPopups();
+  el.classList.add('show');
+  overlay.classList.add('show');
+}
+
+/* Emoji picker */
+const EMOJIS = ['😀','😁','😂','🤣','😊','😍','😘','😜','🤔','😎','😢','😭','😡','👍','👎','👏','🙏','💪','🎉','🔥','❤️','💕','💯','✨','🥳','😴','🤗','🙄','😇','🤩','🌟','☀️','🌙','⭐','🍕','🍔','☕','🍺','⚽','🏀','🎮','📷','🎵','🚀','✅','❌','⏰','📌','🎂'];
+document.getElementById('emojiGrid').innerHTML = EMOJIS.map(e=>`<span>${e}</span>`).join('');
+document.getElementById('emojiGrid').addEventListener('click', (e)=>{
+  if(e.target.tagName==='SPAN'){
+    msgInputEl.focus();
+    document.execCommand('insertText', false, e.target.textContent);
+  }
+});
+document.getElementById('btnEmoji').innerHTML = ico('emoji',24);
+document.getElementById('btnEmoji').addEventListener('click', (e)=>{ e.stopPropagation(); openPopup(document.getElementById('emojiPopup')); });
+
+/* Attach menu */
+document.getElementById('btnAttach').innerHTML = ico('attach',24);
+const attachItems = [
+  {icon:'doc', label:'Document'},
+  {icon:'image', label:'Photos & Videos'},
+  {icon:'camera', label:'Camera'},
+  {icon:'contact', label:'Contact'},
+];
+document.getElementById('attachPopup').innerHTML = attachItems.map(a=>`<div class="menu-item" data-label="${a.label}">${ico(a.icon,20)}<span>${a.label}</span></div>`).join('');
+document.getElementById('attachPopup').addEventListener('click', (e)=>{
+  const item = e.target.closest('.menu-item');
+  if(item){ closeAllPopups(); showToast(`Demo only — "${item.dataset.label}" attachment isn't functional`); }
+});
+document.getElementById('btnAttach').addEventListener('click', (e)=>{ e.stopPropagation(); openPopup(document.getElementById('attachPopup')); });
+
+/* Chat header menu */
+document.getElementById('btnChatMenu').innerHTML = ico('dots',20);
+const chatMenuItems = [
+  {icon:'contact', label:'Contact info', action:'info'},
+  {icon:'star', label:'Add to favourites', action:'fav'},
+  {icon:'mute', label:'Mute notifications', action:'mute'},
+  {icon:'archive', label:'Archive chat', action:'archive'},
+  {icon:'trash', label:'Delete chat', action:'delete', danger:true},
+];
+function renderChatMenu(){
+  document.getElementById('chatMenuPopup').innerHTML = chatMenuItems.map(a=>`<div class="menu-item ${a.danger?'danger':''}" data-action="${a.action}">${ico(a.icon,20)}<span>${a.label}</span></div>`).join('');
+}
+renderChatMenu();
+document.getElementById('chatMenuPopup').addEventListener('click', (e)=>{
+  const item = e.target.closest('.menu-item');
+  if(!item) return;
+  closeAllPopups();
+  const action = item.dataset.action;
+  const chat = chats.find(c=>c.id===activeChatId);
+  if(action==='info'){ toggleInfoPanel(true); }
+  else if(action==='mute'){ chat.muted=!chat.muted; renderChatList(); showToast(chat.muted?'Chat muted':'Chat unmuted'); }
+  else if(action==='fav'){ chat.favourite=!chat.favourite; showToast(chat.favourite?'Added to favourites':'Removed from favourites'); }
+  else { showToast('Demo only — action not functional'); }
+});
+document.getElementById('btnChatMenu').addEventListener('click', (e)=>{ e.stopPropagation(); openPopup(document.getElementById('chatMenuPopup')); });
+
+/* Row context menu (per chat) */
+let rowMenuTargetId = null;
+const rowMenuPopup = document.createElement('div');
+rowMenuPopup.className = 'popup row-menu-popup';
+document.body.appendChild(rowMenuPopup);
+function openRowMenu(btn, id){
+  rowMenuTargetId = id;
+  const chat = chats.find(c=>c.id===id);
+  rowMenuPopup.innerHTML = `
+    <div class="menu-item" data-action="pin">${ico('pin',18)}<span>${chat.pinned?'Unpin chat':'Pin chat'}</span></div>
+    <div class="menu-item" data-action="mute">${ico('mute',18)}<span>${chat.muted?'Unmute notifications':'Mute notifications'}</span></div>
+    <div class="menu-item" data-action="archive">${ico('archive',18)}<span>Archive chat</span></div>
+    <div class="menu-item danger" data-action="delete">${ico('trash',18)}<span>Delete chat</span></div>`;
+  const rect = btn.getBoundingClientRect();
+  rowMenuPopup.style.top = rect.bottom+4+'px';
+  rowMenuPopup.style.left = Math.min(rect.left, window.innerWidth-220)+'px';
+  openPopup(rowMenuPopup);
+}
+rowMenuPopup.addEventListener('click', (e)=>{
+  const item = e.target.closest('.menu-item');
+  if(!item) return;
+  closeAllPopups();
+  const chat = chats.find(c=>c.id===rowMenuTargetId);
+  const action = item.dataset.action;
+  if(action==='pin'){ chat.pinned=!chat.pinned; renderChatList(); }
+  else if(action==='mute'){ chat.muted=!chat.muted; renderChatList(); }
+  else { showToast('Demo only — action not functional'); }
+});
+
+/* Sidebar menu (⋮ top-right) */
+document.getElementById('btnMenu').innerHTML = ico('dots',20);
+document.getElementById('btnNewChat').innerHTML = ico('newchat',20);
+document.getElementById('btnStatusIcon').innerHTML = ico('status',20);
+function renderSidebarMenu(){
+  const el = document.getElementById('sidebarMenuPopup');
+  el.innerHTML = `
+    <div class="menu-item" data-action="newgroup">${ico('communities',18)}<span>New group</span></div>
+    <div class="menu-item" data-action="starred">${ico('star',18)}<span>Starred messages</span></div>
+    <div class="menu-item" data-action="archived">${ico('archive',18)}<span>Archived chats</span></div>
+    <div class="menu-sep"></div>
+    <div class="menu-item" data-action="theme">${ico(theme==='dark'?'sun':'moon',18)}<span>${theme==='dark'?'Switch to light theme':'Switch to dark theme'}</span></div>
+    <div class="menu-item" data-action="settings">${ico('settings',18)}<span>Settings</span></div>`;
+}
+renderSidebarMenu();
+document.getElementById('sidebarMenuPopup').addEventListener('click', (e)=>{
+  const item = e.target.closest('.menu-item');
+  if(!item) return;
+  closeAllPopups();
+  if(item.dataset.action==='theme'){ toggleTheme(); }
+  else { showToast('Demo only — this action isn\'t functional'); }
+});
+document.getElementById('btnMenu').addEventListener('click', (e)=>{ e.stopPropagation(); renderSidebarMenu(); openPopup(document.getElementById('sidebarMenuPopup')); });
+document.getElementById('btnNewChat').addEventListener('click', (e)=>{ e.stopPropagation(); showToast('Demo only — starting new chats isn\'t functional'); });
+document.getElementById('btnStatusIcon').addEventListener('click', (e)=>{ e.stopPropagation(); showToast('Demo only — Status isn\'t functional'); });
+
+/* ============ THEME ============ */
+function toggleTheme(){
+  theme = theme==='light'?'dark':'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('wa-demo-theme', theme);
+  renderSidebarMenu();
+}
+
+/* ============ RAIL ============ */
+document.getElementById('railChats').innerHTML = ico('chatsBubble',22);
+document.getElementById('railStatus').innerHTML = ico('status',22);
+document.getElementById('railChannels').innerHTML = ico('channels',22);
+document.getElementById('railCommunities').innerHTML = ico('communities',22);
+document.getElementById('railSettings').innerHTML = ico('settings',22);
+document.querySelectorAll('.rail-btn').forEach(btn=>{
+  if(btn.id==='railProfile') return;
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.rail-top .rail-btn').forEach(b=>b.classList.remove('active'));
+    if(btn.parentElement.classList.contains('rail-top')) btn.classList.add('active');
+    if(btn.id!=='railChats' && btn.id!=='railSettings') showToast('Demo only — this section isn\'t functional');
+    if(btn.id==='railSettings') toggleInfoPanel(false), showToast('Demo only — Settings isn\'t functional');
+  });
+});
+document.getElementById('railProfile').addEventListener('click', ()=>showToast('Demo only — Profile isn\'t functional'));
+
+/* ============ SEARCH ICON ============ */
+document.getElementById('searchIconSlot').outerHTML = ico('search',16);
+document.getElementById('searchInput').addEventListener('input', renderChatList);
+
+/* ============ FILTER CHIPS ============ */
+document.querySelectorAll('.chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    currentFilter = chip.dataset.filter;
+    renderChatList();
+  });
+});
+
+/* ============ CHAT HEADER -> INFO PANEL ============ */
+document.getElementById('chatHeaderInfo').addEventListener('click', ()=>toggleInfoPanel());
+
+/* ============ INFO PANEL ============ */
+function toggleInfoPanel(forceOpen){
+  infoPanelOpen = forceOpen===undefined ? !infoPanelOpen : forceOpen;
+  const panel = document.getElementById('infoPanel');
+  if(infoPanelOpen && activeChatId!==null){
+    const chat = chats.find(c=>c.id===activeChatId);
+    renderInfoPanel(chat);
+    panel.style.display = 'flex';
+  } else {
+    panel.style.display = 'none';
+  }
+}
+function renderInfoPanel(chat){
+  const panel = document.getElementById('infoPanel');
+  const col = colorFor(chat.name);
+  const mediaColors = [colorFor('a'+chat.id),colorFor('b'+chat.id),colorFor('c'+chat.id),colorFor('d'+chat.id),colorFor('e'+chat.id),colorFor('f'+chat.id)];
+  panel.innerHTML = `
+    <div class="info-header">
+      <button class="icon-btn" id="infoCloseBtn">${ico('close',20)}</button>
+      <div class="title">${chat.isGroup?'Group info':'Contact info'}</div>
+    </div>
+    <div class="info-body">
+      <div class="avatar md" style="background:${col};width:120px;height:120px;font-size:40px;">${initials(chat.name)}</div>
+      <div class="name">${escapeHtml(chat.name)}</div>
+      <div class="sub">${chat.isGroup? (Object.keys(chat.members).length+1)+' members' : chat.statusText}</div>
+      ${!chat.isGroup ? `<div class="info-section"><div class="label">About</div><div class="value">Hey there! I am using WhatsApp.</div></div>`:''}
+      ${chat.isGroup ? `<div class="info-section"><div class="label">Members</div><div class="value">You, ${Object.keys(chat.members).join(', ')}</div></div>`:''}
+      <div class="info-section">
+        <div class="label">Media, links and docs</div>
+        <div class="media-grid">${mediaColors.map(c=>`<div class="cell" style="background:${c}"></div>`).join('')}</div>
+      </div>
+      <div class="toggle-row"><span>Mute notifications</span><div class="switch ${chat.muted?'on':''}" id="muteSwitch"><div class="knob"></div></div></div>
+      <div class="toggle-row"><span>Favourite chat</span><div class="switch ${chat.favourite?'on':''}" id="favSwitch"><div class="knob"></div></div></div>
+      <div class="info-section" style="border-bottom:none;">
+        <div class="value danger" style="cursor:pointer;margin-bottom:10px;" id="blockContact">Block ${chat.isGroup?'group':'contact'}</div>
+        <div class="value danger" style="cursor:pointer;" id="reportContact">Report ${chat.isGroup?'group':'contact'}</div>
+      </div>
+    </div>`;
+  document.getElementById('infoCloseBtn').addEventListener('click', ()=>toggleInfoPanel(false));
+  document.getElementById('muteSwitch').addEventListener('click', ()=>{ chat.muted=!chat.muted; renderInfoPanel(chat); renderChatList(); });
+  document.getElementById('favSwitch').addEventListener('click', ()=>{ chat.favourite=!chat.favourite; renderInfoPanel(chat); });
+  document.getElementById('blockContact').addEventListener('click', ()=>showToast('Demo only — this action isn\'t functional'));
+  document.getElementById('reportContact').addEventListener('click', ()=>showToast('Demo only — this action isn\'t functional'));
+}
+
+/* ============ INIT ============ */
+renderChatList();
+</script>
+</body>
+</html>

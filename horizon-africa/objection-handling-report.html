@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Objection Handling Module — Live Workflow Test Report</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d29;
+    --border: #2a2d3a;
+    --text: #e4e4e7;
+    --muted: #9ca3af;
+    --accent: #f59e0b;
+    --green: #22c55e;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --purple: #a855f7;
+    --chat-user: #2563eb;
+    --chat-ai: #1e293b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0;
+  }
+  .header {
+    background: linear-gradient(135deg, #1a1d29 0%, #0f1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 40px 24px;
+    text-align: center;
+  }
+  .header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .header .subtitle {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  .header .meta {
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .header .meta-item {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .header .meta-item strong {
+    color: var(--text);
+  }
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .summary-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+  .summary-card .number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .summary-card .label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .test-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .test-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .test-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #000;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .test-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  .test-badge {
+    margin-left: auto;
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  .badge-detected {
+    background: rgba(34, 197, 94, 0.15);
+    color: var(--green);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+  }
+  .badge-escalated {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--red);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+  .badge-followup {
+    background: rgba(168, 85, 247, 0.15);
+    color: var(--purple);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+  }
+  .chat {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .message {
+    max-width: 75%;
+    padding: 14px 18px;
+    border-radius: 16px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+  .message-user {
+    align-self: flex-end;
+    background: var(--chat-user);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+  }
+  .message-ai {
+    align-self: flex-start;
+    background: var(--chat-ai);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+  }
+  .message .sender {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .message-user .sender { color: rgba(255,255,255,0.7); }
+  .data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    padding: 0 24px 24px;
+  }
+  .data-item {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+  }
+  .data-item .key {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .data-item .value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .value-true { color: var(--green); }
+  .value-false { color: var(--muted); }
+  .value-warm { color: var(--accent); }
+  .value-objection { color: var(--blue); }
+  .value-date { color: var(--purple); }
+  .footer {
+    text-align: center;
+    padding: 32px 24px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+    margin-top: 32px;
+  }
+  .footer a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .note {
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 32px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .note strong { color: var(--text); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Objection Handling Module — Test Report</h1>
+  <div class="subtitle">Horizon Africa WhatsApp AI Sales Assistant</div>
+  <div class="meta">
+    <div class="meta-item"><strong>Workflow ID:</strong> kW4ELXolGnYx2AvB</div>
+    <div class="meta-item"><strong>Test Date:</strong> 14 July 2026</div>
+    <div class="meta-item"><strong>AI Model:</strong> Gemini 2.5 Flash Lite</div>
+    <div class="meta-item"><strong>Tests Run:</strong> 5/5 Passed</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="note">
+    <strong>Note:</strong> All data below is from real live workflow executions (IDs 61–66) on the production n8n instance.
+    AI responses were generated by Gemini, objection types were detected by the Process Response code node, and
+    metadata was extracted from actual execution data. No data has been fabricated.
+  </div>
+
+  <div class="summary">
+    <div class="summary-card">
+      <div class="number">5/5</div>
+      <div class="label">Objections Detected</div>
+    </div>
+    <div class="summary-card">
+      <div class="number">1</div>
+      <div class="label">Escalations Triggered</div>
+    </div>
+    <div class="summary-card">
+      <div class="number">1</div>
+      <div class="label">Follow-Ups Scheduled</div>
+    </div>
+    <div class="summary-card">
+      <div class="number">5</div>
+      <div class="label">Leads Bumped to WARM</div>
+    </div>
+  </div>
+
+  <!-- Test 1: Price Too High -->
+  <div class="test-section">
+    <div class="test-header">
+      <div class="test-number">1</div>
+      <div class="test-title">Price Too High</div>
+      <div class="test-badge badge-detected">DETECTED</div>
+    </div>
+    <div class="chat">
+      <div class="message message-user">
+        <div class="sender">Sipho — Customer</div>
+        R695 per month is too expensive for me, I cant afford that
+      </div>
+      <div class="message message-ai">
+        <div class="sender">Layla — AI Sales Assistant</div>
+        I understand, budget is important. Many people find they're actually spending more on mobile data than fibre would cost.
+
+        What do you mainly use the internet for?
+      </div>
+    </div>
+    <div class="data-grid">
+      <div class="data-item">
+        <div class="key">Objection Type</div>
+        <div class="value value-objection">price_too_high</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Needs Escalation</div>
+        <div class="value value-false">false</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Follow-Up Requested</div>
+        <div class="value value-false">false</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Lead Score</div>
+        <div class="value value-warm">WARM</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Execution ID</div>
+        <div class="value">61</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Timestamp</div>
+        <div class="value">2026-07-14 12:01:44 UTC</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Test 2: Comparing Providers -->
+  <div class="test-section">
+    <div class="test-header">
+      <div class="test-number">2</div>
+      <div class="test-title">Comparing Providers</div>
+      <div class="test-badge badge-detected">DETECTED</div>
+    </div>
+    <div class="chat">
+      <div class="message message-user">
+        <div class="sender">Thandi — Customer</div>
+        Im still comparing, looking around at other providers first before I decide
+      </div>
+      <div class="message message-ai">
+        <div class="sender">Layla — AI Sales Assistant</div>
+        That's a smart move, it's good to compare! To help you get the best deal, what matters most to you – speed, price, or installation time?
+      </div>
+    </div>
+    <div class="data-grid">
+      <div class="data-item">
+        <div class="key">Objection Type</div>
+        <div class="value value-objection">comparing_providers</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Needs Escalation</div>
+        <div class="value value-false">false</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Follow-Up Requested</div>
+        <div class="value value-false">false</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Lead Score</div>
+        <div class="value value-warm">WARM</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Execution ID</div>
+        <div class="value">62</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Timestamp</div>
+        <div class="value">2026-07-14 12:02:24 UTC</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Test 3: Need to Think About It -->
+  <div class="test-section">
+    <div class="test-header">
+      <div class="test-number">3</div>
+      <div class="test-title">Need to Think About It</div>
+      <div class="test-badge badge-detected">DETECTED</div>
+      <div class="test-badge badge-followup">FOLLOW-UP SCHEDULED</div>
+    </div>
+    <div class="chat">
+      <div class="message message-user">
+        <div class="sender">Johan — Customer</div>
+        Ill think about it and get back to you, I need to discuss it with my family first
+      </div>
+      <div class="message message-ai">
+        <div class="sender">Layla — AI Sales Assistant</div>
+        Absolutely, take your time—it's an important decision. Would it be helpful if I saved your current quotation so you can easily pick up where we left off? Or perhaps you have some questions I can help clear up for you and your family?
+      </div>
+    </div>
+    <div class="data-grid">
+      <div class="data-item">
+        <div class="key">Objection Type</div>
+        <div class="value value-objection">need_to_think</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Needs Escalation</div>
+        <div class="value value-false">false</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Follow-Up Requested</div>
+        <div class="value value-true">true</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Follow-Up Date</div>
+        <div class="value value-date">2026-07-17</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Lead Score</div>
+        <div class="value value-warm">WARM</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Execution ID</div>
+        <div class="value">66</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Timestamp</div>
+        <div class="value">2026-07-14 12:04:33 UTC</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Test 4: Already Have Fibre -->
+  <div class="test-section">
+    <div class="test-header">
+      <div class="test-number">4</div>
+      <div class="test-title">Already Have Fibre</div>
+      <div class="test-badge badge-detected">DETECTED</div>
+    </div>
+    <div class="chat">
+      <div class="message message-user">
+        <div class="sender">Aisha — Customer</div>
+        I already have fibre with another provider, my internet is working fine
+      </div>
+      <div class="message message-ai">
+        <div class="sender">Layla — AI Sales Assistant</div>
+        That's great to hear your internet is working well! It's always good to know you're connected.
+
+        Who is your current fibre provider?
+      </div>
+    </div>
+    <div class="data-grid">
+      <div class="data-item">
+        <div class="key">Objection Type</div>
+        <div class="value value-objection">already_have_fibre</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Needs Escalation</div>
+        <div class="value value-false">false</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Follow-Up Requested</div>
+        <div class="value value-false">false</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Lead Score</div>
+        <div class="value value-warm">WARM</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Execution ID</div>
+        <div class="value">64</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Timestamp</div>
+        <div class="value">2026-07-14 12:03:05 UTC</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Test 5: I'm Moving -->
+  <div class="test-section">
+    <div class="test-header">
+      <div class="test-number">5</div>
+      <div class="test-title">I'm Moving (Availability Check)</div>
+      <div class="test-badge badge-detected">DETECTED</div>
+      <div class="test-badge badge-escalated">ESCALATED TO HUMAN</div>
+    </div>
+    <div class="chat">
+      <div class="message message-user">
+        <div class="sender">Pieter — Customer</div>
+        Im moving next month to a new address, can you check if fibre is available there?
+      </div>
+      <div class="message message-ai">
+        <div class="sender">Layla — AI Sales Assistant</div>
+        Exciting! Let's make sure you're connected at your new place. What's the new address you'll be moving to?
+      </div>
+    </div>
+    <div class="data-grid">
+      <div class="data-item">
+        <div class="key">Objection Type</div>
+        <div class="value value-objection">moving</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Needs Escalation</div>
+        <div class="value value-true">true</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Follow-Up Requested</div>
+        <div class="value value-false">false</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Lead Score</div>
+        <div class="value value-warm">WARM</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Execution ID</div>
+        <div class="value">65</div>
+      </div>
+      <div class="data-item">
+        <div class="key">Timestamp</div>
+        <div class="value">2026-07-14 12:03:25 UTC</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p>Horizon Africa — WhatsApp AI Sales Assistant | Objection Handling Module</p>
+  <p>Report generated from live n8n workflow executions on 14 July 2026</p>
+  <p>All AI responses generated by <strong>Gemini 2.5 Flash Lite</strong> via the production workflow</p>
+</div>
+
+</body>
+</html>

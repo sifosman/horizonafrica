@@ -60,6 +60,8 @@ export async function POST(request: Request) {
     body_text?: string;
     header_text?: string;
     footer_text?: string;
+    body_example?: string[];
+    header_example?: string;
   };
 
   try {
@@ -68,7 +70,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { name, language, category, body_text, header_text, footer_text } = body;
+  const { name, language, category, body_text, header_text, footer_text, body_example, header_example } = body;
 
   if (!name || !language || !category || !body_text) {
     return NextResponse.json(
@@ -77,19 +79,33 @@ export async function POST(request: Request) {
     );
   }
 
-  const components: Array<Record<string, unknown>> = [
-    {
-      type: "BODY",
-      text: body_text,
-    },
-  ];
+  const hasBodyParams = /\{\{\d+\}\}/.test(body_text);
+  const hasHeaderParams = header_text ? /\{\{\d+\}\}/.test(header_text) : false;
+
+  const bodyComponent: Record<string, unknown> = {
+    type: "BODY",
+    text: body_text,
+  };
+  if (hasBodyParams && body_example && body_example.length > 0) {
+    bodyComponent.example = {
+      body_text: [body_example],
+    };
+  }
+
+  const components: Array<Record<string, unknown>> = [bodyComponent];
 
   if (header_text) {
-    components.unshift({
+    const headerComponent: Record<string, unknown> = {
       type: "HEADER",
       format: "TEXT",
       text: header_text,
-    });
+    };
+    if (hasHeaderParams && header_example) {
+      headerComponent.example = {
+        header_text: [header_example],
+      };
+    }
+    components.unshift(headerComponent);
   }
 
   if (footer_text) {
@@ -112,6 +128,7 @@ export async function POST(request: Request) {
           name,
           language,
           category,
+          parameter_format: "positional",
           components,
         }),
       }

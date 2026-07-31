@@ -74,6 +74,11 @@ export function TemplateManager() {
   const [bodyText, setBodyText] = useState("");
   const [headerText, setHeaderText] = useState("");
   const [footerText, setFooterText] = useState("");
+  const [bodyExample, setBodyExample] = useState("");
+  const [headerExample, setHeaderExample] = useState("");
+
+  const hasBodyParams = /\{\{\d+\}\}/.test(bodyText);
+  const hasHeaderParams = /\{\{\d+\}\}/.test(headerText);
 
   // Track status changes for notifications
   const [prevStatuses, setPrevStatuses] = useState<Record<string, string>>({});
@@ -149,6 +154,12 @@ export function TemplateManager() {
           body_text: bodyText,
           header_text: headerText || undefined,
           footer_text: footerText || undefined,
+          body_example: hasBodyParams && bodyExample.trim()
+            ? bodyExample.split(",").map((s) => s.trim())
+            : undefined,
+          header_example: hasHeaderParams && headerExample.trim()
+            ? headerExample.trim()
+            : undefined,
         }),
       });
 
@@ -165,6 +176,8 @@ export function TemplateManager() {
         setBodyText("");
         setHeaderText("");
         setFooterText("");
+        setBodyExample("");
+        setHeaderExample("");
         setShowForm(false);
         // Immediately refresh templates
         fetchTemplates();
@@ -328,6 +341,15 @@ export function TemplateManager() {
                 maxLength={60}
                 className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/10"
               />
+              {hasHeaderParams && (
+                <input
+                  type="text"
+                  value={headerExample}
+                  onChange={(e) => setHeaderExample(e.target.value)}
+                  placeholder="Header example value (e.g. Summer Sale)"
+                  className="mt-2 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/10"
+                />
+              )}
             </div>
 
             <div>
@@ -345,6 +367,24 @@ export function TemplateManager() {
                 Use {"{{1}}"}, {"{{2}}"}, etc. for variable placeholders.
               </p>
             </div>
+
+            {hasBodyParams && (
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+                  Body Example Values <span className="text-error">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={bodyExample}
+                  onChange={(e) => setBodyExample(e.target.value)}
+                  placeholder="e.g. John, Premium Fiber"
+                  className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/10"
+                />
+                <p className="mt-1 text-xs text-on-surface-variant">
+                  Comma-separated sample values for each variable. Required by Meta for approval.
+                </p>
+              </div>
+            )}
 
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
@@ -377,7 +417,7 @@ export function TemplateManager() {
             <div className="flex gap-3">
               <button
                 onClick={submitTemplate}
-                disabled={submitting || !name || !bodyText}
+                disabled={submitting || !name || !bodyText || (hasBodyParams && !bodyExample.trim())}
                 className="flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-on-primary shadow-sm transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {submitting ? (

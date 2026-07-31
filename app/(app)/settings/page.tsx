@@ -12,9 +12,9 @@ interface IntegrationStatus {
 
 const integrations: IntegrationStatus[] = [
   {
-    name: "Gemini AI",
-    description: "Powers the Layla AI assistant for lead qualification",
-    status: "pending",
+    name: "OpenRouter AI",
+    description: "Powers the Layla AI assistant for lead qualification (GPT-5.6-sol)",
+    status: "connected",
     icon: Bot,
   },
   {
@@ -38,7 +38,7 @@ const integrations: IntegrationStatus[] = [
   {
     name: "Meta WhatsApp Business",
     description: "WhatsApp Business API for sending/receiving messages",
-    status: "pending",
+    status: "connected",
     icon: Radio,
   },
 ];

@@ -1,44 +1,90 @@
 "use client";
 
 import { useState } from "react";
-import { BroadcastGroup, BroadcastContact, BroadcastHistory } from "@/lib/types";
-import { Send, Plus, Trash2, Lock } from "lucide-react";
+import { BroadcastGroup, BroadcastContact } from "@/lib/types";
+import { Send, Loader2, CheckCircle2, XCircle, Info, Plus, Trash2 } from "lucide-react";
 
 interface BroadcastFormProps {
   groups: BroadcastGroup[];
 }
 
 const templates = [
-  "promotional_offer",
-  "new_product_alert",
-  "follow_up_reminder",
-  "seasonal_deal",
-  "service_update",
+  { name: "hello_world", label: "Hello World (Test)", status: "approved" },
+  { name: "horizon_welcome_v1", label: "Welcome to Horizon Africa", status: "pending" },
+  { name: "horizon_followup_v5", label: "Follow-up Enquiry", status: "pending" },
 ];
+
+interface SendResult {
+  broadcast_id: number;
+  total_recipients: number;
+  sent: number;
+  failed: number;
+  errors?: string[];
+}
 
 export function BroadcastForm({ groups }: BroadcastFormProps) {
   const [groupId, setGroupId] = useState<string>("");
-  const [template, setTemplate] = useState<string>(templates[0]);
-  const [message, setMessage] = useState("");
+  const [template, setTemplate] = useState<string>(templates[0].name);
+  const [campaignName, setCampaignName] = useState("");
+  const [testPhone, setTestPhone] = useState("");
+  const [sending, setSending] = useState(false);
+  const [result, setResult] = useState<SendResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const selectedGroup = groups.find((g) => String(g.id) === groupId);
+  const selectedTemplate = templates.find((t) => t.name === template);
+  const isTestMode = testPhone.trim().length > 0;
+  const canSend = (isTestMode || groupId) && !sending;
+
+  async function sendBroadcast() {
+    setSending(true);
+    setError(null);
+    setResult(null);
+
+    try {
+      const payload: Record<string, unknown> = {
+        template_name: template,
+        campaign_name: campaignName || undefined,
+      };
+
+      if (isTestMode) {
+        payload.test_phone = testPhone.trim();
+      } else {
+        payload.group_id = Number(groupId);
+      }
+
+      const res = await fetch("/api/broadcasts/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error ?? "Failed to send broadcast");
+      } else {
+        setResult(data);
+      }
+    } catch {
+      setError("Network error sending broadcast");
+    }
+
+    setSending(false);
+  }
 
   return (
     <div className="card-shadow rounded-xl border border-surface-variant bg-surface-container-lowest p-6">
       <h2 className="mb-5 text-lg font-semibold text-on-surface">New Broadcast</h2>
       <div className="space-y-4">
         <div>
-          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Select Group</label>
-          <select
-            value={groupId}
-            onChange={(e) => setGroupId(e.target.value)}
-            className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-secondary focus:outline-none"
-          >
-            <option value="">Choose a group...</option>
-            {groups.map((g) => (
-              <option key={g.id} value={g.id}>{g.group_label} — {g.group_name}</option>
-            ))}
-          </select>
+          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Campaign Name</label>
+          <input
+            type="text"
+            value={campaignName}
+            onChange={(e) => setCampaignName(e.target.value)}
+            placeholder="e.g. July Welcome Campaign"
+            className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/10"
+          />
         </div>
 
         <div>
@@ -49,35 +95,93 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
             className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-secondary focus:outline-none"
           >
             {templates.map((t) => (
-              <option key={t} value={t}>{t.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</option>
+              <option key={t.name} value={t.name}>
+                {t.label} ({t.status})
+              </option>
             ))}
           </select>
+          {selectedTemplate?.status === "pending" && (
+            <p className="mt-1.5 flex items-center gap-1 text-xs text-amber-600">
+              <Info className="h-3 w-3" />
+              This template is pending Meta approval. Use &quot;Hello World (Test)&quot; to test now.
+            </p>
+          )}
         </div>
 
         <div>
-          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Message Preview</label>
-          <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            rows={4}
-            placeholder="Type your broadcast message..."
+          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Test Phone (optional)</label>
+          <input
+            type="tel"
+            value={testPhone}
+            onChange={(e) => setTestPhone(e.target.value)}
+            placeholder="+27658475289"
             className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/10"
           />
+          <p className="mt-1 text-xs text-on-surface-variant">
+            Enter a phone number to send a single test message. Leave empty to send to a group.
+          </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            disabled
-            title="Requires Meta WhatsApp Business API approval"
-            className="flex cursor-not-allowed items-center gap-2 rounded-lg bg-surface-container-high px-4 py-2.5 text-sm font-semibold text-on-surface-variant/50"
-          >
-            <Lock className="h-4 w-4" />
-            Send Broadcast
-          </button>
-          <span className="text-xs text-on-surface-variant">
-            Requires Meta WhatsApp Business API approval
-          </span>
-        </div>
+        {!isTestMode && (
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Select Group</label>
+            <select
+              value={groupId}
+              onChange={(e) => setGroupId(e.target.value)}
+              className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-secondary focus:outline-none"
+            >
+              <option value="">Choose a group...</option>
+              {groups.map((g) => (
+                <option key={g.id} value={g.id}>{g.group_label} — {g.group_name}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {error && (
+          <div className="flex items-start gap-2 rounded-lg bg-error-container/30 px-4 py-3 text-sm text-error">
+            <XCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {result && (
+          <div className="rounded-lg bg-secondary-container/20 px-4 py-3 text-sm">
+            <div className="flex items-center gap-2 text-secondary">
+              <CheckCircle2 className="h-4 w-4" />
+              <span className="font-semibold">Broadcast Complete</span>
+            </div>
+            <div className="mt-2 space-y-1 text-on-surface-variant">
+              <p>Sent: {result.sent} / {result.total_recipients}</p>
+              {result.failed > 0 && <p className="text-error">Failed: {result.failed}</p>}
+              {result.errors && result.errors.length > 0 && (
+                <ul className="mt-1 list-inside list-disc text-xs text-error">
+                  {result.errors.slice(0, 5).map((e, i) => (
+                    <li key={i}>{e}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        )}
+
+        <button
+          onClick={sendBroadcast}
+          disabled={!canSend}
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 text-sm font-semibold text-on-primary shadow-lg transition-all hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {sending ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Sending...
+            </>
+          ) : (
+            <>
+              <Send className="h-4 w-4" />
+              {isTestMode ? "Send Test Message" : "Send Broadcast"}
+            </>
+          )}
+        </button>
       </div>
     </div>
   );

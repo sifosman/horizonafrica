@@ -4,12 +4,56 @@ import { createClient } from "@/lib/supabase/server";
 const META_API_VERSION = process.env.META_API_VERSION ?? "v21.0";
 const META_PHONE_NUMBER_ID = process.env.META_PHONE_NUMBER_ID!;
 const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN!;
+const META_WABA_ID = process.env.META_WABA_ID!;
 
 interface MetaSendResponse {
   messaging_product: string;
   contacts: { input: string; wa_id: string }[];
   messages: { id: string }[];
   error?: { message: string; code: number };
+}
+
+async function fetchTemplateBody(
+  templateName: string
+): Promise<string | null> {
+  if (!META_WABA_ID || !META_ACCESS_TOKEN) return null;
+
+  try {
+    const res = await fetch(
+      `https://graph.facebook.com/${META_API_VERSION}/${META_WABA_ID}/message_templates?fields=name,status,components&limit=100`,
+      { headers: { Authorization: `Bearer ${META_ACCESS_TOKEN}` } }
+    );
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    const templates: Array<{
+      name: string;
+      components: Array<{ type: string; text?: string }>;
+    }> = data.data ?? [];
+
+    const template = templates.find((t) => t.name === templateName);
+    if (!template) return null;
+
+    const bodyComponent = template.components?.find(
+      (c) => c.type === "BODY"
+    );
+    const headerComponent = template.components?.find(
+      (c) => c.type === "HEADER"
+    );
+    const footerComponent = template.components?.find(
+      (c) => c.type === "FOOTER"
+    );
+
+    const parts: string[] = [];
+    if (headerComponent?.text) parts.push(headerComponent.text);
+    if (bodyComponent?.text) parts.push(bodyComponent.text);
+    if (footerComponent?.text) parts.push(footerComponent.text);
+
+    return parts.length > 0 ? parts.join("\n") : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -58,6 +102,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No recipients found" }, { status: 400 });
   }
 
+  // Fetch template body text from Meta for message_content
+  const templateBody = await fetchTemplateBody(template_name);
+
   // Create broadcast history record
   const { data: historyRecord, error: historyError } = await supabase
     .from("broadcast_history")
@@ -65,7 +112,7 @@ export async function POST(request: NextRequest) {
       campaign_name: campaign_name || `Broadcast ${new Date().toLocaleString()}`,
       group_id: group_id ? Number(group_id) : null,
       template_name,
-      message_content: null,
+      message_content: templateBody,
       total_sent: 0,
       total_delivered: 0,
       total_read: 0,
@@ -100,6 +147,8 @@ export async function POST(request: NextRequest) {
       },
     };
 
+    let sendStatus: "sent" | "failed" = "failed";
+
     try {
       const res = await fetch(
         `https://graph.facebook.com/${META_API_VERSION}/${META_PHONE_NUMBER_ID}/messages`,
@@ -120,11 +169,21 @@ export async function POST(request: NextRequest) {
         errors.push(`${phone}: ${data.error?.message ?? "Unknown error"}`);
       } else {
         sent++;
+        sendStatus = "sent";
       }
     } catch {
       failed++;
       errors.push(`${phone}: Network error`);
     }
+
+    // Record recipient in broadcast_recipients
+    await supabase.from("broadcast_recipients").insert({
+      broadcast_id: broadcastId,
+      phone_number: phone,
+      contact_name: recipient.contact_name,
+      status: sendStatus,
+      sent_at: sendStatus === "sent" ? new Date().toISOString() : null,
+    });
   }
 
   // Update broadcast history

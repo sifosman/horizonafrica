@@ -1,7 +1,8 @@
 /**
- * Extracts plain text from a WhatsApp message that may be stored as JSON.
- * Handles various WhatsApp Cloud API message formats and falls back to
- * returning the original string if it's not valid JSON.
+ * Extracts plain text from a WhatsApp message or AI response that may be
+ * stored as JSON. Handles various WhatsApp Cloud API message formats and
+ * AI response objects. Falls back to returning the original string if
+ * it's not valid JSON or no text can be extracted.
  */
 export function extractMessageText(raw: string | null): string | null {
   if (!raw) return null;
@@ -24,6 +25,9 @@ function extractFromParsed(obj: unknown): string | null {
   if (!obj || typeof obj !== "object") return null;
 
   const o = obj as Record<string, unknown>;
+
+  // AI response format: { reply: "...", leadScore: "...", ... }
+  if (typeof o.reply === "string") return o.reply;
 
   // Direct WhatsApp message formats: { type: "text", text: { body: "..." } }
   if (o.text && typeof o.text === "object") {

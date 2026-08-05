@@ -98,7 +98,7 @@ export function ConversationView({ conversations }: ConversationViewProps) {
                     <ScoreBadge score={last.lead_score as LeadScore} />
                   </div>
                   <p className="mt-1 truncate text-xs text-on-surface-variant">
-                    {extractMessageText(last.incoming_message) ?? last.ai_response ?? "—"}
+                    {extractMessageText(last.incoming_message) ?? extractMessageText(last.ai_response) ?? last.ai_response ?? "—"}
                   </p>
                   <p className="mt-1 text-[11px] text-on-surface-variant/60">
                     {msgs.length} messages · {new Date(last.created_at).toLocaleDateString()}
@@ -156,7 +156,7 @@ export function ConversationView({ conversations }: ConversationViewProps) {
                   {msg.ai_response && (
                     <div className="flex items-start gap-2 justify-end">
                       <div className="rounded-lg rounded-tr-sm bg-secondary px-4 py-2.5 max-w-[70%]">
-                        <p className="text-sm text-on-secondary">{msg.ai_response}</p>
+                        <p className="text-sm text-on-secondary">{extractMessageText(msg.ai_response) ?? msg.ai_response}</p>
                         <p className="mt-1 text-[11px] text-on-secondary/70">
                           {new Date(msg.created_at).toLocaleTimeString()}
                         </p>

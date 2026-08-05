@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
   const score = searchParams.get("score");
   const status = searchParams.get("status");
   const search = searchParams.get("search");
+  const followUp = searchParams.get("follow_up");
   const page = parseInt(searchParams.get("page") ?? "1");
   const pageSize = parseInt(searchParams.get("pageSize") ?? "50");
 
@@ -30,6 +31,9 @@ export async function GET(request: NextRequest) {
   }
   if (search) {
     query = query.or(`full_name.ilike.%${search}%,phone_number.ilike.%${search}%`);
+  }
+  if (followUp === "true") {
+    query = query.eq("follow_up_requested", true).order("follow_up_date", { ascending: true });
   }
 
   const { data, error, count } = await query;

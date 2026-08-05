@@ -14,3 +14,6 @@ out/
 *.log
 .env.example
 tsconfig.tsbuildinfo
+
+# local dashboard working copy (tracked at repo root)
+horizon-africa/dashboard/

@@ -39,7 +39,7 @@ function computeExpiryDate(followUpDate: string | null): string {
   return `end of ${months[expiry.getMonth()]}`;
 }
 
-export async function sendFollowUps(): Promise<FollowUpResult> {
+export async function sendFollowUps(leadId?: number): Promise<FollowUpResult> {
   if (!META_PHONE_NUMBER_ID || !META_ACCESS_TOKEN) {
     return {
       processed: 0,
@@ -51,13 +51,20 @@ export async function sendFollowUps(): Promise<FollowUpResult> {
 
   const supabase = await createClient();
 
-  const { data: leads, error } = await supabase
+  let query = supabase
     .from("leads")
     .select("id, phone_number, full_name, offered_package, product_interest, follow_up_date")
     .eq("follow_up_requested", true)
     .eq("follow_up_sent", false)
-    .lte("follow_up_date", new Date().toISOString())
     .not("status", "in", '("converted","lost")');
+
+  if (leadId) {
+    query = query.eq("id", leadId);
+  } else {
+    query = query.lte("follow_up_date", new Date().toISOString());
+  }
+
+  const { data: leads, error } = await query;
 
   if (error) {
     return { processed: 0, sent: 0, failed: 0, errors: [error.message] };

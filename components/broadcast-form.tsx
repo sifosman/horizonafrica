@@ -61,9 +61,11 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
       if (res.ok) {
         const data = await res.json();
         if (data.templates && data.templates.length > 0) {
-          setTemplates(data.templates);
-          if (!data.templates.some((t: Template) => t.name === template)) {
-            setTemplate(data.templates[0].name);
+          const approved = data.templates.filter((t: Template) => t.status === "approved");
+          const list = approved.length > 0 ? approved : data.templates;
+          setTemplates(list);
+          if (!list.some((t: Template) => t.name === template)) {
+            setTemplate(list[0].name);
           }
         }
       }

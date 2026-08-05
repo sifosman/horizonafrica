@@ -121,7 +121,6 @@ export async function GET() {
     }
 
     const templates = allTemplates
-      .filter((t) => t.status === "APPROVED")
       .map((t) => ({
         name: t.name,
         label: formatLabel(t.name),

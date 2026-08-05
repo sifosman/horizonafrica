@@ -129,7 +129,7 @@ export default function LoginPage() {
                 </label>
               </div>
               <a
-                href="#"
+                href="/forgot-password"
                 className="text-[13px] font-semibold text-secondary transition-colors hover:underline"
               >
                 Forgot password?
@@ -166,7 +166,7 @@ export default function LoginPage() {
             <p className="text-[13px] text-on-surface-variant">
               Don&apos;t have an account?{" "}
               <a
-                href="#"
+                href="mailto:admin@horizonafrica.co.za"
                 className="font-semibold text-secondary transition-colors hover:underline"
               >
                 Contact Administrator

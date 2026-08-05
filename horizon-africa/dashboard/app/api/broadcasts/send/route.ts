@@ -28,7 +28,12 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { template_name, group_id, test_phone, campaign_name } = body;
+  const { template_name, group_id, test_phone, campaign_name, template_parameters } = body;
+
+  // template_parameters: array of { source: "contact_name" | "custom", value?: string }
+  // If provided, must match the number of {{N}} placeholders in the template body
+  type TemplateParam = { source: "contact_name" | "custom"; value?: string };
+  const params: TemplateParam[] = Array.isArray(template_parameters) ? template_parameters : [];
 
   if (!template_name) {
     return NextResponse.json({ error: "template_name is required" }, { status: 400 });
@@ -89,15 +94,37 @@ export async function POST(request: NextRequest) {
   for (const recipient of recipients) {
     const phone = recipient.phone_number.replace(/\D/g, "");
 
+    const template: Record<string, unknown> = {
+      name: template_name,
+      language: { code: "en_US" },
+    };
+
+    // Build components with parameters if template has them
+    if (params.length > 0) {
+      const componentParams = params.map((p) => {
+        let value: string;
+        if (p.source === "contact_name") {
+          value = recipient.contact_name?.trim() || "there";
+        } else {
+          value = p.value ?? "";
+        }
+        return { type: "text", text: value };
+      });
+
+      template.components = [
+        {
+          type: "body",
+          parameters: componentParams,
+        },
+      ];
+    }
+
     const payload: Record<string, unknown> = {
       messaging_product: "whatsapp",
       recipient_type: "individual",
       to: phone,
       type: "template",
-      template: {
-        name: template_name,
-        language: { code: "en_US" },
-      },
+      template,
     };
 
     try {

@@ -2,10 +2,15 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { BroadcastGroup, BroadcastContact } from "@/lib/types";
-import { Send, Loader2, CheckCircle2, XCircle, Plus, Trash2, RefreshCw } from "lucide-react";
+import { Send, Loader2, CheckCircle2, XCircle, Plus, Trash2, RefreshCw, Info } from "lucide-react";
 
 interface BroadcastFormProps {
   groups: BroadcastGroup[];
+}
+
+interface TemplateParameter {
+  position: number;
+  label: string;
 }
 
 interface Template {
@@ -13,6 +18,13 @@ interface Template {
   label: string;
   status: string;
   category: string;
+  parameters?: TemplateParameter[];
+  body_text?: string | null;
+}
+
+interface ParamConfig {
+  source: "contact_name" | "custom";
+  value: string;
 }
 
 const FALLBACK_TEMPLATES: Template[] = [
@@ -37,6 +49,7 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<SendResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [paramConfigs, setParamConfigs] = useState<ParamConfig[]>([]);
 
   const fetchTemplates = useCallback(async () => {
     setTemplatesLoading(true);
@@ -63,7 +76,44 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
 
   const selectedTemplate = templates.find((t) => t.name === template);
   const isTestMode = testPhone.trim().length > 0;
-  const canSend = (isTestMode || groupId) && !sending;
+  const templateParams = selectedTemplate?.parameters ?? [];
+  const hasParams = templateParams.length > 0;
+
+  // Reset param configs when template changes
+  useEffect(() => {
+    if (templateParams.length > 0) {
+      setParamConfigs(templateParams.map((p, i) => ({
+        source: i === 0 ? "contact_name" : "custom",
+        value: "",
+      })));
+    } else {
+      setParamConfigs([]);
+    }
+  }, [template]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // For test mode, all params must be custom (no contact to auto-fill from)
+  const effectiveParamConfigs = isTestMode
+    ? paramConfigs.map((p) => ({ ...p, source: "custom" as const }))
+    : paramConfigs;
+
+  const allParamsFilled = !hasParams || effectiveParamConfigs.every(
+    (p) => p.source === "contact_name" || p.value.trim().length > 0
+  );
+  const canSend = (isTestMode || groupId) && !sending && allParamsFilled;
+
+  // Build live preview text
+  const previewText = (() => {
+    if (!selectedTemplate?.body_text) return null;
+    let text = selectedTemplate.body_text;
+    effectiveParamConfigs.forEach((p, i) => {
+      const placeholder = `{{${i + 1}}}`;
+      const value = p.source === "contact_name"
+        ? (isTestMode ? "[Contact Name]" : "John")
+        : (p.value.trim() || `[Parameter ${i + 1}]`);
+      text = text.replace(placeholder, value);
+    });
+    return text;
+  })();
 
   async function sendBroadcast() {
     setSending(true);
@@ -80,6 +130,13 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
         payload.test_phone = testPhone.trim();
       } else {
         payload.group_id = Number(groupId);
+      }
+
+      if (hasParams) {
+        payload.template_parameters = effectiveParamConfigs.map((p) => ({
+          source: p.source,
+          value: p.value.trim(),
+        }));
       }
 
       const res = await fetch("/api/broadcasts/send", {
@@ -175,6 +232,84 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
                 <option key={g.id} value={g.id}>{g.group_label} — {g.group_name}</option>
               ))}
             </select>
+          </div>
+        )}
+
+        {hasParams && (
+          <div className="rounded-lg border border-outline-variant bg-surface-container-low p-4">
+            <div className="mb-3 flex items-center gap-2">
+              <Info className="h-4 w-4 text-secondary" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+                Template Parameters ({templateParams.length})
+              </span>
+            </div>
+            <div className="space-y-3">
+              {templateParams.map((param, i) => (
+                <div key={param.position} className="space-y-1.5">
+                  <label className="block text-xs font-medium text-on-surface-variant">
+                    {param.label}
+                  </label>
+                  {!isTestMode && (
+                    <div className="flex gap-2">
+                      <select
+                        value={paramConfigs[i]?.source ?? "contact_name"}
+                        onChange={(e) => {
+                          const newConfigs = [...paramConfigs];
+                          newConfigs[i] = {
+                            ...newConfigs[i],
+                            source: e.target.value as "contact_name" | "custom",
+                          };
+                          setParamConfigs(newConfigs);
+                        }}
+                        className="rounded-lg border border-outline-variant bg-surface-container-lowest px-2 py-2 text-xs focus:border-secondary focus:outline-none"
+                      >
+                        <option value="contact_name">Contact Name (auto)</option>
+                        <option value="custom">Same for everyone</option>
+                      </select>
+                      {paramConfigs[i]?.source === "custom" && (
+                        <input
+                          type="text"
+                          value={paramConfigs[i]?.value ?? ""}
+                          onChange={(e) => {
+                            const newConfigs = [...paramConfigs];
+                            newConfigs[i] = {
+                              ...newConfigs[i],
+                              value: e.target.value,
+                            };
+                            setParamConfigs(newConfigs);
+                          }}
+                          placeholder={`Enter value for ${param.label}`}
+                          className="flex-1 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-xs focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/10"
+                        />
+                      )}
+                    </div>
+                  )}
+                  {isTestMode && (
+                    <input
+                      type="text"
+                      value={paramConfigs[i]?.value ?? ""}
+                      onChange={(e) => {
+                        const newConfigs = [...paramConfigs];
+                        newConfigs[i] = {
+                          source: "custom",
+                          value: e.target.value,
+                        };
+                        setParamConfigs(newConfigs);
+                      }}
+                      placeholder={`Enter value for ${param.label}`}
+                      className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-xs focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/10"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {previewText && (
+              <div className="mt-3 rounded-lg bg-surface-container-high p-3">
+                <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-on-surface-variant">Preview</p>
+                <p className="text-xs text-on-surface whitespace-pre-wrap">{previewText}</p>
+              </div>
+            )}
           </div>
         )}
 

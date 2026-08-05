@@ -5,12 +5,19 @@ const META_API_VERSION = process.env.META_API_VERSION ?? "v21.0";
 const META_WABA_ID = process.env.META_WABA_ID!;
 const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN!;
 
+interface MetaTemplateComponent {
+  type: string;
+  text?: string;
+  format?: string;
+  buttons?: Array<{ type: string; text: string }>;
+}
+
 interface MetaTemplate {
   name: string;
   status: string;
   language: string;
   category: string;
-  components: Array<{ type: string; text?: string }>;
+  components: MetaTemplateComponent[];
 }
 
 interface MetaTemplatesResponse {
@@ -36,6 +43,22 @@ function formatLabel(name: string): string {
 
 function formatStatus(status: string): string {
   return status.toLowerCase();
+}
+
+function extractParameters(components: MetaTemplateComponent[]): { position: number; label: string }[] {
+  const body = components.find((c) => c.type.toUpperCase() === "BODY");
+  if (!body?.text) return [];
+
+  const matches = [...body.text.matchAll(/\{\{(\d+)\}\}/g)];
+  return matches.map((m) => ({
+    position: Number(m[1]),
+    label: `Parameter ${m[1]}`,
+  }));
+}
+
+function getBodyText(components: MetaTemplateComponent[]): string | null {
+  const body = components.find((c) => c.type.toUpperCase() === "BODY");
+  return body?.text ?? null;
 }
 
 export async function GET() {
@@ -84,6 +107,8 @@ export async function GET() {
         label: formatLabel(t.name),
         status: formatStatus(t.status),
         category: t.category,
+        parameters: extractParameters(t.components),
+        body_text: getBodyText(t.components),
       }))
       .sort((a, b) => a.label.localeCompare(b.label));
 

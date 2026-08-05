@@ -73,7 +73,7 @@ function extractParameters(components: MetaTemplateComponent[]): { position: num
       });
     }
   }
-  return params;
+  return params.sort((a, b) => a.position - b.position);
 }
 
 function getBodyText(components: MetaTemplateComponent[]): string | null {

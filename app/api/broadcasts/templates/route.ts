@@ -201,6 +201,7 @@ export async function GET() {
     }
 
     const templates = allTemplates
+      .filter((t) => t.status === "APPROVED")
       .map((t) => {
         const bodyComponent = t.components?.find((c) => c.type === "BODY");
         const headerComponent = t.components?.find((c) => c.type === "HEADER");
@@ -216,13 +217,7 @@ export async function GET() {
           footer_text: footerComponent?.text ?? null,
         };
       })
-      .sort((a, b) => {
-        const statusOrder: Record<string, number> = { approved: 0, pending: 1, rejected: 2 };
-        const aOrder = statusOrder[a.status] ?? 3;
-        const bOrder = statusOrder[b.status] ?? 3;
-        if (aOrder !== bOrder) return aOrder - bOrder;
-        return a.label.localeCompare(b.label);
-      });
+      .sort((a, b) => a.label.localeCompare(b.label));
 
     return NextResponse.json({ templates });
   } catch {

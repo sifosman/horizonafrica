@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { BroadcastGroup, BroadcastContact } from "@/lib/types";
-import { Send, Loader2, CheckCircle2, XCircle, Info, Plus, Trash2, RefreshCw } from "lucide-react";
+import { Send, Loader2, CheckCircle2, XCircle, Plus, Trash2, RefreshCw } from "lucide-react";
 
 interface BroadcastFormProps {
   groups: BroadcastGroup[];
@@ -13,10 +13,11 @@ interface Template {
   name: string;
   label: string;
   status: string;
+  category: string;
 }
 
 const FALLBACK_TEMPLATES: Template[] = [
-  { name: "hello_world", label: "Hello World (Test)", status: "approved" },
+  { name: "hello_world", label: "Hello World (Test)", status: "approved", category: "MARKETING" },
 ];
 
 interface SendResult {
@@ -149,22 +150,10 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
             )}
             {templates.map((t) => (
               <option key={t.name} value={t.name}>
-                {t.label} ({t.status})
+                {t.label} — {t.category}
               </option>
             ))}
           </select>
-          {selectedTemplate?.status === "pending" && (
-            <p className="mt-1.5 flex items-center gap-1 text-xs text-amber-600">
-              <Info className="h-3 w-3" />
-              This template is pending Meta approval. Use &quot;Hello World (Test)&quot; to test now.
-            </p>
-          )}
-          {selectedTemplate?.status === "rejected" && (
-            <p className="mt-1.5 flex items-center gap-1 text-xs text-red-600">
-              <XCircle className="h-3 w-3" />
-              This template was rejected by Meta and cannot be sent.
-            </p>
-          )}
         </div>
 
         <div>

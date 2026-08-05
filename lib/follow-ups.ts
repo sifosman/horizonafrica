@@ -29,16 +29,6 @@ export interface FollowUpResult {
   errors: string[];
 }
 
-function computeExpiryDate(followUpDate: string | null): string {
-  const base = followUpDate ? new Date(followUpDate) : new Date();
-  const expiry = new Date(base.getTime() + 7 * 24 * 60 * 60 * 1000);
-  const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
-  ];
-  return `end of ${months[expiry.getMonth()]}`;
-}
-
 export async function sendFollowUps(leadId?: number): Promise<FollowUpResult> {
   if (!META_PHONE_NUMBER_ID || !META_ACCESS_TOKEN) {
     return {
@@ -77,7 +67,6 @@ export async function sendFollowUps(leadId?: number): Promise<FollowUpResult> {
     const phone = lead.phone_number.replace(/\D/g, "");
     const name = lead.full_name ?? "there";
     const pkg = lead.offered_package ?? lead.product_interest ?? "fibre";
-    const expiry = computeExpiryDate(lead.follow_up_date);
 
     const payload = {
       messaging_product: "whatsapp",
@@ -89,16 +78,10 @@ export async function sendFollowUps(leadId?: number): Promise<FollowUpResult> {
         language: { code: "en_US" },
         components: [
           {
-            type: "header",
+            type: "body",
             parameters: [
               { type: "text", text: name },
               { type: "text", text: pkg },
-            ],
-          },
-          {
-            type: "body",
-            parameters: [
-              { type: "text", text: expiry },
             ],
           },
         ],

@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Horizon Africa Dashboard – User Guide</title>
+  <style>
+    :root {
+      --primary: #0b1f3b;
+      --accent: #0a84ff;
+      --text: #202124;
+      --muted: #5f6368;
+      --border: #e0e0e0;
+      --bg: #ffffff;
+      --surface: #f8f9fa;
+      --surface2: #f1f3f4;
+      --green: #1a8a3a;
+      --amber: #b26500;
+      --red: #d93025;
+      --blue: #1a73e8;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 24px auto;
+      padding: 24px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--primary);
+    }
+    .logo-area { display: flex; align-items: center; gap: 12px; }
+    .logo-badge {
+      height: 56px; width: 56px;
+      background: var(--primary);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 700; font-size: 20px; letter-spacing: -1px;
+    }
+    h1 { margin: 0; font-size: 26px; color: var(--primary); }
+    .subtitle { font-size: 14px; color: var(--muted); margin-top: 2px; }
+    .meta { text-align: right; font-size: 13px; color: var(--muted); }
+    h2 {
+      font-size: 20px;
+      color: var(--primary);
+      margin: 32px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    h3 { font-size: 16px; color: var(--text); margin: 20px 0 8px; }
+    p { margin: 8px 0; font-size: 14px; }
+    ul, ol { margin: 8px 0; padding-left: 20px; }
+    li { margin: 4px 0; font-size: 14px; }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin: 12px 0;
+      background: var(--surface);
+    }
+    .card h3 { margin: 0 0 8px; }
+    .info-box {
+      border-left: 4px solid var(--accent);
+      background: #e8f0fe;
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    .tip-box {
+      border-left: 4px solid var(--green);
+      background: #e6f4ea;
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    .warn-box {
+      border-left: 4px solid var(--amber);
+      background: #fef7e0;
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+
+    /* UI Mockup Styles */
+    .mockup {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 16px 0;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .mockup-label {
+      background: var(--surface2);
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .mockup-body { padding: 16px; }
+
+    /* Sidebar mockup */
+    .mock-sidebar {
+      width: 200px;
+      background: #fff;
+      border-right: 1px solid var(--border);
+      padding: 16px 12px;
+      display: inline-block;
+      vertical-align: top;
+    }
+    .mock-sidebar .brand {
+      font-weight: 700; font-size: 14px; color: var(--primary);
+      margin-bottom: 16px; padding: 0 8px;
+    }
+    .mock-sidebar .nav-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 12px; border-radius: 8px;
+      font-size: 12px; font-weight: 600;
+      color: var(--muted); margin-bottom: 2px;
+    }
+    .mock-sidebar .nav-item.active {
+      background: var(--surface2); color: var(--text);
+    }
+    .mock-sidebar .nav-icon {
+      width: 16px; height: 16px; border-radius: 3px;
+      background: var(--muted); opacity: 0.4;
+    }
+    .mock-sidebar .nav-item.active .nav-icon { opacity: 0.8; background: var(--accent); }
+    .mock-sidebar .cta {
+      background: var(--primary); color: #fff;
+      padding: 10px 12px; border-radius: 8px;
+      font-size: 11px; font-weight: 600;
+      text-align: center; margin-bottom: 12px;
+    }
+
+    /* Stat card mockup */
+    .mock-stats { display: flex; gap: 12px; flex-wrap: wrap; }
+    .mock-stat {
+      flex: 1; min-width: 140px;
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px; background: #fff;
+    }
+    .mock-stat .stat-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--surface2); margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .mock-stat .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .mock-stat .stat-value { font-size: 24px; font-weight: 700; color: var(--text); }
+
+    /* Table mockup */
+    .mock-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .mock-table th {
+      text-align: left; padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--muted); font-weight: 600;
+    }
+    .mock-table td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; }
+    .mock-table tr:hover td { background: var(--surface); }
+
+    /* Badge mockup */
+    .mock-badge {
+      display: inline-block; padding: 2px 8px;
+      border-radius: 99px; font-size: 10px; font-weight: 700;
+    }
+    .badge-hot { background: #fce8e6; color: var(--red); }
+    .badge-warm { background: #fef7e0; color: var(--amber); }
+    .badge-cold { background: var(--surface2); color: var(--muted); }
+    .badge-green { background: #e6f4ea; color: var(--green); }
+    .badge-amber { background: #fef7e0; color: var(--amber); }
+    .badge-blue { background: #e8f0fe; color: var(--blue); }
+
+    /* Score bar mockup */
+    .score-bar { height: 6px; border-radius: 99px; background: var(--surface2); overflow: hidden; margin-top: 4px; }
+    .score-bar .fill { height: 100%; border-radius: 99px; }
+
+    /* Chat mockup */
+    .mock-chat { display: flex; gap: 12px; height: 280px; }
+    .mock-chat-list { width: 200px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .mock-chat-list .search-bar {
+      padding: 8px; border-bottom: 1px solid var(--border);
+      background: var(--surface); font-size: 11px; color: var(--muted);
+    }
+    .mock-chat-item { padding: 10px; border-bottom: 1px solid #f0f0f0; font-size: 11px; }
+    .mock-chat-item.active { background: var(--surface2); }
+    .mock-chat-item .name { font-weight: 600; font-size: 12px; }
+    .mock-chat-item .preview { color: var(--muted); font-size: 10px; margin-top: 2px; }
+    .mock-chat-window {
+      flex: 1; border: 1px solid var(--border); border-radius: 8px;
+      display: flex; flex-direction: column;
+    }
+    .mock-chat-header {
+      padding: 10px 14px; border-bottom: 1px solid var(--border);
+      font-size: 12px; font-weight: 600;
+    }
+    .mock-chat-messages { flex: 1; padding: 12px; overflow: hidden; }
+    .mock-bubble {
+      max-width: 70%; padding: 8px 12px; border-radius: 10px;
+      font-size: 11px; margin-bottom: 8px;
+    }
+    .mock-bubble.incoming { background: var(--surface); border-top-left-radius: 2px; }
+    .mock-bubble.ai { background: var(--accent); color: #fff; border-top-right-radius: 2px; margin-left: auto; }
+    .mock-chat-input {
+      padding: 10px; border-top: 1px solid var(--border);
+      font-size: 11px; color: var(--muted);
+    }
+
+    /* Form mockup */
+    .mock-form-field { margin-bottom: 10px; }
+    .mock-form-field label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); display: block; margin-bottom: 4px; }
+    .mock-form-field .input-box {
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 8px 12px; font-size: 12px; color: var(--muted);
+      background: var(--surface);
+    }
+    .mock-btn {
+      display: inline-block; padding: 8px 16px; border-radius: 8px;
+      font-size: 12px; font-weight: 600; border: none; cursor: default;
+    }
+    .mock-btn-primary { background: var(--primary); color: #fff; }
+    .mock-btn-secondary { background: var(--accent); color: #fff; }
+    .mock-btn-outline { border: 1px solid var(--border); color: var(--muted); background: #fff; }
+
+    /* Integration card mockup */
+    .mock-integration {
+      display: flex; align-items: center; justify-content: space-between;
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px; background: #fff; margin-bottom: 8px;
+    }
+    .mock-integration .left { display: flex; align-items: center; gap: 10px; }
+    .mock-integration .icon-box {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: var(--surface2); display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .mock-integration .name { font-size: 13px; font-weight: 600; }
+    .mock-integration .desc { font-size: 11px; color: var(--muted); }
+
+    /* Top bar mockup */
+    .mock-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; border-bottom: 1px solid var(--border);
+      background: #fff;
+    }
+    .mock-topbar .title { font-size: 16px; font-weight: 600; }
+    .mock-topbar .right-icons { display: flex; align-items: center; gap: 12px; }
+    .mock-topbar .icon-circle {
+      width: 32px; height: 32px; border-radius: 99px;
+      background: var(--surface); display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .mock-topbar .notif-dot {
+      position: relative;
+    }
+    .mock-topbar .notif-dot::after {
+      content: '3'; position: absolute; top: -2px; right: -2px;
+      background: var(--red); color: #fff; font-size: 8px; font-weight: 700;
+      width: 14px; height: 14px; border-radius: 99px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Login mockup */
+    .mock-login {
+      max-width: 340px; margin: 0 auto;
+      border: 1px solid var(--border); border-radius: 16px;
+      padding: 28px; background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .mock-login .login-logo {
+      width: 180px; height: 60px; margin: 0 auto 16px;
+      background: var(--primary); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 700; font-size: 18px;
+    }
+    .mock-login .login-title { text-align: center; font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+    .mock-login .login-sub { text-align: center; font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+
+    /* Broadcast mockup */
+    .mock-broadcast-cards { display: flex; gap: 10px; }
+    .mock-bc-card {
+      flex: 1; border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px; background: #fff;
+    }
+    .mock-bc-card .bc-label { font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--muted); }
+    .mock-bc-card .bc-count { font-size: 22px; font-weight: 700; margin: 4px 0; }
+    .mock-bc-card .bc-sub { font-size: 10px; color: var(--muted); }
+
+    /* Follow-up mockup */
+    .mock-fu-summary { display: flex; gap: 10px; margin-bottom: 12px; }
+    .mock-fu-stat {
+      flex: 1; border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px; display: flex; align-items: center; gap: 10px;
+    }
+    .mock-fu-stat .fu-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+    }
+    .mock-fu-stat .fu-label { font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--muted); }
+    .mock-fu-stat .fu-value { font-size: 18px; font-weight: 700; }
+
+    /* Template mockup */
+    .mock-template-item {
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 12px; background: var(--surface); margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .mock-template-item .tmpl-name { font-size: 13px; font-weight: 600; }
+    .mock-template-item .tmpl-body { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .mock-template-item .tmpl-meta { display: flex; gap: 6px; margin-top: 6px; }
+    .mock-template-item .tmpl-tag {
+      font-size: 9px; padding: 2px 6px; border-radius: 4px;
+      background: var(--surface2); color: var(--muted);
+    }
+
+    /* Drawer mockup */
+    .mock-drawer {
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 16px; background: #fff; max-width: 360px; margin: 0 auto;
+    }
+    .mock-drawer .drawer-header {
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 12px;
+    }
+    .mock-drawer .drawer-avatar {
+      width: 40px; height: 40px; border-radius: 99px;
+      background: var(--surface2); display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: var(--accent);
+    }
+    .mock-drawer .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .mock-drawer .field { font-size: 11px; }
+    .mock-drawer .field-label { font-size: 9px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .mock-drawer .field-value { font-size: 12px; margin-top: 2px; }
+
+    .page-break { page-break-before: always; }
+
+    @media print {
+      body { background: #fff; }
+      .container { border: none; border-radius: 0; box-shadow: none; margin: 0; width: 100%; max-width: 100%; }
+      .no-print { display: none !important; }
+      a { color: currentColor; text-decoration: none; }
+      @page { size: A4; margin: 16mm; }
+      .page-break { page-break-before: always; }
+      h2, h3 { page-break-after: avoid; }
+      .mockup, .card { page-break-inside: avoid; }
+    }
+
+    .btns { display: flex; gap: 8px; justify-content: flex-end; margin: 0 0 10px; }
+    .btn { background: var(--primary); color: #fff; border: none; border-radius: 8px; padding: 10px 14px; cursor: pointer; font-weight: 600; font-size: 14px; }
+    .btn.secondary { background: #e9eef6; color: var(--primary); }
+    .muted { color: var(--muted); }
+    .toc { font-size: 14px; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc li { margin: 6px 0; }
+  </style>
+  <script>
+    function downloadPDF() { window.print(); }
+    function downloadHTML() {
+      const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'horizon-africa-dashboard-guide.html'; a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <div class="no-print btns">
+      <button class="btn" onclick="downloadPDF()">Download PDF</button>
+      <button class="btn secondary" onclick="downloadHTML()">Download HTML</button>
+    </div>
+
+    <header>
+      <div class="logo-area">
+        <div class="logo-badge">HA</div>
+        <div>
+          <h1>Dashboard User Guide</h1>
+          <div class="subtitle">Horizon Africa &mdash; WhatsApp AI Sales Platform</div>
+        </div>
+      </div>
+      <div class="meta">
+        <div><strong>Version</strong>: 1.0</div>
+        <div><strong>Date</strong>: 31 July 2026</div>
+        <div><strong>Prepared by</strong>: OWD Solutions</div>
+      </div>
+    </header>
+
+    <div class="card">
+      <h3 style="margin:0 0 8px;">Access Details</h3>
+      <p><strong>Dashboard URL:</strong> <a href="https://dashboard.horizonafrica.co.za">https://dashboard.horizonafrica.co.za</a></p>
+      <p><strong>Login:</strong> Email and password (provided separately by administrator)</p>
+      <p><strong>Support:</strong> mohamed@owdsolutions.co.za</p>
+    </div>
+
+    <div class="info-box">
+      <strong>What is the Dashboard?</strong><br>
+      The Horizon Africa Dashboard is a web-based control panel that lets you manage leads, view WhatsApp conversations, send broadcast campaigns, schedule follow-up reminders, create message templates, and monitor integration health &mdash; all in one place.
+    </div>
+
+    <h2>Table of Contents</h2>
+    <ol class="toc">
+      <li><a href="#login">Logging In</a></li>
+      <li><a href="#overview">Overview Page</a></li>
+      <li><a href="#leads">Leads Management</a></li>
+      <li><a href="#conversations">Conversations</a></li>
+      <li><a href="#broadcasts">Broadcasts</a></li>
+      <li><a href="#followups">Follow-Ups</a></li>
+      <li><a href="#templates">Templates</a></li>
+      <li><a href="#settings">Settings</a></li>
+      <li><a href="#notifications">Notifications</a></li>
+    </ol>
+
+    <!-- ============ LOGIN ============ -->
+    <h2 id="login">1. Logging In</h2>
+    <p>Navigate to <strong>dashboard.horizonafrica.co.za</strong> in your browser. You will see the login screen below. Enter your email address and password, then click <strong>Sign In</strong>.</p>
+
+    <div class="mockup">
+      <div class="mockup-label">Login Page</div>
+      <div class="mockup-body" style="background: #f5f5f5; padding: 30px;">
+        <div class="mock-login">
+          <div class="login-logo">HORIZON AFRICA</div>
+          <div class="login-title">Welcome back</div>
+          <div class="login-sub">Please enter your details to sign in</div>
+          <div class="mock-form-field">
+            <label>Email address</label>
+            <div class="input-box">name@company.com</div>
+          </div>
+          <div class="mock-form-field">
+            <label>Password</label>
+            <div class="input-box">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin: 8px 0;">
+            <span style="font-size:11px; color:var(--muted);">&#9744; Remember me</span>
+            <span style="font-size:11px; color:var(--accent);">Forgot password?</span>
+          </div>
+          <div style="background:var(--primary); color:#fff; padding:10px; border-radius:8px; text-align:center; font-size:13px; font-weight:600;">
+            Sign In &rarr;
+          </div>
+          <div style="text-align:center; margin-top:12px; font-size:11px; color:var(--muted);">
+            Don't have an account? <span style="color:var(--accent);">Contact Administrator</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <strong>Tip:</strong> Tick "Remember me" to stay logged in on your personal device. Use the eye icon on the password field to toggle password visibility.
+    </div>
+
+    <!-- ============ OVERVIEW ============ -->
+    <h2 id="overview">2. Overview Page</h2>
+    <p>After logging in, you land on the <strong>Overview</strong> page. This is your at-a-glance snapshot of the entire WhatsApp AI sales pipeline.</p>
+
+    <div class="mockup">
+      <div class="mockup-label">Overview Page &mdash; Top Section</div>
+      <div class="mockup-body">
+        <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Snapshot of your WhatsApp AI sales pipeline</p>
+        <div class="mock-stats">
+          <div class="mock-stat">
+            <div class="stat-icon">&#128100;</div>
+            <div class="stat-label">Total Leads</div>
+            <div class="stat-value">142</div>
+          </div>
+          <div class="mock-stat">
+            <div class="stat-icon" style="background:#fce8e6;">&#128293;</div>
+            <div class="stat-label">Hot Leads</div>
+            <div class="stat-value">38</div>
+          </div>
+          <div class="mock-stat">
+            <div class="stat-icon" style="background:#e8f0fe;">&#128172;</div>
+            <div class="stat-label">Active Conversations</div>
+            <div class="stat-value">87</div>
+          </div>
+          <div class="mock-stat">
+            <div class="stat-icon" style="background:#e6f4ea;">&#128246;</div>
+            <div class="stat-label">Broadcasts Sent</div>
+            <div class="stat-value">5</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:12px; margin-top:12px;">
+          <div class="mock-stat" style="flex:1; min-width:180px;">
+            <div class="stat-icon" style="background:#fef7e0;">&#128276;</div>
+            <div class="stat-label">Pending Follow-Ups</div>
+            <div class="stat-value">12</div>
+          </div>
+          <div class="mock-stat" style="flex:1; min-width:180px;">
+            <div class="stat-icon" style="background:#fce8e6;">&#9888;</div>
+            <div class="stat-label">Overdue Follow-Ups</div>
+            <div class="stat-value">3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p>The overview also shows a <strong>Recent Leads</strong> table (last 5 leads) and a <strong>Lead Score Breakdown</strong> showing the percentage of HOT, WARM, and COLD leads with progress bars.</p>
+
+    <div class="mockup">
+      <div class="mockup-label">Overview Page &mdash; Recent Leads &amp; Score Breakdown</div>
+      <div class="mockup-body">
+        <div style="display:flex; gap:16px;">
+          <div style="flex:2;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+              <strong style="font-size:14px;">Recent Leads</strong>
+              <span style="font-size:11px; color:var(--accent);">View all &rarr;</span>
+            </div>
+            <table class="mock-table">
+              <thead><tr><th>Name</th><th>Phone</th><th>Score</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>John Doe</td><td>+2765...</td><td><span class="mock-badge badge-hot">HOT</span></td><td>new</td></tr>
+                <tr><td>Jane Smith</td><td>+2782...</td><td><span class="mock-badge badge-warm">WARM</span></td><td>contacted</td></tr>
+                <tr><td>Sipho N.</td><td>+2771...</td><td><span class="mock-badge badge-cold">COLD</span></td><td>new</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="flex:1;">
+            <strong style="font-size:14px; display:block; margin-bottom:10px;">Lead Score Breakdown</strong>
+            <div style="margin-bottom:10px;">
+              <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
+                <span class="mock-badge badge-hot">HOT</span>
+                <span style="color:var(--muted);">38 (27%)</span>
+              </div>
+              <div class="score-bar"><div class="fill" style="width:27%; background:var(--red);"></div></div>
+            </div>
+            <div style="margin-bottom:10px;">
+              <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
+                <span class="mock-badge badge-warm">WARM</span>
+                <span style="color:var(--muted);">67 (47%)</span>
+              </div>
+              <div class="score-bar"><div class="fill" style="width:47%; background:var(--amber);"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
+                <span class="mock-badge badge-cold">COLD</span>
+                <span style="color:var(--muted);">37 (26%)</span>
+              </div>
+              <div class="score-bar"><div class="fill" style="width:26%; background:var(--muted);"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ LEADS ============ -->
+    <h2 id="leads" class="page-break">3. Leads Management</h2>
+    <p>The <strong>Leads</strong> page shows all leads captured by the AI assistant. You can search, filter by score and status, export to CSV, and view detailed information for each lead.</p>
+
+    <div class="mockup">
+      <div class="mockup-label">Leads Page &mdash; Filter Bar &amp; Table</div>
+      <div class="mockup-body">
+        <div style="display:flex; gap:8px; margin-bottom:12px; align-items:center;">
+          <div style="flex:1; border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:12px; color:var(--muted);">
+            &#128269; Search by name or phone...
+          </div>
+          <div style="border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:12px; color:var(--muted);">All Scores &#9662;</div>
+          <div style="border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:12px; color:var(--muted);">All Statuses &#9662;</div>
+          <div style="background:var(--accent); color:#fff; padding:8px 12px; border-radius:8px; font-size:12px; font-weight:600;">&#11015; Export CSV</div>
+        </div>
+        <table class="mock-table">
+          <thead>
+            <tr><th>Name</th><th>Phone</th><th>Product Interest</th><th>Score</th><th>Status</th><th>Follow-Up</th><th>Created</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>John Doe</td><td>+2765...</td><td>Fibre</td><td><span class="mock-badge badge-hot">HOT</span></td><td>new</td><td>&mdash;</td><td>31 Jul</td></tr>
+            <tr><td>Jane Smith</td><td>+2782...</td><td>5G</td><td><span class="mock-badge badge-warm">WARM</span></td><td>contacted</td><td><span class="mock-badge badge-amber">Pending</span></td><td>30 Jul</td></tr>
+            <tr><td>Sipho N.</td><td>+2771...</td><td>Fibre</td><td><span class="mock-badge badge-hot">HOT</span></td><td>qualified</td><td><span class="mock-badge badge-green">Sent</span></td><td>29 Jul</td></tr>
+          </tbody>
+        </table>
+        <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:11px; color:var(--muted);">
+          <span>Showing 3 of 142 leads</span>
+          <span>&lsaquo; 1 / 18 &rsaquo;</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>Lead Detail Drawer</h3>
+    <p>Click any row in the leads table to open the <strong>detail drawer</strong> on the right side. Here you can:</p>
+    <ul>
+      <li><strong>View</strong> all lead information (name, phone, email, address, product interest, recommended package, household size, internet usage, notes)</li>
+      <li><strong>Edit</strong> the lead's score (HOT/WARM/COLD), status (new/contacted/qualified/converted/lost), and notes</li>
+      <li><strong>Schedule a follow-up</strong> by picking a date and ticking "Follow-up requested"</li>
+      <li>See if the lead has been <strong>escalated</strong> to a human agent (Needs Escalation flag)</li>
+    </ul>
+
+    <div class="mockup">
+      <div class="mockup-label">Lead Detail Drawer</div>
+      <div class="mockup-body">
+        <div class="mock-drawer">
+          <div class="drawer-header">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div class="drawer-avatar">J</div>
+              <div>
+                <div style="font-size:14px; font-weight:600;">John Doe</div>
+                <div style="font-size:11px; color:var(--muted);">+27658475289</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <span class="mock-btn mock-btn-outline" style="font-size:11px; padding:4px 10px;">Edit</span>
+              <span style="font-size:16px;">&times;</span>
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field"><div class="field-label">Status</div><div class="field-value">New</div></div>
+            <div class="field"><div class="field-label">Email</div><div class="field-value">john@email.com</div></div>
+            <div class="field"><div class="field-label">Product Interest</div><div class="field-value">Fibre</div></div>
+            <div class="field"><div class="field-label">Recommended Package</div><div class="field-value">Premium Fibre</div></div>
+            <div class="field"><div class="field-label">Household Size</div><div class="field-value">4</div></div>
+            <div class="field"><div class="field-label">Internet Usage</div><div class="field-value">Heavy</div></div>
+            <div class="field" style="grid-column:span 2;"><div class="field-label">Physical Address</div><div class="field-value">123 Main St, Johannesburg</div></div>
+            <div class="field" style="grid-column:span 2;"><div class="field-label">Notes</div><div class="field-value">&mdash;</div></div>
+          </div>
+          <div style="margin-top:12px; border:1px solid var(--border); border-radius:8px; padding:12px; background:var(--surface);">
+            <div style="font-size:12px; font-weight:600; margin-bottom:8px;">&#128276; Schedule Follow-Up</div>
+            <div class="mock-form-field">
+              <label>Follow-Up Date</label>
+              <div class="input-box">2026-08-05</div>
+            </div>
+            <label style="font-size:11px; display:flex; align-items:center; gap:6px;">
+              <span style="width:14px; height:14px; border:1px solid var(--border); border-radius:3px; display:inline-block;"></span>
+              Follow-up requested
+            </label>
+            <div class="mock-btn mock-btn-secondary" style="margin-top:8px; font-size:11px;">&#128190; Save Follow-Up</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <strong>Tip:</strong> Use the <strong>Export CSV</strong> button to download all leads (or filtered leads) as a spreadsheet for offline analysis or reporting.
+    </div>
+
+    <!-- ============ CONVERSATIONS ============ -->
+    <h2 id="conversations" class="page-break">4. Conversations</h2>
+    <p>The <strong>Conversations</strong> page shows the full WhatsApp message history between leads and the AI assistant ("Layla"). Messages are grouped by phone number.</p>
+
+    <div class="mockup">
+      <div class="mockup-label">Conversations Page</div>
+      <div class="mockup-body">
+        <div class="mock-chat">
+          <div class="mock-chat-list">
+            <div class="search-bar">&#128269; Search conversations...</div>
+            <div style="display:flex; gap:4px; padding:6px;">
+              <span style="background:var(--accent); color:#fff; padding:3px 8px; border-radius:99px; font-size:9px; font-weight:600;">All</span>
+              <span style="background:var(--surface); padding:3px 8px; border-radius:99px; font-size:9px; font-weight:600; color:var(--muted);">HOT</span>
+              <span style="background:var(--surface); padding:3px 8px; border-radius:99px; font-size:9px; font-weight:600; color:var(--muted);">WARM</span>
+              <span style="background:var(--surface); padding:3px 8px; border-radius:99px; font-size:9px; font-weight:600; color:var(--muted);">COLD</span>
+            </div>
+            <div class="mock-chat-item active">
+              <div style="display:flex; justify-content:space-between;">
+                <span class="name">John Doe</span>
+                <span class="mock-badge badge-hot">HOT</span>
+              </div>
+              <div class="preview">I'd like to sign up please</div>
+              <div style="font-size:9px; color:var(--muted); margin-top:2px;">5 messages &middot; 31 Jul</div>
+            </div>
+            <div class="mock-chat-item">
+              <div style="display:flex; justify-content:space-between;">
+                <span class="name">Jane Smith</span>
+                <span class="mock-badge badge-warm">WARM</span>
+              </div>
+              <div class="preview">Can you call me back?</div>
+              <div style="font-size:9px; color:var(--muted); margin-top:2px;">3 messages &middot; 30 Jul</div>
+            </div>
+            <div class="mock-chat-item">
+              <div style="display:flex; justify-content:space-between;">
+                <span class="name">+27712345678</span>
+                <span class="mock-badge badge-cold">COLD</span>
+              </div>
+              <div class="preview">Just browsing, thanks</div>
+              <div style="font-size:9px; color:var(--muted); margin-top:2px;">2 messages &middot; 29 Jul</div>
+            </div>
+          </div>
+          <div class="mock-chat-window">
+            <div class="mock-chat-header">
+              <strong>John Doe</strong> &middot; +27658475289
+            </div>
+            <div class="mock-chat-messages">
+              <div class="mock-bubble incoming">Hi, I'm looking for fibre internet</div>
+              <div class="mock-bubble ai">Hi there! Welcome to Horizon Africa. I'd love to help you find the perfect fibre package. What's your address?</div>
+              <div class="mock-bubble incoming">123 Main St, Johannesburg</div>
+              <div class="mock-bubble ai">Great! Based on your area, we have Premium Fibre available. How many people are in your household?</div>
+              <div class="mock-bubble incoming">4 people</div>
+              <div class="mock-bubble ai">Perfect! I'd recommend our Premium Fibre package at R899/month. Would you like to sign up?</div>
+            </div>
+            <div class="mock-chat-input">
+              Type a message... (read-only) &nbsp; &#128229;
+              <div style="font-size:9px; color:var(--muted); margin-top:4px; text-align:center;">AI responses are automated via n8n workflow</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>Note:</strong> The conversation view is read-only. AI responses are automated by the n8n workflow. To respond to a customer manually, use <strong>Chatwoot</strong> (see the Chatwoot guide).
+    </div>
+
+    <!-- ============ BROADCASTS ============ -->
+    <h2 id="broadcasts" class="page-break">5. Broadcasts</h2>
+    <p>The <strong>Broadcasts</strong> page lets you send WhatsApp template messages to groups of contacts. You can also manage contact groups and view broadcast history.</p>
+
+    <h3>Group Cards</h3>
+    <p>At the top, you'll see cards showing each broadcast group with the number of contacts in each.</p>
+
+    <div class="mockup">
+      <div class="mockup-label">Broadcast Group Cards</div>
+      <div class="mockup-body">
+        <div class="mock-broadcast-cards">
+          <div class="mock-bc-card">
+            <div class="bc-label">All Leads</div>
+            <div class="bc-count">142</div>
+            <div class="bc-sub">contacts</div>
+          </div>
+          <div class="mock-bc-card">
+            <div class="bc-label">Hot Leads</div>
+            <div class="bc-count">38</div>
+            <div class="bc-sub">contacts</div>
+          </div>
+          <div class="mock-bc-card">
+            <div class="bc-label">Newsletter</div>
+            <div class="bc-count">89</div>
+            <div class="bc-sub">contacts</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Sending a Broadcast</h3>
+    <p>Use the <strong>New Broadcast</strong> form to send a campaign:</p>
+    <ol>
+      <li>Enter a <strong>Campaign Name</strong> (e.g. "August Promotion")</li>
+      <li>Select a <strong>Template</strong> from the dropdown (only Meta-approved templates can be sent)</li>
+      <li>Optionally enter a <strong>Test Phone</strong> number to send a single test message</li>
+      <li>If not testing, select a <strong>Group</strong> to send to all contacts in that group</li>
+      <li>Click <strong>Send Broadcast</strong></li>
+    </ol>
+
+    <div class="mockup">
+      <div class="mockup-label">New Broadcast Form</div>
+      <div class="mockup-body">
+        <strong style="font-size:14px; display:block; margin-bottom:12px;">New Broadcast</strong>
+        <div class="mock-form-field">
+          <label>Campaign Name</label>
+          <div class="input-box">e.g. July Welcome Campaign</div>
+        </div>
+        <div class="mock-form-field">
+          <label>Template</label>
+          <div class="input-box">Hello World (Test) (approved) &#9662;</div>
+        </div>
+        <div class="mock-form-field">
+          <label>Test Phone (optional)</label>
+          <div class="input-box">+27658475289</div>
+        </div>
+        <p style="font-size:11px; color:var(--muted);">Enter a phone number to send a single test message. Leave empty to send to a group.</p>
+        <div class="mock-btn mock-btn-primary" style="margin-top:8px; width:100%; text-align:center;">&#128229; Send Test Message</div>
+      </div>
+    </div>
+
+    <h3>Contacts Manager</h3>
+    <p>On the right side, the <strong>Contacts</strong> panel lets you add and remove contacts from broadcast groups. Click "Add Contact" to enter a name, phone number, and select a group.</p>
+
+    <h3>Broadcast History</h3>
+    <p>The history table shows all past campaigns with delivery statistics (sent, delivered, read, failed) and status.</p>
+
+    <div class="mockup">
+      <div class="mockup-label">Broadcast History Table</div>
+      <div class="mockup-body">
+        <table class="mock-table">
+          <thead><tr><th>Campaign</th><th>Template</th><th>Sent</th><th>Delivered</th><th>Read</th><th>Failed</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>July Welcome</td><td>hello_world</td><td>89</td><td>85</td><td>42</td><td>4</td><td><span class="mock-badge badge-green">completed</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ FOLLOW-UPS ============ -->
+    <h2 id="followups" class="page-break">6. Follow-Ups</h2>
+    <p>The <strong>Follow-Ups</strong> page manages automated WhatsApp reminders for leads who asked for time to decide. The AI flags these leads during conversation and you can schedule a follow-up date.</p>
+
+    <div class="mockup">
+      <div class="mockup-label">Follow-Ups Summary Cards</div>
+      <div class="mockup-body">
+        <div class="mock-fu-summary">
+          <div class="mock-fu-stat">
+            <div class="fu-icon" style="background:#fef7e0; color:#b26500;">&#128339;</div>
+            <div><div class="fu-label">Pending</div><div class="fu-value">9</div></div>
+          </div>
+          <div class="mock-fu-stat">
+            <div class="fu-icon" style="background:#fce8e6; color:#d93025;">&#9888;</div>
+            <div><div class="fu-label">Overdue</div><div class="fu-value">3</div></div>
+          </div>
+          <div class="mock-fu-stat">
+            <div class="fu-icon" style="background:#e6f4ea; color:#1a8a3a;">&#10003;</div>
+            <div><div class="fu-label">Sent</div><div class="fu-value">15</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Sending Follow-Ups</h3>
+    <ul>
+      <li><strong>Send Follow-Ups Now</strong> &mdash; Sends all overdue follow-up messages at once via WhatsApp</li>
+      <li><strong>Send Now</strong> (per lead) &mdash; Sends a single follow-up to a specific lead</li>
+      <li><strong>Refresh</strong> &mdash; Manually refresh the list (auto-refreshes every 30 seconds)</li>
+    </ul>
+
+    <div class="mockup">
+      <div class="mockup-label">Follow-Ups Table</div>
+      <div class="mockup-body">
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+          <div>
+            <strong style="font-size:14px;">Follow-Up Reminders</strong>
+            <p style="font-size:11px; color:var(--muted); margin:4px 0 0;">Send WhatsApp reminders to leads who asked for time to decide</p>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <span class="mock-btn mock-btn-outline" style="font-size:11px;">&#128260; Refresh</span>
+            <span class="mock-btn mock-btn-primary" style="font-size:11px;">&#128229; Send Follow-Ups Now</span>
+          </div>
+        </div>
+        <table class="mock-table">
+          <thead><tr><th>Name</th><th>Phone</th><th>Package</th><th>Follow-Up Date</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td>Jane Smith</td><td>+2782...</td><td>Premium Fibre</td><td>03 Aug 2026</td><td><span class="mock-badge badge-amber">Pending</span></td><td><span class="mock-btn mock-btn-outline" style="font-size:10px; padding:4px 8px;">&#128229; Send Now</span></td></tr>
+            <tr><td>Mark T.</td><td>+2761...</td><td>Standard 5G</td><td>29 Jul 2026</td><td><span class="mock-badge badge-amber" style="background:#fce8e6; color:#d93025;">Overdue</span></td><td><span class="mock-btn mock-btn-outline" style="font-size:10px; padding:4px 8px;">&#128229; Send Now</span></td></tr>
+            <tr><td>Sipho N.</td><td>+2771...</td><td>Premium Fibre</td><td>28 Jul 2026</td><td><span class="mock-badge badge-green">Sent</span></td><td style="font-size:10px; color:var(--muted);">28 Jul 2026</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>Automated Follow-Ups:</strong> A daily cron job runs at 9:00 AM to automatically send overdue follow-up messages. You can also trigger them manually from this page.
+    </div>
+
+    <!-- ============ TEMPLATES ============ -->
+    <h2 id="templates" class="page-break">7. Templates</h2>
+    <p>The <strong>Templates</strong> page is where you create and submit WhatsApp message templates for Meta approval. Templates must be approved by Meta before they can be used in broadcasts.</p>
+
+    <h3>Creating a Template</h3>
+    <ol>
+      <li>Click <strong>New Template</strong></li>
+      <li>Enter a <strong>Template Name</strong> in snake_case (e.g. <code>horizon_followup_v2</code>)</li>
+      <li>Select a <strong>Language</strong> (English, Afrikaans, Zulu)</li>
+      <li>Select a <strong>Category</strong> (Marketing, Utility, Authentication)</li>
+      <li>Optionally add a <strong>Header</strong> and <strong>Footer</strong></li>
+      <li>Write the <strong>Body Text</strong> using <code>{{1}}</code>, <code>{{2}}</code> for variable placeholders</li>
+      <li>If using variables, provide <strong>Body Example Values</strong> (comma-separated)</li>
+      <li>Click <strong>Submit to Meta</strong></li>
+    </ol>
+
+    <div class="mockup">
+      <div class="mockup-label">Template Creation Form</div>
+      <div class="mockup-body">
+        <strong style="font-size:14px; display:block; margin-bottom:12px;">Create New Template</strong>
+        <div class="mock-form-field">
+          <label>Template Name</label>
+          <div class="input-box">horizon_followup_v2</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <div class="mock-form-field" style="flex:1;">
+            <label>Language</label>
+            <div class="input-box">English (US) &#9662;</div>
+          </div>
+          <div class="mock-form-field" style="flex:1;">
+            <label>Category</label>
+            <div class="input-box">Marketing &#9662;</div>
+          </div>
+        </div>
+        <div class="mock-form-field">
+          <label>Header (optional)</label>
+          <div class="input-box">Welcome to Horizon Africa</div>
+        </div>
+        <div class="mock-form-field">
+          <label>Body Text</label>
+          <div class="input-box" style="padding: 8px 12px; min-height: 50px;">Hi {{1}}, we saved the {{2}} package we discussed. Still thinking it over? Just reply here and we will pick up where we left off.</div>
+        </div>
+        <div class="mock-form-field">
+          <label>Body Example Values *</label>
+          <div class="input-box">John, Premium Fibre</div>
+        </div>
+        <div class="mock-form-field">
+          <label>Footer (optional)</label>
+          <div class="input-box">&mdash; Horizon Africa</div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <span class="mock-btn mock-btn-primary">&#128229; Submit to Meta</span>
+          <span class="mock-btn mock-btn-outline">Cancel</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>Template Statuses</h3>
+    <p>Each template shows one of three statuses:</p>
+    <ul>
+      <li><span class="mock-badge badge-green">Approved</span> &mdash; Ready to use in broadcasts</li>
+      <li><span class="mock-badge badge-amber">Pending Review</span> &mdash; Submitted to Meta, awaiting approval (auto-refreshes every 15 seconds)</li>
+      <li><span class="mock-badge badge-hot">Rejected</span> &mdash; Rejected by Meta, cannot be used</li>
+    </ul>
+
+    <div class="mockup">
+      <div class="mockup-label">Template List</div>
+      <div class="mockup-body">
+        <div class="mock-template-item">
+          <div>
+            <div class="tmpl-name">Hello World (Test) <span style="font-size:10px; color:var(--muted);">(hello_world)</span></div>
+            <div class="tmpl-body">Hello World</div>
+            <div class="tmpl-meta"><span class="tmpl-tag">en_US</span><span class="tmpl-tag">MARKETING</span></div>
+          </div>
+          <span class="mock-badge badge-green">&#10003; Approved</span>
+        </div>
+        <div class="mock-template-item">
+          <div>
+            <div class="tmpl-name">Horizon Follow-up V2 <span style="font-size:10px; color:var(--muted);">(horizon_followup_v2)</span></div>
+            <div class="tmpl-body">Hi {{1}}, we saved the {{2}} package we discussed...</div>
+            <div class="tmpl-meta"><span class="tmpl-tag">en_US</span><span class="tmpl-tag">MARKETING</span></div>
+          </div>
+          <span class="mock-badge badge-amber">&#128339; Pending Review</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="warn-box">
+      <strong>Important:</strong> Meta approval can take up to 24 hours. The template list auto-refreshes every 15 seconds to check for status changes. You will see a notification at the top when a status changes.
+    </div>
+
+    <!-- ============ SETTINGS ============ -->
+    <h2 id="settings" class="page-break">8. Settings</h2>
+    <p>The <strong>Settings</strong> page shows the status of all platform integrations and lets you configure staff alert emails.</p>
+
+    <h3>Integration Status</h3>
+    <p>Each integration shows its current status:</p>
+
+    <div class="mockup">
+      <div class="mockup-label">Integration Cards</div>
+      <div class="mockup-body">
+        <div class="mock-integration">
+          <div class="left">
+            <div class="icon-box">&#129302;</div>
+            <div><div class="name">OpenRouter AI</div><div class="desc">Powers the Layla AI assistant for lead qualification (GPT-5.6-sol)</div></div>
+          </div>
+          <span class="mock-badge badge-green">&#10003; Connected</span>
+        </div>
+        <div class="mock-integration">
+          <div class="left">
+            <div class="icon-box">&#128231;</div>
+            <div><div class="name">Brevo Email</div><div class="desc">Sends hot lead email alerts to staff</div></div>
+          </div>
+          <span class="mock-badge badge-amber">&#128339; Pending</span>
+        </div>
+        <div class="mock-integration">
+          <div class="left">
+            <div class="icon-box">&#128202;</div>
+            <div><div class="name">Google Sheets</div><div class="desc">Syncs lead data to Google Sheets for reporting</div></div>
+          </div>
+          <span class="mock-badge badge-cold">&#10007; Not Configured</span>
+        </div>
+        <div class="mock-integration">
+          <div class="left">
+            <div class="icon-box">&#128172;</div>
+            <div><div class="name">Chatwoot</div><div class="desc">Live chat handover when AI escalates to human agent</div></div>
+          </div>
+          <span class="mock-badge badge-cold">&#10007; Not Configured</span>
+        </div>
+        <div class="mock-integration">
+          <div class="left">
+            <div class="icon-box">&#128246;</div>
+            <div><div class="name">Meta WhatsApp Business</div><div class="desc">WhatsApp Business API for sending/receiving messages</div></div>
+          </div>
+          <span class="mock-badge badge-green">&#10003; Connected</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>Staff Alert Emails</h3>
+    <p>Configure which email addresses receive hot lead alerts. Add or remove emails using the form. These alerts will be activated once the Brevo email integration is fully configured.</p>
+
+    <h3>Platform Info</h3>
+    <p>Shows key platform details: Supabase project, region, n8n URL, and AI persona name ("Layla").</p>
+
+    <!-- ============ NOTIFICATIONS ============ -->
+    <h2 id="notifications">9. Notifications</h2>
+    <p>The bell icon in the top bar shows real-time notifications. A red badge with a number indicates unread items. Click the bell to view:</p>
+    <ul>
+      <li><strong>Hot Lead</strong> &mdash; A new lead has been scored as HOT</li>
+      <li><strong>New Lead</strong> &mdash; A new lead has been captured</li>
+      <li><strong>Escalation</strong> &mdash; A lead has been escalated to a human agent</li>
+      <li><strong>Follow-Up Due</strong> &mdash; A follow-up reminder is due</li>
+    </ul>
+
+    <div class="mockup">
+      <div class="mockup-label">Top Bar with Notifications</div>
+      <div class="mockup-body">
+        <div class="mock-topbar">
+          <div class="title">Overview</div>
+          <div class="right-icons">
+            <div class="icon-circle notif-dot">&#128276;</div>
+            <div class="icon-circle">?</div>
+            <div style="width:1px; height:24px; background:var(--border);"></div>
+            <span style="font-size:11px; font-weight:600;">Sign Out</span>
+            <div class="icon-circle" style="background:var(--surface2); border:1px solid var(--border); font-size:11px; font-weight:700; color:var(--accent);">M</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <strong>Tip:</strong> Notifications auto-refresh every 30 seconds. Clicking a notification takes you directly to the relevant lead in the Leads page.
+    </div>
+
+    <!-- ============ SIDEBAR NAV ============ -->
+    <h2>Navigation Sidebar</h2>
+    <p>The left sidebar is your main navigation. It contains links to all pages and a quick "New Broadcast" button.</p>
+
+    <div class="mockup">
+      <div class="mockup-label">Sidebar Navigation</div>
+      <div class="mockup-body">
+        <div class="mock-sidebar">
+          <div class="brand">HORIZON AFRICA</div>
+          <div class="cta">+ New Broadcast</div>
+          <div class="nav-item active"><div class="nav-icon"></div>Overview</div>
+          <div class="nav-item"><div class="nav-icon"></div>Leads</div>
+          <div class="nav-item"><div class="nav-icon"></div>Conversations</div>
+          <div class="nav-item"><div class="nav-icon"></div>Broadcasts</div>
+          <div class="nav-item"><div class="nav-icon"></div>Follow-Ups</div>
+          <div class="nav-item"><div class="nav-icon"></div>Templates</div>
+          <div class="nav-item"><div class="nav-icon"></div>Settings</div>
+          <div class="nav-item"><div class="nav-icon"></div>Help Center</div>
+          <div class="nav-item"><div class="nav-icon"></div>Logout</div>
+        </div>
+      </div>
+    </div>
+
+    <footer style="margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 12px;">
+      <div>Horizon Africa &mdash; Dashboard User Guide</div>
+      <div>Prepared by OWD Solutions &middot; 31 July 2026</div>
+    </footer>
+  </div>
+</body>
+</html>

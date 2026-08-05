@@ -14,7 +14,8 @@ const pageTitles: Record<string, string> = {
   "/conversations": "Conversations",
   "/broadcasts": "Broadcasts",
   "/reports": "Reports",
-  "/settings": "Settings",
+  "/products": "Products",
+    "/settings": "Settings",
 };
 
 export function TopBar({ user, onMenuClick }: TopBarProps) {

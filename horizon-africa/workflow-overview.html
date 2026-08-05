@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horizon Africa — AI Workflow Overview</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f0f2f5;
+    color: #1a1a2e;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Print button */
+  .print-btn {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background: #6c5ce7;
+    color: #fff;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(108, 92, 231, 0.4);
+    transition: all 0.2s ease;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Inter', sans-serif;
+  }
+  .print-btn:hover {
+    background: #5b4cdb;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(108, 92, 231, 0.5);
+  }
+  .print-btn svg { width: 20px; height: 20px; }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+    padding: 48px 48px 40px;
+    color: #fff;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+  .header p {
+    font-size: 15px;
+    opacity: 0.9;
+    font-weight: 400;
+  }
+  .header .meta {
+    margin-top: 16px;
+    font-size: 13px;
+    opacity: 0.75;
+  }
+
+  /* Content */
+  .content { padding: 40px 48px 80px; }
+
+  .intro {
+    background: #f8f9fd;
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 40px;
+    border: 1px solid #e8ecf4;
+  }
+  .intro p {
+    font-size: 14px;
+    color: #4a4a6a;
+    line-height: 1.7;
+  }
+
+  /* Workflow section */
+  .workflow-section {
+    margin-bottom: 48px;
+  }
+  .workflow-section:last-child { margin-bottom: 0; }
+
+  .workflow-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .workflow-number {
+    background: #6c5ce7;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .workflow-title h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a2e;
+  }
+  .workflow-desc {
+    font-size: 14px;
+    color: #6a6a8a;
+    margin-bottom: 24px;
+    margin-left: 44px;
+  }
+
+  /* Flowchart */
+  .flowchart {
+    margin-left: 44px;
+    position: relative;
+  }
+
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 0;
+    flex-wrap: wrap;
+  }
+
+  .node {
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    min-width: 140px;
+    max-width: 220px;
+    position: relative;
+    line-height: 1.4;
+  }
+
+  /* Node types */
+  .node-trigger {
+    background: #6c5ce7;
+    color: #fff;
+  }
+  .node-action {
+    background: #fff;
+    border: 2px solid #dfe1ea;
+    color: #1a1a2e;
+  }
+  .node-ai {
+    background: #e8ecff;
+    border: 2px solid #6c5ce7;
+    color: #5b4cdb;
+  }
+  .node-decision {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    color: #856404;
+    border-radius: 8px;
+  }
+  .node-alert {
+    background: #fee;
+    border: 2px solid #e74c3c;
+    color: #c0392b;
+  }
+  .node-success {
+    background: #d4edda;
+    border: 2px solid #28a745;
+    color: #155724;
+  }
+  .node-handover {
+    background: #d1ecf1;
+    border: 2px solid #17a2b8;
+    color: #0c5460;
+  }
+
+  /* Arrows */
+  .arrow-down {
+    width: 2px;
+    height: 24px;
+    background: #b8bcc8;
+    margin: 0 auto;
+    position: relative;
+  }
+  .arrow-down::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 7px solid #b8bcc8;
+  }
+
+  .arrow-right {
+    width: 32px;
+    height: 2px;
+    background: #b8bcc8;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .arrow-right::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 7px solid #b8bcc8;
+  }
+
+  /* Branch container */
+  .branch {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    margin-top: 0;
+  }
+  .branch-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+  }
+  .branch-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #999;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Vertical stack */
+  .vstack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+    padding: 16px 20px;
+    background: #f8f9fd;
+    border-radius: 10px;
+    border: 1px solid #e8ecf4;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #6a6a8a;
+  }
+  .legend-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  /* Stats */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+  .stat-card {
+    background: #f8f9fd;
+    border: 1px solid #e8ecf4;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+  .stat-number {
+    font-size: 28px;
+    font-weight: 800;
+    color: #6c5ce7;
+    margin-bottom: 4px;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: #6a6a8a;
+    font-weight: 500;
+  }
+
+  /* Footer */
+  .footer {
+    padding: 24px 48px;
+    border-top: 1px solid #e8ecf4;
+    text-align: center;
+    font-size: 12px;
+    color: #aaa;
+  }
+
+  /* Print styles */
+  @media print {
+    body { background: #fff; }
+    .page { max-width: 100%; box-shadow: none; }
+    .print-btn { display: none; }
+    .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .node, .legend-dot { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .content { padding: 24px 32px 40px; }
+    .workflow-section { page-break-inside: avoid; margin-bottom: 32px; }
+    .flowchart { margin-left: 0; }
+    @page { margin: 12mm; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>Horizon Africa — AI Workflow Overview</h1>
+    <p>Automated WhatsApp Lead Qualification & Follow-Up System</p>
+    <div class="meta">Prepared for Horizon Africa Health &nbsp;|&nbsp; August 2026</div>
+  </div>
+
+  <div class="content">
+
+    <!-- Intro -->
+    <div class="intro">
+      <p>
+        This document outlines the automated workflows powering Horizon Africa's WhatsApp customer engagement system.
+        Three workflows operate together to ensure every inbound message is handled intelligently, leads are qualified
+        automatically, and follow-ups are sent on time — all without manual intervention.
+      </p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-number">3</div>
+        <div class="stat-label">Active Workflows</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">24/7</div>
+        <div class="stat-label">AI Availability</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">9 AM</div>
+        <div class="stat-label">Daily Follow-Ups</div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#6c5ce7"></div> Trigger</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fff;border:2px solid #dfe1ea"></div> Action</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#e8ecff;border:2px solid #6c5ce7"></div> AI Processing</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fff3cd;border:2px solid #ffc107"></div> Decision</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fee;border:2px solid #e74c3c"></div> Alert</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#d4edda;border:2px solid #28a745"></div> Success</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#d1ecf1;border:2px solid #17a2b8"></div> Handover</div>
+    </div>
+
+    <!-- Workflow 1: Inbound AI Lead Qualification -->
+    <div class="workflow-section">
+      <div class="workflow-title">
+        <div class="workflow-number">1</div>
+        <h2>Inbound AI Lead Qualification</h2>
+      </div>
+      <p class="workflow-desc">
+        When a customer sends a WhatsApp message, the AI assistant "Layla" responds automatically —
+        answering questions about fibre and LTE packages, qualifying leads, and escalating to a human consultant when needed.
+      </p>
+
+      <div class="flowchart">
+        <!-- Trigger -->
+        <div class="vstack">
+          <div class="node node-trigger">WhatsApp Message Received</div>
+          <div class="arrow-down"></div>
+        </div>
+
+        <!-- Extract + Forward -->
+        <div class="vstack">
+          <div class="node node-action">Extract Message Details</div>
+          <div class="arrow-down"></div>
+        </div>
+
+        <!-- Fetch history -->
+        <div class="vstack">
+          <div class="node node-action">Fetch Conversation History</div>
+          <div class="arrow-down"></div>
+        </div>
+
+        <!-- AI -->
+        <div class="vstack">
+          <div class="node node-ai">AI Generates Response<br><span style="font-size:11px;font-weight:400;opacity:0.8">Layla AI Assistant</span></div>
+          <div class="arrow-down"></div>
+        </div>
+
+        <!-- Process + Log -->
+        <div class="vstack">
+          <div class="node node-action">Process Response &amp; Save to Database</div>
+          <div class="arrow-down"></div>
+        </div>
+
+        <!-- Three branches -->
+        <div class="branch">
+          <div class="branch-col">
+            <div class="branch-label">Reply to Customer</div>
+            <div class="node node-action">Validate Reply</div>
+            <div class="arrow-down"></div>
+            <div class="node node-decision">Valid?</div>
+            <div class="arrow-down"></div>
+            <div class="node node-success">Send WhatsApp Reply</div>
+          </div>
+
+          <div class="branch-col">
+            <div class="branch-label">Hot Lead Detection</div>
+            <div class="node node-decision">Is Hot Lead?</div>
+            <div class="arrow-down"></div>
+            <div class="node node-alert">Send Hot Lead Alert<br><span style="font-size:11px;font-weight:400">Email notification</span></div>
+          </div>
+
+          <div class="branch-col">
+            <div class="branch-label">Human Handover</div>
+            <div class="node node-decision">Needs Escalation?</div>
+            <div class="arrow-down"></div>
+            <div class="node node-handover">Create Contact in Chatwoot</div>
+            <div class="arrow-down"></div>
+            <div class="node node-handover">Open Conversation &amp; Add Summary Note</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workflow 2: Follow-Up Reminders -->
+    <div class="workflow-section">
+      <div class="workflow-title">
+        <div class="workflow-number">2</div>
+        <h2>Automated Follow-Up Reminders</h2>
+      </div>
+      <p class="workflow-desc">
+        Every morning at 9 AM, the system checks for leads that requested a follow-up and haven't been contacted yet.
+        It sends a personalised WhatsApp reminder to each one automatically.
+      </p>
+
+      <div class="flowchart">
+        <div class="vstack">
+          <div class="node node-trigger">Daily Schedule — 9:00 AM</div>
+          <div class="arrow-down"></div>
+        </div>
+
+        <div class="vstack">
+          <div class="node node-action">Query Pending Follow-Ups<br><span style="font-size:11px;font-weight:400;opacity:0.7">from lead database</span></div>
+          <div class="arrow-down"></div>
+        </div>
+
+        <div class="vstack">
+          <div class="node node-action">Split Into Individual Leads</div>
+          <div class="arrow-down"></div>
+        </div>
+
+        <div class="vstack">
+          <div class="node node-success">Send WhatsApp Reminder<br><span style="font-size:11px;font-weight:400;opacity:0.8">Personalised template message</span></div>
+          <div class="arrow-down"></div>
+        </div>
+
+        <div class="vstack">
+          <div class="node node-action">Mark Lead as Contacted</div>
+          <div class="arrow-down"></div>
+        </div>
+
+        <div class="vstack">
+          <div class="node node-action">Log Summary</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workflow 3: Error Monitoring -->
+    <div class="workflow-section">
+      <div class="workflow-title">
+        <div class="workflow-number">3</div>
+        <h2>Error Monitoring &amp; Alerts</h2>
+      </div>
+      <p class="workflow-desc">
+        If any workflow encounters an error, an automatic email alert is sent to the team with full details —
+        ensuring issues are caught and resolved quickly.
+      </p>
+
+      <div class="flowchart">
+        <div class="vstack">
+          <div class="node node-trigger">Error Detected</div>
+          <div class="arrow-down"></div>
+        </div>
+
+        <div class="vstack">
+          <div class="node node-action">Build Error Report</div>
+          <div class="arrow-down"></div>
+        </div>
+
+        <div class="vstack">
+          <div class="node node-alert">Send Email Alert<br><span style="font-size:11px;font-weight:400">with error details &amp; stack trace</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    Horizon Africa &nbsp;&copy;&nbsp; 2026 &nbsp;|&nbsp; AI Workflow Overview &nbsp;|&nbsp; Confidential
+  </div>
+
+</div>
+
+<!-- Print / PDF Button -->
+<button class="print-btn" onclick="window.print()">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+  </svg>
+  Print / Save as PDF
+</button>
+
+</body>
+</html>

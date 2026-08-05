@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Horizon Africa Chatwoot Guide – User Guide</title>
+  <style>
+    :root {
+      --primary: #0b1f3b;
+      --accent: #0a84ff;
+      --text: #202124;
+      --muted: #5f6368;
+      --border: #e0e0e0;
+      --bg: #ffffff;
+      --surface: #f8f9fa;
+      --surface2: #f1f3f4;
+      --green: #1a8a3a;
+      --amber: #b26500;
+      --red: #d93025;
+      --blue: #1a73e8;
+      --chatwoot: #1f93ff;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 24px auto;
+      padding: 24px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--primary);
+    }
+    .logo-area { display: flex; align-items: center; gap: 12px; }
+    .logo-badge {
+      height: 56px; width: 56px;
+      background: var(--primary);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 700; font-size: 20px; letter-spacing: -1px;
+    }
+    h1 { margin: 0; font-size: 26px; color: var(--primary); }
+    .subtitle { font-size: 14px; color: var(--muted); margin-top: 2px; }
+    .meta { text-align: right; font-size: 13px; color: var(--muted); }
+    h2 {
+      font-size: 20px;
+      color: var(--primary);
+      margin: 32px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    h3 { font-size: 16px; color: var(--text); margin: 20px 0 8px; }
+    p { margin: 8px 0; font-size: 14px; }
+    ul, ol { margin: 8px 0; padding-left: 20px; }
+    li { margin: 4px 0; font-size: 14px; }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin: 12px 0;
+      background: var(--surface);
+    }
+    .info-box {
+      border-left: 4px solid var(--accent);
+      background: #e8f0fe;
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    .tip-box {
+      border-left: 4px solid var(--green);
+      background: #e6f4ea;
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    .warn-box {
+      border-left: 4px solid var(--amber);
+      background: #fef7e0;
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+
+    /* UI Mockup Styles */
+    .mockup {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 16px 0;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .mockup-label {
+      background: var(--surface2);
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .mockup-body { padding: 16px; }
+
+    /* Chatwoot login mockup */
+    .mock-cw-login {
+      max-width: 360px; margin: 0 auto;
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 32px 28px; background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .mock-cw-login .cw-logo {
+      width: 56px; height: 56px; margin: 0 auto 16px;
+      background: var(--chatwoot); border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 700; font-size: 24px;
+    }
+    .mock-cw-login .cw-title { text-align: center; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .mock-cw-login .cw-sub { text-align: center; font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+    /* Form fields */
+    .mock-form-field { margin-bottom: 12px; }
+    .mock-form-field label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); display: block; margin-bottom: 4px; }
+    .mock-form-field .input-box {
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 14px; font-size: 13px; color: var(--muted);
+      background: var(--surface);
+    }
+    .mock-btn {
+      display: inline-block; padding: 10px 18px; border-radius: 8px;
+      font-size: 13px; font-weight: 600; border: none; cursor: default;
+    }
+    .mock-btn-primary { background: var(--chatwoot); color: #fff; }
+
+    /* Chatwoot layout mockup */
+    .mock-cw-layout { display: flex; height: 380px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .mock-cw-sidebar {
+      width: 56px; background: var(--primary);
+      display: flex; flex-direction: column; align-items: center;
+      padding: 12px 0; gap: 16px;
+    }
+    .mock-cw-sidebar .cw-side-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: rgba(255,255,255,0.6);
+    }
+    .mock-cw-sidebar .cw-side-icon.active { background: rgba(255,255,255,0.15); color: #fff; }
+
+    .mock-cw-conversations {
+      width: 260px; border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+    }
+    .mock-cw-conv-header {
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+      font-size: 14px; font-weight: 700;
+    }
+    .mock-cw-conv-tabs {
+      display: flex; padding: 0 16px; border-bottom: 1px solid var(--border);
+    }
+    .mock-cw-conv-tab {
+      padding: 8px 12px; font-size: 12px; font-weight: 600;
+      color: var(--muted); border-bottom: 2px solid transparent;
+    }
+    .mock-cw-conv-tab.active { color: var(--chatwoot); border-bottom-color: var(--chatwoot); }
+    .mock-cw-conv-item {
+      padding: 12px 16px; border-bottom: 1px solid #f0f0f0;
+      display: flex; gap: 10px; cursor: pointer;
+    }
+    .mock-cw-conv-item.active { background: var(--surface); }
+    .mock-cw-conv-item.unread { background: #e8f0fe; }
+    .mock-cw-conv-avatar {
+      width: 36px; height: 36px; border-radius: 99px;
+      background: var(--surface2); display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: var(--accent); flex-shrink: 0;
+    }
+    .mock-cw-conv-info { flex: 1; min-width: 0; }
+    .mock-cw-conv-name { font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; }
+    .mock-cw-conv-preview { font-size: 11px; color: var(--muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mock-cw-conv-meta { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .mock-cw-unread-badge {
+      background: var(--chatwoot); color: #fff;
+      font-size: 9px; font-weight: 700; padding: 1px 6px;
+      border-radius: 99px;
+    }
+
+    .mock-cw-chat {
+      flex: 1; display: flex; flex-direction: column;
+    }
+    .mock-cw-chat-header {
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .mock-cw-chat-header .avatar {
+      width: 36px; height: 36px; border-radius: 99px;
+      background: var(--surface2); display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: var(--accent);
+    }
+    .mock-cw-chat-header .name { font-size: 14px; font-weight: 600; }
+    .mock-cw-chat-header .phone { font-size: 11px; color: var(--muted); }
+
+    .mock-cw-messages { flex: 1; padding: 16px; overflow: hidden; background: #fafbfc; }
+    .mock-cw-msg { margin-bottom: 10px; max-width: 75%; }
+    .mock-cw-msg.outgoing { margin-left: auto; }
+    .mock-cw-bubble {
+      padding: 10px 14px; border-radius: 12px; font-size: 12px;
+    }
+    .mock-cw-bubble.incoming { background: #fff; border: 1px solid var(--border); border-top-left-radius: 4px; }
+    .mock-cw-bubble.outgoing { background: var(--chatwoot); color: #fff; border-top-right-radius: 4px; }
+    .mock-cw-msg-time { font-size: 9px; color: var(--muted); margin-top: 3px; }
+
+    .mock-cw-note {
+      background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px;
+      padding: 10px 14px; margin-bottom: 10px; font-size: 11px;
+    }
+    .mock-cw-note-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--amber); margin-bottom: 4px; }
+
+    .mock-cw-input-area {
+      padding: 12px 16px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .mock-cw-input {
+      flex: 1; border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 14px; font-size: 12px; color: var(--muted);
+      background: var(--surface);
+    }
+    .mock-cw-send {
+      background: var(--chatwoot); color: #fff;
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+
+    /* Filter bar mockup */
+    .mock-cw-filter {
+      display: flex; gap: 8px; padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .mock-cw-filter-item {
+      padding: 4px 10px; border-radius: 99px; font-size: 11px;
+      font-weight: 600; background: var(--surface); color: var(--muted);
+    }
+    .mock-cw-filter-item.active { background: var(--chatwoot); color: #fff; }
+
+    /* Badge */
+    .mock-badge {
+      display: inline-block; padding: 2px 8px;
+      border-radius: 99px; font-size: 10px; font-weight: 700;
+    }
+    .badge-green { background: #e6f4ea; color: var(--green); }
+    .badge-amber { background: #fef7e0; color: var(--amber); }
+    .badge-blue { background: #e8f0fe; color: var(--blue); }
+    .badge-red { background: #fce8e6; color: var(--red); }
+
+    .page-break { page-break-before: always; }
+
+    @media print {
+      body { background: #fff; }
+      .container { border: none; border-radius: 0; box-shadow: none; margin: 0; width: 100%; max-width: 100%; }
+      .no-print { display: none !important; }
+      a { color: currentColor; text-decoration: none; }
+      @page { size: A4; margin: 16mm; }
+      .page-break { page-break-before: always; }
+      h2, h3 { page-break-after: avoid; }
+      .mockup, .card { page-break-inside: avoid; }
+    }
+
+    .btns { display: flex; gap: 8px; justify-content: flex-end; margin: 0 0 10px; }
+    .btn { background: var(--primary); color: #fff; border: none; border-radius: 8px; padding: 10px 14px; cursor: pointer; font-weight: 600; font-size: 14px; }
+    .btn.secondary { background: #e9eef6; color: var(--primary); }
+    .muted { color: var(--muted); }
+    .toc { font-size: 14px; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc li { margin: 6px 0; }
+  </style>
+  <script>
+    function downloadPDF() { window.print(); }
+    function downloadHTML() {
+      const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'horizon-africa-chatwoot-guide.html'; a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <div class="no-print btns">
+      <button class="btn" onclick="downloadPDF()">Download PDF</button>
+      <button class="btn secondary" onclick="downloadHTML()">Download HTML</button>
+    </div>
+
+    <header>
+      <div class="logo-area">
+        <div class="logo-badge">HA</div>
+        <div>
+          <h1>Chatwoot User Guide</h1>
+          <div class="subtitle">Horizon Africa &mdash; Live Chat &amp; AI Handover</div>
+        </div>
+      </div>
+      <div class="meta">
+        <div><strong>Version</strong>: 1.0</div>
+        <div><strong>Date</strong>: 31 July 2026</div>
+        <div><strong>Prepared by</strong>: OWD Solutions</div>
+      </div>
+    </header>
+
+    <div class="card">
+      <h3 style="margin:0 0 8px;">Access Details</h3>
+      <p><strong>Chatwoot URL:</strong> <a href="https://chat.horizonafrica.co.za">https://chat.horizonafrica.co.za</a></p>
+      <p><strong>Login:</strong> Email and password (provided separately by administrator)</p>
+      <p><strong>Support:</strong> mohamed@owdsolutions.co.za</p>
+    </div>
+
+    <div class="info-box">
+      <strong>What is Chatwoot?</strong><br>
+      Chatwoot is a customer support platform that connects to your WhatsApp Business number. When the AI assistant ("Layla") encounters a query it cannot handle &mdash; such as fibre availability checks, discount requests, or requests to speak to a human &mdash; the conversation is automatically handed over to Chatwoot. You can then continue the conversation directly with the customer in real time.
+    </div>
+
+    <h2>Table of Contents</h2>
+    <ol class="toc">
+      <li><a href="#login">Logging In</a></li>
+      <li><a href="#layout">Understanding the Layout</a></li>
+      <li><a href="#find-chats">Finding AI-Handed-Over Chats</a></li>
+      <li><a href="#chat">Using the Chat Feature</a></li>
+      <li><a href="#handover">Understanding Handover Notes</a></li>
+      <li><a href="#resolve">Resolving Conversations</a></li>
+      <li><a href="#tips">Tips &amp; Best Practices</a></li>
+    </ol>
+
+    <!-- ============ LOGIN ============ -->
+    <h2 id="login">1. Logging In</h2>
+    <p>Navigate to <strong>chat.horizonafrica.co.za</strong> in your browser. You will see the Chatwoot login screen. Enter your email address and password, then click <strong>Sign In</strong>.</p>
+
+    <div class="mockup">
+      <div class="mockup-label">Chatwoot Login Page</div>
+      <div class="mockup-body" style="background: #f5f5f5; padding: 30px;">
+        <div class="mock-cw-login">
+          <div class="cw-logo">C</div>
+          <div class="cw-title">Sign In</div>
+          <div class="cw-sub">Horizon Africa Health</div>
+          <div class="mock-form-field">
+            <label>Email</label>
+            <div class="input-box">name@horizonafrica.co.za</div>
+          </div>
+          <div class="mock-form-field">
+            <label>Password</label>
+            <div class="input-box">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
+          </div>
+          <div class="mock-btn mock-btn-primary" style="width:100%; text-align:center; margin-top:8px;">Sign In</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <strong>Tip:</strong> If you forgot your password, use the "Forgot password?" link on the login page to reset it. Contact your administrator if you need an account created.
+    </div>
+
+    <!-- ============ LAYOUT ============ -->
+    <h2 id="layout">2. Understanding the Layout</h2>
+    <p>After logging in, you'll see the main Chatwoot interface with three panels:</p>
+
+    <div class="mockup">
+      <div class="mockup-label">Chatwoot Main Interface</div>
+      <div class="mockup-body" style="padding: 0;">
+        <div class="mock-cw-layout">
+          <!-- Left sidebar -->
+          <div class="mock-cw-sidebar">
+            <div class="cw-side-icon active">&#128172;</div>
+            <div class="cw-side-icon">&#128221;</div>
+            <div class="cw-side-icon">&#128100;</div>
+            <div class="cw-side-icon">&#128202;</div>
+            <div class="cw-side-icon">&#9881;</div>
+          </div>
+          <!-- Conversations list -->
+          <div class="mock-cw-conversations">
+            <div class="mock-cw-conv-header">Conversations</div>
+            <div class="mock-cw-conv-tabs">
+              <div class="mock-cw-conv-tab active">Open</div>
+              <div class="mock-cw-conv-tab">Resolved</div>
+              <div class="mock-cw-conv-tab">All</div>
+            </div>
+            <div class="mock-cw-filter">
+              <div class="mock-cw-filter-item active">All</div>
+              <div class="mock-cw-filter-item">Mine</div>
+              <div class="mock-cw-filter-item">Unassigned</div>
+            </div>
+            <div style="flex:1; overflow:hidden;">
+              <div class="mock-cw-conv-item unread">
+                <div class="mock-cw-conv-avatar">J</div>
+                <div class="mock-cw-conv-info">
+                  <div class="mock-cw-conv-name">John Doe <span class="mock-cw-unread-badge">2</span></div>
+                  <div class="mock-cw-conv-preview">Can you check if fibre is available...</div>
+                  <div class="mock-cw-conv-meta">WhatsApp &middot; 5m ago</div>
+                </div>
+              </div>
+              <div class="mock-cw-conv-item">
+                <div class="mock-cw-conv-avatar">S</div>
+                <div class="mock-cw-conv-info">
+                  <div class="mock-cw-conv-name">Sipho N.</div>
+                  <div class="mock-cw-conv-preview">I'd like a discount on the...</div>
+                  <div class="mock-cw-conv-meta">WhatsApp &middot; 1h ago</div>
+                </div>
+              </div>
+              <div class="mock-cw-conv-item">
+                <div class="mock-cw-conv-avatar">M</div>
+                <div class="mock-cw-conv-info">
+                  <div class="mock-cw-conv-name">Mary K.</div>
+                  <div class="mock-cw-conv-preview">Can someone call me back?</div>
+                  <div class="mock-cw-conv-meta">WhatsApp &middot; 3h ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Chat window -->
+          <div class="mock-cw-chat">
+            <div class="mock-cw-chat-header">
+              <div class="avatar">J</div>
+              <div>
+                <div class="name">John Doe</div>
+                <div class="phone">+27658475289</div>
+              </div>
+            </div>
+            <div class="mock-cw-messages">
+              <div class="mock-cw-msg incoming">
+                <div class="mock-cw-bubble incoming">Hi, I'm looking for fibre internet</div>
+                <div class="mock-cw-msg-time">10:32 AM</div>
+              </div>
+              <div class="mock-cw-msg outgoing">
+                <div class="mock-cw-bubble outgoing">Hi there! I'd love to help. What's your address?</div>
+                <div class="mock-cw-msg-time">10:32 AM</div>
+              </div>
+              <div class="mock-cw-msg incoming">
+                <div class="mock-cw-bubble incoming">123 Main St, Johannesburg. Can you check if fibre is available there?</div>
+                <div class="mock-cw-msg-time">10:35 AM</div>
+              </div>
+            </div>
+            <div class="mock-cw-input-area">
+              <div class="mock-cw-input">Type your message...</div>
+              <div class="mock-cw-send">&#128229;</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p>The interface has three main areas:</p>
+    <ul>
+      <li><strong>Left sidebar</strong> (dark blue) &mdash; Navigation icons: Conversations, Contacts, Reports, Settings</li>
+      <li><strong>Middle panel</strong> &mdash; Conversation list with tabs (Open, Resolved, All) and filters</li>
+      <li><strong>Right panel</strong> &mdash; Active chat window with the selected conversation</li>
+    </ul>
+
+    <!-- ============ FINDING CHATS ============ -->
+    <h2 id="find-chats" class="page-break">3. Finding AI-Handed-Over Chats</h2>
+    <p>When the AI assistant escalates a conversation to a human agent, it automatically creates a new conversation in Chatwoot. Here's how to find them:</p>
+
+    <h3>Step 1: Go to Conversations</h3>
+    <p>Click the <strong>Conversations</strong> icon (chat bubble) in the left sidebar. This is usually the default view when you log in.</p>
+
+    <h3>Step 2: Check the "Open" Tab</h3>
+    <p>Make sure you're on the <strong>Open</strong> tab. All newly handed-over conversations appear here. They will have a blue unread badge showing the number of unread messages.</p>
+
+    <div class="mockup">
+      <div class="mockup-label">Open Conversations with Unread Badge</div>
+      <div class="mockup-body">
+        <div style="border:1px solid var(--border); border-radius:8px; overflow:hidden;">
+          <div class="mock-cw-conv-tabs" style="padding-left:0;">
+            <div class="mock-cw-conv-tab active" style="border-bottom: 2px solid var(--chatwoot); color: var(--chatwoot);">Open (3)</div>
+            <div class="mock-cw-conv-tab">Resolved</div>
+            <div class="mock-cw-conv-tab">All</div>
+          </div>
+          <div class="mock-cw-conv-item unread">
+            <div class="mock-cw-conv-avatar">J</div>
+            <div class="mock-cw-conv-info">
+              <div class="mock-cw-conv-name">John Doe <span class="mock-cw-unread-badge">2</span></div>
+              <div class="mock-cw-conv-preview">Can you check if fibre is available at my address?</div>
+              <div class="mock-cw-conv-meta">WhatsApp &middot; 5m ago</div>
+            </div>
+          </div>
+          <div class="mock-cw-conv-item unread">
+            <div class="mock-cw-conv-avatar">S</div>
+            <div class="mock-cw-conv-info">
+              <div class="mock-cw-conv-name">Sipho N. <span class="mock-cw-unread-badge">1</span></div>
+              <div class="mock-cw-conv-preview">I'd like a discount on the premium package</div>
+              <div class="mock-cw-conv-meta">WhatsApp &middot; 1h ago</div>
+            </div>
+          </div>
+          <div class="mock-cw-conv-item unread">
+            <div class="mock-cw-conv-avatar">M</div>
+            <div class="mock-cw-conv-info">
+              <div class="mock-cw-conv-name">Mary K. <span class="mock-cw-unread-badge">3</span></div>
+              <div class="mock-cw-conv-preview">Can someone call me back please?</div>
+              <div class="mock-cw-conv-meta">WhatsApp &middot; 3h ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Step 3: Use Filters</h3>
+    <p>Use the filter pills to narrow down conversations:</p>
+    <ul>
+      <li><strong>All</strong> &mdash; Show all open conversations</li>
+      <li><strong>Mine</strong> &mdash; Show only conversations assigned to you</li>
+      <li><strong>Unassigned</strong> &mdash; Show conversations that haven't been assigned to anyone yet</li>
+    </ul>
+
+    <div class="info-box">
+      <strong>How to know it's an AI handover:</strong> Conversations handed over by the AI will appear as new WhatsApp conversations. The AI also adds a <strong>private note</strong> to the conversation with a summary of what was discussed (see section 5).
+    </div>
+
+    <!-- ============ CHAT ============ -->
+    <h2 id="chat" class="page-break">4. Using the Chat Feature</h2>
+    <p>Once you've found a conversation, click on it to open the chat window. You can now respond to the customer directly via WhatsApp.</p>
+
+    <h3>Sending a Message</h3>
+    <ol>
+      <li>Click the <strong>message input box</strong> at the bottom of the chat window</li>
+      <li>Type your message</li>
+      <li>Press <strong>Enter</strong> or click the <strong>Send</strong> button</li>
+    </ol>
+
+    <div class="mockup">
+      <div class="mockup-label">Chat Window &mdash; Sending a Message</div>
+      <div class="mockup-body" style="padding:0;">
+        <div style="border:1px solid var(--border); border-radius:10px; overflow:hidden;">
+          <div class="mock-cw-chat-header" style="padding:12px 16px;">
+            <div class="avatar">J</div>
+            <div>
+              <div class="name">John Doe</div>
+              <div class="phone">+27658475289 &middot; WhatsApp</div>
+            </div>
+          </div>
+          <div style="padding:16px; background:#fafbfc; min-height:160px;">
+            <div class="mock-cw-msg incoming">
+              <div class="mock-cw-bubble incoming">Can you check if fibre is available at 123 Main St, Johannesburg?</div>
+              <div class="mock-cw-msg-time">10:35 AM</div>
+            </div>
+            <div class="mock-cw-msg outgoing">
+              <div class="mock-cw-bubble outgoing">Hi John! Let me check that for you. One moment please.</div>
+              <div class="mock-cw-msg-time">10:36 AM</div>
+            </div>
+          </div>
+          <div class="mock-cw-input-area">
+            <div class="mock-cw-input">Type your message...</div>
+            <div class="mock-cw-send">&#128229;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Message Types</h3>
+    <ul>
+      <li><strong>Customer messages</strong> appear on the left in white bubbles</li>
+      <li><strong>Your messages</strong> appear on the right in blue bubbles</li>
+      <li><strong>Private notes</strong> appear as yellow highlighted boxes (visible only to your team, not the customer)</li>
+    </ul>
+
+    <h3>Using Private Notes</h3>
+    <p>Click the <strong>Notes</strong> tab (next to the message input) to switch to private notes. Notes are internal comments visible only to your team &mdash; the customer cannot see them. Use notes to:</p>
+    <ul>
+      <li>Leave context for other team members</li>
+      <li>Record what action was taken</li>
+      <li>Flag important information about the customer</li>
+    </ul>
+
+    <div class="mockup">
+      <div class="mockup-label">Private Note Example</div>
+      <div class="mockup-body">
+        <div style="border:1px solid var(--border); border-radius:10px; overflow:hidden;">
+          <div style="padding:16px; background:#fafbfc;">
+            <div class="mock-cw-note">
+              <div class="mock-cw-note-label">&#128221; AI Handover Summary</div>
+              <div><strong>Customer:</strong> John Doe</div>
+              <div><strong>Phone:</strong> +27658475289</div>
+              <div><strong>Product Interest:</strong> Fibre</div>
+              <div><strong>Recommended Package:</strong> Premium Fibre (R899/month)</div>
+              <div><strong>Address:</strong> 123 Main St, Johannesburg</div>
+              <div><strong>Reason for Escalation:</strong> Customer asked to check fibre availability at their address</div>
+              <div style="margin-top:6px;"><em>Conversation summary: Customer is interested in fibre internet. AI recommended Premium Fibre package. Customer wants to confirm availability before signing up.</em></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ HANDOVER NOTES ============ -->
+    <h2 id="handover">5. Understanding Handover Notes</h2>
+    <p>When the AI escalates a conversation, it automatically creates a <strong>private note</strong> with a summary of the conversation so far. This note typically includes:</p>
+
+    <ul>
+      <li><strong>Customer name and phone number</strong></li>
+      <li><strong>Product interest</strong> (e.g. Fibre, 5G)</li>
+      <li><strong>Recommended package</strong> from the AI conversation</li>
+      <li><strong>Email and physical address</strong> (if provided by the customer)</li>
+      <li><strong>Reason for escalation</strong> (e.g. "Customer asked about fibre availability")</li>
+      <li><strong>Conversation summary</strong> &mdash; a brief description of what was discussed</li>
+    </ul>
+
+    <div class="info-box">
+      <strong>Why read the handover note first?</strong> The note gives you full context of what the AI already discussed with the customer, so you don't ask them to repeat information. This makes the handover seamless and professional.
+    </div>
+
+    <h3>Common Escalation Reasons</h3>
+    <p>The AI escalates to Chatwoot when a customer:</p>
+    <ul>
+      <li>Asks about <strong>fibre availability</strong> at a specific address</li>
+      <li>Requests a <strong>discount</strong> or better pricing</li>
+      <li>Asks for a <strong>callback</strong> from a human consultant</li>
+      <li>Requests to speak to a <strong>human agent</strong></li>
+      <li>Has a complex query the AI cannot resolve</li>
+    </ul>
+
+    <!-- ============ RESOLVE ============ -->
+    <h2 id="resolve">6. Resolving Conversations</h2>
+    <p>Once you've finished helping a customer, mark the conversation as <strong>Resolved</strong> to remove it from the Open list and keep your workspace clean.</p>
+
+    <h3>How to Resolve</h3>
+    <ol>
+      <li>Open the conversation you want to resolve</li>
+      <li>Click the <strong>Resolve</strong> button (checkmark icon) in the top-right of the chat header</li>
+      <li>The conversation moves to the <strong>Resolved</strong> tab</li>
+    </ol>
+
+    <div class="mockup">
+      <div class="mockup-label">Resolve Button Location</div>
+      <div class="mockup-body">
+        <div style="border:1px solid var(--border); border-radius:10px; overflow:hidden;">
+          <div class="mock-cw-chat-header" style="display:flex; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div class="avatar">J</div>
+              <div>
+                <div class="name">John Doe</div>
+                <div class="phone">+27658475289 &middot; WhatsApp</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <span class="mock-badge badge-green" style="padding:6px 12px; font-size:12px;">&#10003; Resolve</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <strong>Tip:</strong> If a customer sends a new message on a resolved conversation, it will automatically reopen and move back to the Open tab.
+    </div>
+
+    <!-- ============ TIPS ============ -->
+    <h2 id="tips">7. Tips &amp; Best Practices</h2>
+
+    <div class="card">
+      <h3 style="margin:0 0 10px;">Do's</h3>
+      <ul>
+        <li><strong>Read the handover note first</strong> before responding to the customer</li>
+        <li><strong>Respond promptly</strong> &mdash; the customer is waiting for a human reply</li>
+        <li><strong>Use the customer's name</strong> &mdash; the AI already collected it</li>
+        <li><strong>Reference what was discussed</strong> &mdash; e.g. "I see you're interested in our Premium Fibre package..."</li>
+        <li><strong>Resolve conversations</strong> when the issue is handled</li>
+        <li><strong>Use private notes</strong> to keep your team informed</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 10px;">Don'ts</h3>
+      <ul>
+        <li><strong>Don't ask the customer to repeat</strong> information the AI already collected</li>
+        <li><strong>Don't leave conversations unresolved</strong> if the issue is handled</li>
+        <li><strong>Don't send private notes</strong> as regular messages &mdash; the customer can see those</li>
+        <li><strong>Don't ignore unread badges</strong> &mdash; customers are waiting for a response</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <strong>Need Help?</strong> If you encounter any issues with Chatwoot, can't log in, or need a new team member added, contact OWD Solutions at <strong>mohamed@owdsolutions.co.za</strong> or <strong>065 847 5289</strong>.
+    </div>
+
+    <footer style="margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 12px;">
+      <div>Horizon Africa &mdash; Chatwoot User Guide</div>
+      <div>Prepared by OWD Solutions &middot; 31 July 2026</div>
+    </footer>
+  </div>
+</body>
+</html>

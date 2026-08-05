@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { BroadcastForm, ContactsManager } from "@/components/broadcast-form";
+import { BroadcastHistoryList } from "@/components/broadcast-history";
 import { BroadcastGroup, BroadcastHistory, BroadcastContact } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -51,53 +52,16 @@ export default async function BroadcastsPage() {
         ))}
       </div>
 
-      {/* Broadcast History */}
-      <div className="card-shadow rounded-xl border border-surface-variant bg-surface-container-lowest p-6">
-        <h2 className="mb-5 text-lg font-semibold text-on-surface">Broadcast History</h2>
-        {history.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-outline-variant text-left text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
-                  <th className="pb-3">Campaign</th>
-                  <th className="pb-3">Template</th>
-                  <th className="pb-3">Sent</th>
-                  <th className="pb-3">Delivered</th>
-                  <th className="pb-3">Read</th>
-                  <th className="pb-3">Failed</th>
-                  <th className="pb-3">Status</th>
-                  <th className="pb-3">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {history.map((h) => (
-                  <tr key={h.id} className="border-b border-outline-variant/30 last:border-0">
-                    <td className="py-3 text-on-surface">{h.campaign_name}</td>
-                    <td className="py-3 text-on-surface-variant">{h.template_name ?? "—"}</td>
-                    <td className="py-3 text-on-surface-variant">{h.total_sent}</td>
-                    <td className="py-3 text-on-surface-variant">{h.total_delivered}</td>
-                    <td className="py-3 text-on-surface-variant">{h.total_read}</td>
-                    <td className="py-3 text-on-surface-variant">{h.total_failed}</td>
-                    <td className="py-3 capitalize text-on-surface-variant">{h.status}</td>
-                    <td className="py-3 text-on-surface-variant">
-                      {new Date(h.created_at).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p className="py-8 text-center text-sm text-on-surface-variant">
-            No broadcasts sent yet. Campaign history will appear here once WhatsApp is active.
-          </p>
-        )}
-      </div>
-
       {/* Form + Contacts Manager */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <BroadcastForm groups={groups} />
         <ContactsManager groups={groups} contacts={contacts} />
+      </div>
+
+      {/* Broadcast History */}
+      <div className="card-shadow rounded-xl border border-surface-variant bg-surface-container-lowest p-6">
+        <h2 className="mb-5 text-lg font-semibold text-on-surface">Broadcast History</h2>
+        <BroadcastHistoryList history={history} />
       </div>
     </div>
   );

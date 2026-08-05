@@ -201,7 +201,6 @@ export async function GET() {
     }
 
     const templates = allTemplates
-      .filter((t) => t.status === "APPROVED")
       .map((t) => {
         const bodyComponent = t.components?.find((c) => c.type === "BODY");
         const headerComponent = t.components?.find((c) => c.type === "HEADER");

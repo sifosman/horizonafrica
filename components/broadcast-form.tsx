@@ -56,9 +56,10 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
       if (res.ok) {
         const data = await res.json();
         if (data.templates && data.templates.length > 0) {
-          setTemplates(data.templates);
+          const approved = data.templates.filter((t: Template) => t.status === "approved");
+          setTemplates(approved.length > 0 ? approved : data.templates);
           if (!data.templates.some((t: Template) => t.name === template)) {
-            setTemplate(data.templates[0].name);
+            setTemplate((approved[0] ?? data.templates[0]).name);
           }
         }
         toast.success("Templates refreshed");

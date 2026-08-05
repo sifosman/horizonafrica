@@ -12,6 +12,8 @@ import {
   RefreshCw,
   Send,
   AlertCircle,
+  ArrowUpDown,
+  Filter,
 } from "lucide-react";
 
 const CATEGORIES = [
@@ -68,6 +70,9 @@ export function TemplateManager() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("name");
 
   // Form fields
   const [name, setName] = useState("");
@@ -198,6 +203,23 @@ export function TemplateManager() {
 
     setSubmitting(false);
   }
+
+  const filteredTemplates = templates
+    .filter((t) => statusFilter === "all" || t.status === statusFilter)
+    .filter((t) => categoryFilter === "all" || t.category === categoryFilter)
+    .sort((a, b) => {
+      switch (sortBy) {
+        case "name_desc":
+          return b.label.localeCompare(a.label);
+        case "status":
+          const order: Record<string, number> = { approved: 0, pending: 1, rejected: 2 };
+          return (order[a.status] ?? 3) - (order[b.status] ?? 3) || a.label.localeCompare(b.label);
+        case "category":
+          return a.category.localeCompare(b.category) || a.label.localeCompare(b.label);
+        default:
+          return a.label.localeCompare(b.label);
+      }
+    });
 
   const pendingCount = templates.filter((t) => t.status === "pending").length;
 
@@ -459,9 +481,58 @@ export function TemplateManager() {
 
       {/* Templates List */}
       <div className="card-shadow rounded-xl border border-surface-variant bg-surface-container-lowest p-6">
-        <h3 className="mb-4 text-base font-semibold text-on-surface">
-          All Templates
-        </h3>
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-base font-semibold text-on-surface">
+            All Templates
+            <span className="ml-2 text-sm font-normal text-on-surface-variant">
+              ({filteredTemplates.length}{filteredTemplates.length !== templates.length ? ` of ${templates.length}` : ""})
+            </span>
+          </h3>
+        </div>
+
+        {/* Filter & Sort Controls */}
+        {!loading && templates.length > 0 && (
+          <div className="mb-4 flex flex-wrap items-center gap-3 rounded-lg border border-outline-variant bg-surface-container-low p-3">
+            <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+              <Filter className="h-3.5 w-3.5" />
+              Filter
+            </div>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-1.5 text-xs focus:border-secondary focus:outline-none"
+            >
+              <option value="all">All Statuses</option>
+              <option value="approved">Approved</option>
+              <option value="pending">Pending</option>
+              <option value="rejected">Rejected</option>
+            </select>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-1.5 text-xs focus:border-secondary focus:outline-none"
+            >
+              <option value="all">All Categories</option>
+              <option value="MARKETING">Marketing</option>
+              <option value="UTILITY">Utility</option>
+              <option value="AUTHENTICATION">Authentication</option>
+            </select>
+            <div className="ml-auto flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+              <ArrowUpDown className="h-3.5 w-3.5" />
+              Sort
+            </div>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-1.5 text-xs focus:border-secondary focus:outline-none"
+            >
+              <option value="name">Name (A-Z)</option>
+              <option value="name_desc">Name (Z-A)</option>
+              <option value="status">Status</option>
+              <option value="category">Category</option>
+            </select>
+          </div>
+        )}
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
@@ -471,9 +542,13 @@ export function TemplateManager() {
           <p className="py-8 text-center text-sm text-on-surface-variant">
             No templates found. Create one to get started.
           </p>
+        ) : filteredTemplates.length === 0 ? (
+          <p className="py-8 text-center text-sm text-on-surface-variant">
+            No templates match the current filters.
+          </p>
         ) : (
           <div className="space-y-3">
-            {templates.map((t) => {
+            {filteredTemplates.map((t) => {
               const config = getStatusConfig(t.status);
               const StatusIcon = config.icon;
               return (

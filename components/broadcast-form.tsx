@@ -19,6 +19,7 @@ interface Template {
   label: string;
   status: string;
   category: string;
+  language?: string;
   parameters?: TemplateParameter[];
   body_text?: string | null;
 }
@@ -128,6 +129,10 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
         template_name: template,
         campaign_name: campaignName || undefined,
       };
+
+      if (selectedTemplate?.language) {
+        payload.template_language = selectedTemplate.language;
+      }
 
       if (isTestMode) {
         payload.test_phone = testPhone.trim();

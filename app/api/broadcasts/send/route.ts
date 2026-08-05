@@ -28,7 +28,9 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { template_name, group_id, test_phone, campaign_name, template_parameters } = body;
+  const { template_name, group_id, test_phone, campaign_name, template_parameters, template_language } = body;
+
+  const langCode = template_language || "en_US";
 
   // template_parameters: array of { source: "contact_name" | "custom", value?: string, component: "header" | "body" }
   // Must match the total number of {{N}} placeholders across all template components
@@ -96,7 +98,7 @@ export async function POST(request: NextRequest) {
 
     const template: Record<string, unknown> = {
       name: template_name,
-      language: { code: "en_US" },
+      language: { code: langCode },
     };
 
     // Build components with parameters if template has them

@@ -127,6 +127,7 @@ export async function GET() {
         label: formatLabel(t.name),
         status: formatStatus(t.status),
         category: t.category,
+        language: t.language,
         parameters: extractParameters(t.components),
         body_text: getBodyText(t.components),
       }))

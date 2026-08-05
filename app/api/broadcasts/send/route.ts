@@ -30,9 +30,9 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const { template_name, group_id, test_phone, campaign_name, template_parameters } = body;
 
-  // template_parameters: array of { source: "contact_name" | "custom", value?: string }
-  // If provided, must match the number of {{N}} placeholders in the template body
-  type TemplateParam = { source: "contact_name" | "custom"; value?: string };
+  // template_parameters: array of { source: "contact_name" | "custom", value?: string, component: "header" | "body" }
+  // Must match the total number of {{N}} placeholders across all template components
+  type TemplateParam = { source: "contact_name" | "custom"; value?: string; component?: string };
   const params: TemplateParam[] = Array.isArray(template_parameters) ? template_parameters : [];
 
   if (!template_name) {
@@ -101,22 +101,26 @@ export async function POST(request: NextRequest) {
 
     // Build components with parameters if template has them
     if (params.length > 0) {
-      const componentParams = params.map((p) => {
-        let value: string;
-        if (p.source === "contact_name") {
-          value = recipient.contact_name?.trim() || "there";
-        } else {
-          value = p.value ?? "";
-        }
-        return { type: "text", text: value };
-      });
+      // Group params by component type (header, body)
+      const byComponent: Record<string, typeof params> = {};
+      for (const p of params) {
+        const compKey = p.component ?? "body";
+        if (!byComponent[compKey]) byComponent[compKey] = [];
+        byComponent[compKey].push(p);
+      }
 
-      template.components = [
-        {
-          type: "body",
-          parameters: componentParams,
-        },
-      ];
+      template.components = Object.entries(byComponent).map(([compType, compParams]) => ({
+        type: compType,
+        parameters: compParams.map((p) => {
+          let value: string;
+          if (p.source === "contact_name") {
+            value = recipient.contact_name?.trim() || "there";
+          } else {
+            value = p.value ?? "";
+          }
+          return { type: "text", text: value };
+        }),
+      }));
     }
 
     const payload: Record<string, unknown> = {

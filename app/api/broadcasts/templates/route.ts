@@ -32,6 +32,18 @@ const LABEL_MAP: Record<string, string> = {
   hello_world: "Hello World (Test)",
   horizon_welcome_v1: "Welcome to Horizon Africa",
   horizon_followup_v5: "Follow-up Enquiry",
+  horizon_followup_v6: "Follow-up Enquiry v6",
+  horizon_promo_v1: "Horizon Promo",
+  horizon_service_update_v1: "Service Update",
+  telkom_prepaid_offer: "Telkom Prepaid Offer",
+  telkom_reengagement: "Telkom Re-engagement",
+  telkom_fibre_packages: "Telkom Fibre Packages",
+  telkom_payment_instructions_v2: "Telkom Payment Instructions",
+  telkom_deposit_required_v2: "Telkom Deposit Required",
+  telkom_credit_approved_v2: "Telkom Credit Approved",
+  telkom_consultant_call_v2: "Telkom Consultant Call",
+  telkom_app_confirmation_v2: "Telkom App Confirmation",
+  telkom_credit_declined: "Telkom Credit Declined",
 };
 
 function formatLabel(name: string): string {
@@ -45,15 +57,23 @@ function formatStatus(status: string): string {
   return status.toLowerCase();
 }
 
-function extractParameters(components: MetaTemplateComponent[]): { position: number; label: string }[] {
-  const body = components.find((c) => c.type.toUpperCase() === "BODY");
-  if (!body?.text) return [];
-
-  const matches = [...body.text.matchAll(/\{\{(\d+)\}\}/g)];
-  return matches.map((m) => ({
-    position: Number(m[1]),
-    label: `Parameter ${m[1]}`,
-  }));
+function extractParameters(components: MetaTemplateComponent[]): { position: number; label: string; component: string }[] {
+  const params: { position: number; label: string; component: string }[] = [];
+  for (const comp of components) {
+    const compType = comp.type.toUpperCase();
+    if (compType !== "HEADER" && compType !== "BODY") continue;
+    if (!comp.text) continue;
+    const matches = [...comp.text.matchAll(/\{\{(\d+)\}\}/g)];
+    for (const m of matches) {
+      const compLabel = compType === "HEADER" ? "Header" : "Body";
+      params.push({
+        position: Number(m[1]),
+        label: `${compLabel} Param ${m[1]}`,
+        component: compType.toLowerCase(),
+      });
+    }
+  }
+  return params;
 }
 
 function getBodyText(components: MetaTemplateComponent[]): string | null {

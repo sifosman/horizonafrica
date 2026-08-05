@@ -11,6 +11,7 @@ interface BroadcastFormProps {
 interface TemplateParameter {
   position: number;
   label: string;
+  component: string;
 }
 
 interface Template {
@@ -25,6 +26,7 @@ interface Template {
 interface ParamConfig {
   source: "contact_name" | "custom";
   value: string;
+  component: string;
 }
 
 const FALLBACK_TEMPLATES: Template[] = [
@@ -85,6 +87,7 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
       setParamConfigs(templateParams.map((p, i) => ({
         source: i === 0 ? "contact_name" : "custom",
         value: "",
+        component: p.component,
       })));
     } else {
       setParamConfigs([]);
@@ -136,6 +139,7 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
         payload.template_parameters = effectiveParamConfigs.map((p) => ({
           source: p.source,
           value: p.value.trim(),
+          component: p.component,
         }));
       }
 
@@ -293,6 +297,7 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
                         newConfigs[i] = {
                           source: "custom",
                           value: e.target.value,
+                          component: paramConfigs[i]?.component ?? "body",
                         };
                         setParamConfigs(newConfigs);
                       }}

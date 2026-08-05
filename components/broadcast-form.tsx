@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { toast } from "sonner";
 import { BroadcastGroup, BroadcastContact } from "@/lib/types";
-import { Send, Loader2, CheckCircle2, XCircle, Plus, Trash2, RefreshCw, Info } from "lucide-react";
+import { Send, Loader2, CheckCircle2, XCircle, Plus, Trash2, RefreshCw, Info, Upload, Download } from "lucide-react";
 
 interface BroadcastFormProps {
   groups: BroadcastGroup[];
@@ -381,12 +382,16 @@ interface ContactsManagerProps {
 
 export function ContactsManager({ groups, contacts: initialContacts }: ContactsManagerProps) {
   const [showAdd, setShowAdd] = useState(false);
+  const [showUpload, setShowUpload] = useState(false);
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
   const [newGroup, setNewGroup] = useState<string>("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [contacts, setContacts] = useState(initialContacts);
+  const [uploadGroup, setUploadGroup] = useState<string>("");
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function addContact() {
     if (!newPhone || !newGroup) return;
@@ -419,20 +424,95 @@ export function ContactsManager({ groups, contacts: initialContacts }: ContactsM
     const res = await fetch(`/api/broadcasts/contacts/${id}`, { method: "DELETE" });
     if (res.ok) {
       setContacts(contacts.filter((c) => String(c.id) !== id));
+      toast.success("Contact deleted");
+    } else {
+      toast.error("Failed to delete contact");
     }
+  }
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !uploadGroup) return;
+
+    setUploading(true);
+    setError(null);
+
+    try {
+      const XLSX = await import("xlsx");
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws);
+
+      const parsed = rows.map((row) => {
+        const name = String(row["Contact Name"] ?? row["contact_name"] ?? row["Name"] ?? row["name"] ?? "").trim();
+        const phone = String(row["Phone Number"] ?? row["phone_number"] ?? row["Phone"] ?? row["phone"] ?? "").trim();
+        return { contact_name: name || null, phone_number: phone };
+      }).filter((r) => r.phone_number.length > 0);
+
+      if (parsed.length === 0) {
+        setError("No valid rows found. Make sure your Excel has 'Contact Name' and 'Phone Number' columns.");
+        setUploading(false);
+        return;
+      }
+
+      const res = await fetch("/api/broadcasts/contacts/bulk-import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ group_id: Number(uploadGroup), contacts: parsed }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error ?? "Failed to import contacts");
+        toast.error(data.error ?? "Failed to import contacts");
+      } else {
+        setContacts([...data.contacts, ...contacts]);
+        setShowUpload(false);
+        toast.success(`Imported ${data.imported} contacts${data.skipped > 0 ? `, ${data.skipped} skipped` : ""}`);
+      }
+    } catch {
+      setError("Failed to read Excel file. Please ensure it's a valid .xlsx or .csv file.");
+      toast.error("Failed to read Excel file");
+    }
+
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  function downloadTemplate() {
+    window.open("/api/broadcasts/contacts/template", "_blank");
   }
 
   return (
     <div className="card-shadow rounded-xl border border-surface-variant bg-surface-container-lowest p-6">
       <div className="mb-5 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-on-surface">Contacts</h2>
-        <button
-          onClick={() => setShowAdd(!showAdd)}
-          className="flex items-center gap-2 rounded-lg bg-secondary px-3 py-1.5 text-sm font-semibold text-on-secondary transition hover:opacity-90"
-        >
-          <Plus className="h-4 w-4" />
-          Add Contact
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={downloadTemplate}
+            className="flex items-center gap-1.5 rounded-lg border border-outline-variant px-3 py-1.5 text-sm font-semibold text-on-surface-variant transition hover:bg-surface-container-high"
+            title="Download Excel template"
+          >
+            <Download className="h-4 w-4" />
+            Template
+          </button>
+          <button
+            onClick={() => setShowUpload(!showUpload)}
+            className="flex items-center gap-1.5 rounded-lg border border-outline-variant px-3 py-1.5 text-sm font-semibold text-on-surface-variant transition hover:bg-surface-container-high"
+          >
+            <Upload className="h-4 w-4" />
+            Import
+          </button>
+          <button
+            onClick={() => setShowAdd(!showAdd)}
+            className="flex items-center gap-2 rounded-lg bg-secondary px-3 py-1.5 text-sm font-semibold text-on-secondary transition hover:opacity-90"
+          >
+            <Plus className="h-4 w-4" />
+            Add Contact
+          </button>
+        </div>
       </div>
 
       {showAdd && (
@@ -468,6 +548,60 @@ export function ContactsManager({ groups, contacts: initialContacts }: ContactsM
           >
             {saving ? "Saving..." : "Save"}
           </button>
+        </div>
+      )}
+
+      {showUpload && (
+        <div className="mb-4 space-y-3 rounded-lg border border-outline-variant bg-surface-container-low p-4">
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Select Group</label>
+            <select
+              value={uploadGroup}
+              onChange={(e) => setUploadGroup(e.target.value)}
+              className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-secondary focus:outline-none"
+            >
+              <option value="">Choose a group...</option>
+              {groups.map((g) => (
+                <option key={g.id} value={g.id}>{g.group_label}</option>
+              ))}
+            </select>
+          </div>
+          <div
+            onClick={() => uploadGroup && fileInputRef.current?.click()}
+            className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition ${uploadGroup ? "cursor-pointer border-outline-variant hover:border-secondary hover:bg-surface-container-lowest" : "cursor-not-allowed border-outline-variant/50 opacity-50"}`}
+          >
+            {uploading ? (
+              <>
+                <Loader2 className="mb-2 h-6 w-6 animate-spin text-secondary" />
+                <p className="text-sm text-on-surface-variant">Importing contacts...</p>
+              </>
+            ) : (
+              <>
+                <Upload className="mb-2 h-6 w-6 text-on-surface-variant" />
+                <p className="text-sm font-medium text-on-surface">Click to upload Excel file</p>
+                <p className="mt-1 text-xs text-on-surface-variant">.xlsx or .csv format</p>
+              </>
+            )}
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls,.csv"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          <div className="flex items-center justify-between text-xs">
+            <p className="text-on-surface-variant">
+              Need the correct format? Download the template first.
+            </p>
+            <button
+              onClick={downloadTemplate}
+              className="flex items-center gap-1 font-semibold text-secondary transition hover:opacity-80"
+            >
+              <Download className="h-3 w-3" />
+              Download Template
+            </button>
+          </div>
         </div>
       )}
 

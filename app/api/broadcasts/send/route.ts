@@ -56,6 +56,75 @@ async function fetchTemplateBody(
   }
 }
 
+async function fetchTemplateComponents(
+  templateName: string
+): Promise<Array<{ type: string; text?: string }> | null> {
+  if (!META_WABA_ID || !META_ACCESS_TOKEN) return null;
+
+  try {
+    const res = await fetch(
+      `https://graph.facebook.com/${META_API_VERSION}/${META_WABA_ID}/message_templates?fields=name,status,components&limit=100`,
+      { headers: { Authorization: `Bearer ${META_ACCESS_TOKEN}` } }
+    );
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    const templates: Array<{
+      name: string;
+      components: Array<{ type: string; text?: string }>;
+    }> = data.data ?? [];
+
+    const template = templates.find((t) => t.name === templateName);
+    if (!template) return null;
+
+    return template.components ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function countParamsInText(text: string | undefined): number {
+  if (!text) return 0;
+  const matches = text.match(/\{\{(\d+)\}\}/g);
+  if (!matches) return 0;
+  return Math.max(...matches.map((m) => Number(m.replace(/\{|\}/g, ""))));
+}
+
+function buildTemplateComponents(
+  components: Array<{ type: string; text?: string }>,
+  params: string[]
+): Array<Record<string, unknown>> {
+  const result: Array<Record<string, unknown>> = [];
+  let paramIndex = 0;
+
+  for (const comp of components) {
+    if (comp.type === "HEADER" && comp.text) {
+      const count = countParamsInText(comp.text);
+      if (count > 0 && paramIndex < params.length) {
+        const headerParams = params.slice(paramIndex, paramIndex + count);
+        result.push({
+          type: "header",
+          parameters: headerParams.map((p) => ({ type: "text", text: p })),
+        });
+        paramIndex += count;
+      }
+    } else if (comp.type === "BODY" && comp.text) {
+      const count = countParamsInText(comp.text);
+      if (count > 0 && paramIndex < params.length) {
+        const bodyParams = params.slice(paramIndex, paramIndex + count);
+        result.push({
+          type: "body",
+          parameters: bodyParams.map((p) => ({ type: "text", text: p })),
+        });
+        paramIndex += count;
+      }
+    }
+  }
+
+  return result;
+}
+
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -72,7 +141,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { template_name, group_id, test_phone, campaign_name } = body;
+  const { template_name, group_id, test_phone, campaign_name, template_params } = body;
 
   if (!template_name) {
     return NextResponse.json({ error: "template_name is required" }, { status: 400 });
@@ -105,6 +174,15 @@ export async function POST(request: NextRequest) {
   // Fetch template body text from Meta for message_content
   const templateBody = await fetchTemplateBody(template_name);
 
+  // Fetch template components to build parameter components if needed
+  const templateComponents = template_params && Array.isArray(template_params) && template_params.length > 0
+    ? await fetchTemplateComponents(template_name)
+    : null;
+
+  const builtComponents = templateComponents
+    ? buildTemplateComponents(templateComponents, template_params as string[])
+    : null;
+
   // Create broadcast history record
   const { data: historyRecord, error: historyError } = await supabase
     .from("broadcast_history")
@@ -136,15 +214,21 @@ export async function POST(request: NextRequest) {
   for (const recipient of recipients) {
     const phone = recipient.phone_number.replace(/\D/g, "");
 
+    const templatePayload: Record<string, unknown> = {
+        name: template_name,
+        language: { code: "en_US" },
+      };
+
+    if (builtComponents && builtComponents.length > 0) {
+      templatePayload.components = builtComponents;
+    }
+
     const payload: Record<string, unknown> = {
       messaging_product: "whatsapp",
       recipient_type: "individual",
       to: phone,
       type: "template",
-      template: {
-        name: template_name,
-        language: { code: "en_US" },
-      },
+      template: templatePayload,
     };
 
     let sendStatus: "sent" | "failed" = "failed";

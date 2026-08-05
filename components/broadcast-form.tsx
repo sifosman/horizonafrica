@@ -14,11 +14,20 @@ interface Template {
   label: string;
   status: string;
   category: string;
+  body_text: string | null;
+  header_text: string | null;
 }
 
 const FALLBACK_TEMPLATES: Template[] = [
-  { name: "hello_world", label: "Hello World (Test)", status: "approved", category: "MARKETING" },
+  { name: "hello_world", label: "Hello World (Test)", status: "approved", category: "MARKETING", body_text: "Hello World", header_text: null },
 ];
+
+function countParams(text: string | null): number {
+  if (!text) return 0;
+  const matches = text.match(/\{\{(\d+)\}\}/g);
+  if (!matches) return 0;
+  return Math.max(...matches.map((m) => Number(m.replace(/\{|\}/g, ""))));
+}
 
 interface SendResult {
   broadcast_id: number;
@@ -38,6 +47,7 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<SendResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [templateParams, setTemplateParams] = useState<string[]>([]);
 
   const fetchTemplates = useCallback(async () => {
     setTemplatesLoading(true);
@@ -67,8 +77,18 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const selectedTemplate = templates.find((t) => t.name === template);
+  const headerParamCount = countParams(selectedTemplate?.header_text ?? null);
+  const bodyParamCount = countParams(selectedTemplate?.body_text ?? null);
+  const totalParams = headerParamCount + bodyParamCount;
+  const paramsFilled = totalParams === 0 || (templateParams.length === totalParams && templateParams.every((p) => p.trim().length > 0));
+
+  // Reset params when template changes
+  useEffect(() => {
+    setTemplateParams([]);
+  }, [template]);
+
   const isTestMode = testPhone.trim().length > 0;
-  const canSend = (isTestMode || groupId) && !sending;
+  const canSend = (isTestMode || groupId) && !sending && paramsFilled;
 
   async function sendBroadcast() {
     setSending(true);
@@ -80,6 +100,10 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
         template_name: template,
         campaign_name: campaignName || undefined,
       };
+
+      if (totalParams > 0) {
+        payload.template_params = templateParams.map((p) => p.trim());
+      }
 
       if (isTestMode) {
         payload.test_phone = testPhone.trim();
@@ -154,6 +178,37 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
               </option>
             ))}
           </select>
+          {totalParams > 0 && (
+            <div className="mt-3 space-y-2 rounded-lg border border-outline-variant bg-surface-container-low p-3">
+              <p className="text-xs font-semibold text-on-surface-variant">
+                This template has {totalParams} variable{totalParams > 1 ? "s" : ""}. Fill in the value{totalParams > 1 ? "s" : ""} below:
+              </p>
+              {selectedTemplate?.header_text && headerParamCount > 0 && (
+                <p className="text-xs text-on-surface-variant">
+                  Header: <span className="font-mono">{selectedTemplate.header_text}</span>
+                </p>
+              )}
+              {selectedTemplate?.body_text && (
+                <p className="text-xs text-on-surface-variant">
+                  Body: <span className="font-mono">{selectedTemplate.body_text}</span>
+                </p>
+              )}
+              {Array.from({ length: totalParams }, (_, i) => (
+                <input
+                  key={i}
+                  type="text"
+                  value={templateParams[i] ?? ""}
+                  onChange={(e) => {
+                    const next = [...templateParams];
+                    next[i] = e.target.value;
+                    setTemplateParams(next);
+                  }}
+                  placeholder={`Parameter {{${i + 1}}}`}
+                  className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/10"
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         <div>

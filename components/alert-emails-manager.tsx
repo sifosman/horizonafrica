@@ -1,15 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { toast } from "sonner";
-import { Plus, Trash2, Mail, Loader2 } from "lucide-react";
+import { Plus, Trash2, Mail } from "lucide-react";
 
 export function AlertEmailsManager() {
   const [emails, setEmails] = useState<string[]>([]);
   const [newEmail, setNewEmail] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [removingEmail, setRemovingEmail] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -35,18 +33,16 @@ export function AlertEmailsManager() {
     if (res.ok) {
       setEmails(updated);
       setNewEmail("");
-      toast.success("Email added");
     } else {
       const { error } = await res.json();
       setError(error ?? "Failed to add email");
-      toast.error(error ?? "Failed to add email");
     }
     setSaving(false);
   }
 
   async function removeEmail(email: string) {
     const updated = emails.filter((e) => e !== email);
-    setRemovingEmail(email);
+    setSaving(true);
     setError(null);
     const res = await fetch("/api/settings/alert-emails", {
       method: "POST",
@@ -55,13 +51,11 @@ export function AlertEmailsManager() {
     });
     if (res.ok) {
       setEmails(updated);
-      toast.success("Email removed");
     } else {
       const { error } = await res.json();
       setError(error ?? "Failed to remove email");
-      toast.error(error ?? "Failed to remove email");
     }
-    setRemovingEmail(null);
+    setSaving(false);
   }
 
   return (
@@ -88,11 +82,7 @@ export function AlertEmailsManager() {
           disabled={saving || !newEmail.trim()}
           className="flex items-center gap-2 rounded-lg bg-secondary px-4 py-2.5 text-sm font-semibold text-on-secondary transition hover:opacity-90 disabled:opacity-50"
         >
-          {saving ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Plus className="h-4 w-4" />
-          )}
+          <Plus className="h-4 w-4" />
           Add
         </button>
       </div>
@@ -110,14 +100,10 @@ export function AlertEmailsManager() {
               <span className="text-sm text-on-surface">{email}</span>
               <button
                 onClick={() => removeEmail(email)}
-                disabled={removingEmail === email}
+                disabled={saving}
                 className="text-on-surface-variant transition hover:text-error disabled:opacity-50"
               >
-                {removingEmail === email ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="h-4 w-4" />
-                )}
+                <Trash2 className="h-4 w-4" />
               </button>
             </div>
           ))

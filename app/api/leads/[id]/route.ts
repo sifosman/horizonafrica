@@ -15,7 +15,7 @@ export async function PATCH(
   const { id } = await params;
   const body = await request.json();
 
-  const allowedFields = ["lead_score", "status", "full_name", "email", "notes", "follow_up_requested", "follow_up_date", "follow_up_sent", "follow_up_sent_at", "offered_package", "product_interest", "recommended_package", "household_size", "internet_usage", "physical_address"];
+  const allowedFields = ["lead_score", "status", "full_name", "email", "notes"];
   const updates: Record<string, unknown> = {};
   for (const field of allowedFields) {
     if (body[field] !== undefined) {

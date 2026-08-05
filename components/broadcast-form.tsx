@@ -1,12 +1,16 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import { toast } from "sonner";
+import { useState, useEffect, useCallback } from "react";
 import { BroadcastGroup, BroadcastContact } from "@/lib/types";
-import { Send, Loader2, CheckCircle2, XCircle, Plus, Trash2, RefreshCw, Upload, Download } from "lucide-react";
+import { Send, Loader2, CheckCircle2, XCircle, Plus, Trash2, RefreshCw, Info } from "lucide-react";
 
 interface BroadcastFormProps {
   groups: BroadcastGroup[];
+}
+
+interface TemplateParameter {
+  position: number;
+  label: string;
 }
 
 interface Template {
@@ -14,20 +18,18 @@ interface Template {
   label: string;
   status: string;
   category: string;
-  body_text: string | null;
-  header_text: string | null;
+  parameters?: TemplateParameter[];
+  body_text?: string | null;
+}
+
+interface ParamConfig {
+  source: "contact_name" | "custom";
+  value: string;
 }
 
 const FALLBACK_TEMPLATES: Template[] = [
-  { name: "hello_world", label: "Hello World (Test)", status: "approved", category: "MARKETING", body_text: "Hello World", header_text: null },
+  { name: "hello_world", label: "Hello World (Test)", status: "approved", category: "MARKETING" },
 ];
-
-function countParams(text: string | null): number {
-  if (!text) return 0;
-  const matches = text.match(/\{\{(\d+)\}\}/g);
-  if (!matches) return 0;
-  return Math.max(...matches.map((m) => Number(m.replace(/\{|\}/g, ""))));
-}
 
 interface SendResult {
   broadcast_id: number;
@@ -47,7 +49,7 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<SendResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [templateParams, setTemplateParams] = useState<string[]>([]);
+  const [paramConfigs, setParamConfigs] = useState<ParamConfig[]>([]);
 
   const fetchTemplates = useCallback(async () => {
     setTemplatesLoading(true);
@@ -56,18 +58,13 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
       if (res.ok) {
         const data = await res.json();
         if (data.templates && data.templates.length > 0) {
-          const approved = data.templates.filter((t: Template) => t.status === "approved");
-          setTemplates(approved.length > 0 ? approved : data.templates);
+          setTemplates(data.templates);
           if (!data.templates.some((t: Template) => t.name === template)) {
-            setTemplate((approved[0] ?? data.templates[0]).name);
+            setTemplate(data.templates[0].name);
           }
         }
-        toast.success("Templates refreshed");
-      } else {
-        toast.error("Failed to refresh templates");
       }
     } catch {
-      toast.error("Network error refreshing templates");
       // Keep fallback templates on error
     }
     setTemplatesLoading(false);
@@ -78,18 +75,45 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const selectedTemplate = templates.find((t) => t.name === template);
-  const headerParamCount = countParams(selectedTemplate?.header_text ?? null);
-  const bodyParamCount = countParams(selectedTemplate?.body_text ?? null);
-  const totalParams = headerParamCount + bodyParamCount;
-  const paramsFilled = totalParams === 0 || (templateParams.length === totalParams && templateParams.every((p) => p.trim().length > 0));
-
-  // Reset params when template changes
-  useEffect(() => {
-    setTemplateParams([]);
-  }, [template]);
-
   const isTestMode = testPhone.trim().length > 0;
-  const canSend = (isTestMode || groupId) && !sending && paramsFilled;
+  const templateParams = selectedTemplate?.parameters ?? [];
+  const hasParams = templateParams.length > 0;
+
+  // Reset param configs when template changes
+  useEffect(() => {
+    if (templateParams.length > 0) {
+      setParamConfigs(templateParams.map((p, i) => ({
+        source: i === 0 ? "contact_name" : "custom",
+        value: "",
+      })));
+    } else {
+      setParamConfigs([]);
+    }
+  }, [template]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // For test mode, all params must be custom (no contact to auto-fill from)
+  const effectiveParamConfigs = isTestMode
+    ? paramConfigs.map((p) => ({ ...p, source: "custom" as const }))
+    : paramConfigs;
+
+  const allParamsFilled = !hasParams || effectiveParamConfigs.every(
+    (p) => p.source === "contact_name" || p.value.trim().length > 0
+  );
+  const canSend = (isTestMode || groupId) && !sending && allParamsFilled;
+
+  // Build live preview text
+  const previewText = (() => {
+    if (!selectedTemplate?.body_text) return null;
+    let text = selectedTemplate.body_text;
+    effectiveParamConfigs.forEach((p, i) => {
+      const placeholder = `{{${i + 1}}}`;
+      const value = p.source === "contact_name"
+        ? (isTestMode ? "[Contact Name]" : "John")
+        : (p.value.trim() || `[Parameter ${i + 1}]`);
+      text = text.replace(placeholder, value);
+    });
+    return text;
+  })();
 
   async function sendBroadcast() {
     setSending(true);
@@ -102,14 +126,17 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
         campaign_name: campaignName || undefined,
       };
 
-      if (totalParams > 0) {
-        payload.template_params = templateParams.map((p) => p.trim());
-      }
-
       if (isTestMode) {
         payload.test_phone = testPhone.trim();
       } else {
         payload.group_id = Number(groupId);
+      }
+
+      if (hasParams) {
+        payload.template_parameters = effectiveParamConfigs.map((p) => ({
+          source: p.source,
+          value: p.value.trim(),
+        }));
       }
 
       const res = await fetch("/api/broadcasts/send", {
@@ -122,14 +149,11 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
 
       if (!res.ok) {
         setError(data.error ?? "Failed to send broadcast");
-        toast.error(data.error ?? "Failed to send broadcast");
       } else {
         setResult(data);
-        toast.success(`Broadcast sent: ${data.sent}/${data.total_recipients} successful`);
       }
     } catch {
       setError("Network error sending broadcast");
-      toast.error("Network error sending broadcast");
     }
 
     setSending(false);
@@ -179,37 +203,6 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
               </option>
             ))}
           </select>
-          {totalParams > 0 && (
-            <div className="mt-3 space-y-2 rounded-lg border border-outline-variant bg-surface-container-low p-3">
-              <p className="text-xs font-semibold text-on-surface-variant">
-                This template has {totalParams} variable{totalParams > 1 ? "s" : ""}. Fill in the value{totalParams > 1 ? "s" : ""} below:
-              </p>
-              {selectedTemplate?.header_text && headerParamCount > 0 && (
-                <p className="text-xs text-on-surface-variant">
-                  Header: <span className="font-mono">{selectedTemplate.header_text}</span>
-                </p>
-              )}
-              {selectedTemplate?.body_text && (
-                <p className="text-xs text-on-surface-variant">
-                  Body: <span className="font-mono">{selectedTemplate.body_text}</span>
-                </p>
-              )}
-              {Array.from({ length: totalParams }, (_, i) => (
-                <input
-                  key={i}
-                  type="text"
-                  value={templateParams[i] ?? ""}
-                  onChange={(e) => {
-                    const next = [...templateParams];
-                    next[i] = e.target.value;
-                    setTemplateParams(next);
-                  }}
-                  placeholder={`Parameter {{${i + 1}}}`}
-                  className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/10"
-                />
-              ))}
-            </div>
-          )}
         </div>
 
         <div>
@@ -239,6 +232,84 @@ export function BroadcastForm({ groups }: BroadcastFormProps) {
                 <option key={g.id} value={g.id}>{g.group_label} — {g.group_name}</option>
               ))}
             </select>
+          </div>
+        )}
+
+        {hasParams && (
+          <div className="rounded-lg border border-outline-variant bg-surface-container-low p-4">
+            <div className="mb-3 flex items-center gap-2">
+              <Info className="h-4 w-4 text-secondary" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+                Template Parameters ({templateParams.length})
+              </span>
+            </div>
+            <div className="space-y-3">
+              {templateParams.map((param, i) => (
+                <div key={param.position} className="space-y-1.5">
+                  <label className="block text-xs font-medium text-on-surface-variant">
+                    {param.label}
+                  </label>
+                  {!isTestMode && (
+                    <div className="flex gap-2">
+                      <select
+                        value={paramConfigs[i]?.source ?? "contact_name"}
+                        onChange={(e) => {
+                          const newConfigs = [...paramConfigs];
+                          newConfigs[i] = {
+                            ...newConfigs[i],
+                            source: e.target.value as "contact_name" | "custom",
+                          };
+                          setParamConfigs(newConfigs);
+                        }}
+                        className="rounded-lg border border-outline-variant bg-surface-container-lowest px-2 py-2 text-xs focus:border-secondary focus:outline-none"
+                      >
+                        <option value="contact_name">Contact Name (auto)</option>
+                        <option value="custom">Same for everyone</option>
+                      </select>
+                      {paramConfigs[i]?.source === "custom" && (
+                        <input
+                          type="text"
+                          value={paramConfigs[i]?.value ?? ""}
+                          onChange={(e) => {
+                            const newConfigs = [...paramConfigs];
+                            newConfigs[i] = {
+                              ...newConfigs[i],
+                              value: e.target.value,
+                            };
+                            setParamConfigs(newConfigs);
+                          }}
+                          placeholder={`Enter value for ${param.label}`}
+                          className="flex-1 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-xs focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/10"
+                        />
+                      )}
+                    </div>
+                  )}
+                  {isTestMode && (
+                    <input
+                      type="text"
+                      value={paramConfigs[i]?.value ?? ""}
+                      onChange={(e) => {
+                        const newConfigs = [...paramConfigs];
+                        newConfigs[i] = {
+                          source: "custom",
+                          value: e.target.value,
+                        };
+                        setParamConfigs(newConfigs);
+                      }}
+                      placeholder={`Enter value for ${param.label}`}
+                      className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-xs focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/10"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {previewText && (
+              <div className="mt-3 rounded-lg bg-surface-container-high p-3">
+                <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-on-surface-variant">Preview</p>
+                <p className="text-xs text-on-surface whitespace-pre-wrap">{previewText}</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -298,17 +369,12 @@ interface ContactsManagerProps {
 
 export function ContactsManager({ groups, contacts: initialContacts }: ContactsManagerProps) {
   const [showAdd, setShowAdd] = useState(false);
-  const [showUpload, setShowUpload] = useState(false);
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
   const [newGroup, setNewGroup] = useState<string>("");
   const [saving, setSaving] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [contacts, setContacts] = useState(initialContacts);
-  const [uploadGroup, setUploadGroup] = useState<string>("");
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function addContact() {
     if (!newPhone || !newGroup) return;
@@ -330,110 +396,31 @@ export function ContactsManager({ groups, contacts: initialContacts }: ContactsM
       setNewName("");
       setNewPhone("");
       setNewGroup("");
-      toast.success("Contact added");
     } else {
       const { error } = await res.json();
       setError(error ?? "Failed to add contact");
-      toast.error(error ?? "Failed to add contact");
     }
     setSaving(false);
   }
 
   async function deleteContact(id: string) {
-    setDeletingId(id);
     const res = await fetch(`/api/broadcasts/contacts/${id}`, { method: "DELETE" });
     if (res.ok) {
       setContacts(contacts.filter((c) => String(c.id) !== id));
-      toast.success("Contact deleted");
-    } else {
-      toast.error("Failed to delete contact");
     }
-    setDeletingId(null);
-  }
-
-  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file || !uploadGroup) return;
-
-    setUploading(true);
-    setError(null);
-
-    try {
-      const XLSX = await import("xlsx");
-      const buf = await file.arrayBuffer();
-      const wb = XLSX.read(buf, { type: "array" });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws);
-
-      const parsed = rows.map((row) => {
-        const name = String(row["Contact Name"] ?? row["contact_name"] ?? row["Name"] ?? row["name"] ?? "").trim();
-        const phone = String(row["Phone Number"] ?? row["phone_number"] ?? row["Phone"] ?? row["phone"] ?? "").trim();
-        return { contact_name: name || null, phone_number: phone };
-      }).filter((r) => r.phone_number.length > 0);
-
-      if (parsed.length === 0) {
-        setError("No valid rows found. Make sure your Excel has 'Contact Name' and 'Phone Number' columns.");
-        setUploading(false);
-        return;
-      }
-
-      const res = await fetch("/api/broadcasts/contacts/bulk-import", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ group_id: Number(uploadGroup), contacts: parsed }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error ?? "Failed to import contacts");
-        toast.error(data.error ?? "Failed to import contacts");
-      } else {
-        setContacts([...data.contacts, ...contacts]);
-        setShowUpload(false);
-        toast.success(`Imported ${data.imported} contacts${data.skipped > 0 ? `, ${data.skipped} skipped` : ""}`);
-      }
-    } catch {
-      setError("Failed to read Excel file. Please ensure it's a valid .xlsx or .csv file.");
-      toast.error("Failed to read Excel file");
-    }
-
-    setUploading(false);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  }
-
-  function downloadTemplate() {
-    window.open("/api/broadcasts/contacts/template", "_blank");
   }
 
   return (
     <div className="card-shadow rounded-xl border border-surface-variant bg-surface-container-lowest p-6">
       <div className="mb-5 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-on-surface">Contacts</h2>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={downloadTemplate}
-            className="flex items-center gap-1.5 rounded-lg border border-outline-variant px-3 py-1.5 text-sm font-semibold text-on-surface-variant transition hover:bg-surface-container-high"
-            title="Download Excel template"
-          >
-            <Download className="h-4 w-4" />
-            Template
-          </button>
-          <button
-            onClick={() => setShowUpload(!showUpload)}
-            className="flex items-center gap-1.5 rounded-lg border border-outline-variant px-3 py-1.5 text-sm font-semibold text-on-surface-variant transition hover:bg-surface-container-high"
-          >
-            <Upload className="h-4 w-4" />
-            Import
-          </button>
-          <button
-            onClick={() => setShowAdd(!showAdd)}
-            className="flex items-center gap-2 rounded-lg bg-secondary px-3 py-1.5 text-sm font-semibold text-on-secondary transition hover:opacity-90"
-          >
-            <Plus className="h-4 w-4" />
-            Add
-          </button>
-        </div>
+        <button
+          onClick={() => setShowAdd(!showAdd)}
+          className="flex items-center gap-2 rounded-lg bg-secondary px-3 py-1.5 text-sm font-semibold text-on-secondary transition hover:opacity-90"
+        >
+          <Plus className="h-4 w-4" />
+          Add Contact
+        </button>
       </div>
 
       {showAdd && (
@@ -465,69 +452,10 @@ export function ContactsManager({ groups, contacts: initialContacts }: ContactsM
           <button
             onClick={addContact}
             disabled={saving || !newPhone || !newGroup}
-            className="flex items-center gap-2 rounded-lg bg-secondary px-4 py-2 text-sm font-semibold text-on-secondary transition hover:opacity-90 disabled:opacity-50"
+            className="rounded-lg bg-secondary px-4 py-2 text-sm font-semibold text-on-secondary transition hover:opacity-90 disabled:opacity-50"
           >
-            {saving ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Plus className="h-4 w-4" />
-            )}
             {saving ? "Saving..." : "Save"}
           </button>
-        </div>
-      )}
-
-      {showUpload && (
-        <div className="mb-4 space-y-3 rounded-lg border border-outline-variant bg-surface-container-low p-4">
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Select Group</label>
-            <select
-              value={uploadGroup}
-              onChange={(e) => setUploadGroup(e.target.value)}
-              className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-secondary focus:outline-none"
-            >
-              <option value="">Choose a group...</option>
-              {groups.map((g) => (
-                <option key={g.id} value={g.id}>{g.group_label}</option>
-              ))}
-            </select>
-          </div>
-          <div
-            onClick={() => uploadGroup && fileInputRef.current?.click()}
-            className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition ${uploadGroup ? "cursor-pointer border-outline-variant hover:border-secondary hover:bg-surface-container-lowest" : "cursor-not-allowed border-outline-variant/50 opacity-50"}`}
-          >
-            {uploading ? (
-              <>
-                <Loader2 className="mb-2 h-6 w-6 animate-spin text-secondary" />
-                <p className="text-sm text-on-surface-variant">Importing contacts...</p>
-              </>
-            ) : (
-              <>
-                <Upload className="mb-2 h-6 w-6 text-on-surface-variant" />
-                <p className="text-sm font-medium text-on-surface">Click to upload Excel file</p>
-                <p className="mt-1 text-xs text-on-surface-variant">.xlsx or .csv format</p>
-              </>
-            )}
-          </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".xlsx,.xls,.csv"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-          <div className="flex items-center justify-between text-xs">
-            <p className="text-on-surface-variant">
-              Need the correct format? Download the template first.
-            </p>
-            <button
-              onClick={downloadTemplate}
-              className="flex items-center gap-1 font-semibold text-secondary transition hover:opacity-80"
-            >
-              <Download className="h-3 w-3" />
-              Download Template
-            </button>
-          </div>
         </div>
       )}
 
@@ -561,16 +489,8 @@ export function ContactsManager({ groups, contacts: initialContacts }: ContactsM
                       </span>
                     </td>
                     <td className="py-2.5">
-                      <button
-                        onClick={() => deleteContact(String(c.id))}
-                        disabled={deletingId === String(c.id)}
-                        className="text-on-surface-variant transition hover:text-error disabled:opacity-50"
-                      >
-                        {deletingId === String(c.id) ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-4 w-4" />
-                        )}
+                      <button onClick={() => deleteContact(String(c.id))} className="text-on-surface-variant hover:text-error">
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     </td>
                   </tr>

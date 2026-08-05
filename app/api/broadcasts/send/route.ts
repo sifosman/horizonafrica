@@ -4,125 +4,12 @@ import { createClient } from "@/lib/supabase/server";
 const META_API_VERSION = process.env.META_API_VERSION ?? "v21.0";
 const META_PHONE_NUMBER_ID = process.env.META_PHONE_NUMBER_ID!;
 const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN!;
-const META_WABA_ID = process.env.META_WABA_ID!;
 
 interface MetaSendResponse {
   messaging_product: string;
   contacts: { input: string; wa_id: string }[];
   messages: { id: string }[];
   error?: { message: string; code: number };
-}
-
-async function fetchTemplateBody(
-  templateName: string
-): Promise<string | null> {
-  if (!META_WABA_ID || !META_ACCESS_TOKEN) return null;
-
-  try {
-    const res = await fetch(
-      `https://graph.facebook.com/${META_API_VERSION}/${META_WABA_ID}/message_templates?fields=name,status,components&limit=100`,
-      { headers: { Authorization: `Bearer ${META_ACCESS_TOKEN}` } }
-    );
-
-    if (!res.ok) return null;
-
-    const data = await res.json();
-    const templates: Array<{
-      name: string;
-      components: Array<{ type: string; text?: string }>;
-    }> = data.data ?? [];
-
-    const template = templates.find((t) => t.name === templateName);
-    if (!template) return null;
-
-    const bodyComponent = template.components?.find(
-      (c) => c.type === "BODY"
-    );
-    const headerComponent = template.components?.find(
-      (c) => c.type === "HEADER"
-    );
-    const footerComponent = template.components?.find(
-      (c) => c.type === "FOOTER"
-    );
-
-    const parts: string[] = [];
-    if (headerComponent?.text) parts.push(headerComponent.text);
-    if (bodyComponent?.text) parts.push(bodyComponent.text);
-    if (footerComponent?.text) parts.push(footerComponent.text);
-
-    return parts.length > 0 ? parts.join("\n") : null;
-  } catch {
-    return null;
-  }
-}
-
-async function fetchTemplateComponents(
-  templateName: string
-): Promise<Array<{ type: string; text?: string }> | null> {
-  if (!META_WABA_ID || !META_ACCESS_TOKEN) return null;
-
-  try {
-    const res = await fetch(
-      `https://graph.facebook.com/${META_API_VERSION}/${META_WABA_ID}/message_templates?fields=name,status,components&limit=100`,
-      { headers: { Authorization: `Bearer ${META_ACCESS_TOKEN}` } }
-    );
-
-    if (!res.ok) return null;
-
-    const data = await res.json();
-    const templates: Array<{
-      name: string;
-      components: Array<{ type: string; text?: string }>;
-    }> = data.data ?? [];
-
-    const template = templates.find((t) => t.name === templateName);
-    if (!template) return null;
-
-    return template.components ?? null;
-  } catch {
-    return null;
-  }
-}
-
-function countParamsInText(text: string | undefined): number {
-  if (!text) return 0;
-  const matches = text.match(/\{\{(\d+)\}\}/g);
-  if (!matches) return 0;
-  return Math.max(...matches.map((m) => Number(m.replace(/\{|\}/g, ""))));
-}
-
-function buildTemplateComponents(
-  components: Array<{ type: string; text?: string }>,
-  params: string[]
-): Array<Record<string, unknown>> {
-  const result: Array<Record<string, unknown>> = [];
-  let paramIndex = 0;
-
-  for (const comp of components) {
-    if (comp.type === "HEADER" && comp.text) {
-      const count = countParamsInText(comp.text);
-      if (count > 0 && paramIndex < params.length) {
-        const headerParams = params.slice(paramIndex, paramIndex + count);
-        result.push({
-          type: "header",
-          parameters: headerParams.map((p) => ({ type: "text", text: p })),
-        });
-        paramIndex += count;
-      }
-    } else if (comp.type === "BODY" && comp.text) {
-      const count = countParamsInText(comp.text);
-      if (count > 0 && paramIndex < params.length) {
-        const bodyParams = params.slice(paramIndex, paramIndex + count);
-        result.push({
-          type: "body",
-          parameters: bodyParams.map((p) => ({ type: "text", text: p })),
-        });
-        paramIndex += count;
-      }
-    }
-  }
-
-  return result;
 }
 
 export async function POST(request: NextRequest) {
@@ -141,7 +28,12 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { template_name, group_id, test_phone, campaign_name, template_params } = body;
+  const { template_name, group_id, test_phone, campaign_name, template_parameters } = body;
+
+  // template_parameters: array of { source: "contact_name" | "custom", value?: string }
+  // If provided, must match the number of {{N}} placeholders in the template body
+  type TemplateParam = { source: "contact_name" | "custom"; value?: string };
+  const params: TemplateParam[] = Array.isArray(template_parameters) ? template_parameters : [];
 
   if (!template_name) {
     return NextResponse.json({ error: "template_name is required" }, { status: 400 });
@@ -171,18 +63,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No recipients found" }, { status: 400 });
   }
 
-  // Fetch template body text from Meta for message_content
-  const templateBody = await fetchTemplateBody(template_name);
-
-  // Fetch template components to build parameter components if needed
-  const templateComponents = template_params && Array.isArray(template_params) && template_params.length > 0
-    ? await fetchTemplateComponents(template_name)
-    : null;
-
-  const builtComponents = templateComponents
-    ? buildTemplateComponents(templateComponents, template_params as string[])
-    : null;
-
   // Create broadcast history record
   const { data: historyRecord, error: historyError } = await supabase
     .from("broadcast_history")
@@ -190,7 +70,7 @@ export async function POST(request: NextRequest) {
       campaign_name: campaign_name || `Broadcast ${new Date().toLocaleString()}`,
       group_id: group_id ? Number(group_id) : null,
       template_name,
-      message_content: templateBody,
+      message_content: null,
       total_sent: 0,
       total_delivered: 0,
       total_read: 0,
@@ -214,13 +94,29 @@ export async function POST(request: NextRequest) {
   for (const recipient of recipients) {
     const phone = recipient.phone_number.replace(/\D/g, "");
 
-    const templatePayload: Record<string, unknown> = {
-        name: template_name,
-        language: { code: "en_US" },
-      };
+    const template: Record<string, unknown> = {
+      name: template_name,
+      language: { code: "en_US" },
+    };
 
-    if (builtComponents && builtComponents.length > 0) {
-      templatePayload.components = builtComponents;
+    // Build components with parameters if template has them
+    if (params.length > 0) {
+      const componentParams = params.map((p) => {
+        let value: string;
+        if (p.source === "contact_name") {
+          value = recipient.contact_name?.trim() || "there";
+        } else {
+          value = p.value ?? "";
+        }
+        return { type: "text", text: value };
+      });
+
+      template.components = [
+        {
+          type: "body",
+          parameters: componentParams,
+        },
+      ];
     }
 
     const payload: Record<string, unknown> = {
@@ -228,10 +124,8 @@ export async function POST(request: NextRequest) {
       recipient_type: "individual",
       to: phone,
       type: "template",
-      template: templatePayload,
+      template,
     };
-
-    let sendStatus: "sent" | "failed" = "failed";
 
     try {
       const res = await fetch(
@@ -253,21 +147,11 @@ export async function POST(request: NextRequest) {
         errors.push(`${phone}: ${data.error?.message ?? "Unknown error"}`);
       } else {
         sent++;
-        sendStatus = "sent";
       }
     } catch {
       failed++;
       errors.push(`${phone}: Network error`);
     }
-
-    // Record recipient in broadcast_recipients
-    await supabase.from("broadcast_recipients").insert({
-      broadcast_id: broadcastId,
-      phone_number: phone,
-      contact_name: recipient.contact_name,
-      status: sendStatus,
-      sent_at: sendStatus === "sent" ? new Date().toISOString() : null,
-    });
   }
 
   // Update broadcast history

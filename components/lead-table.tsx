@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { toast } from "sonner";
 import { Lead, LeadScore, LeadStatus } from "@/lib/types";
 import { ScoreBadge } from "@/components/score-badge";
-import { Search, Download, X, Save, ChevronLeft, ChevronRight, Bell, Calendar, Loader2 } from "lucide-react";
+import { Search, Download, X, Save, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface LeadTableProps {
   leads: Lead[];
@@ -43,7 +42,6 @@ export function LeadTable({ leads }: LeadTableProps) {
     if (statusFilter !== "ALL") params.set("status", statusFilter);
     if (search) params.set("search", search);
     window.open(`/api/leads/export?${params.toString()}`, "_blank");
-    toast.success("Exporting CSV...");
   }
 
   return (
@@ -187,49 +185,6 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
   const [editStatus, setEditStatus] = useState<LeadStatus>(lead.status);
   const [editNotes, setEditNotes] = useState<string>(lead.notes ?? "");
   const [currentLead, setCurrentLead] = useState(lead);
-  const [followUpDate, setFollowUpDate] = useState<string>(
-    lead.follow_up_date ? lead.follow_up_date.slice(0, 10) : ""
-  );
-  const [followUpRequested, setFollowUpRequested] = useState<boolean>(
-    lead.follow_up_requested ?? false
-  );
-  const [savingFollowUp, setSavingFollowUp] = useState(false);
-  const [followUpError, setFollowUpError] = useState<string | null>(null);
-  const [followUpSuccess, setFollowUpSuccess] = useState<string | null>(null);
-
-  async function saveFollowUp() {
-    if (!followUpDate) return;
-    setSavingFollowUp(true);
-    setFollowUpError(null);
-    setFollowUpSuccess(null);
-
-    try {
-      const res = await fetch("/api/follow-ups/schedule", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          lead_id: currentLead.id,
-          follow_up_date: new Date(followUpDate).toISOString(),
-        }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        setFollowUpError(data.error ?? "Failed to schedule follow-up");
-        toast.error(data.error ?? "Failed to schedule follow-up");
-      } else {
-        setCurrentLead(data.lead);
-        setFollowUpSuccess("Follow-up scheduled successfully.");
-        toast.success("Follow-up scheduled successfully");
-        setTimeout(() => setFollowUpSuccess(null), 3000);
-      }
-    } catch {
-      setFollowUpError("Network error scheduling follow-up");
-      toast.error("Network error scheduling follow-up");
-    }
-
-    setSavingFollowUp(false);
-  }
 
   async function saveLead() {
     setSaving(true);
@@ -246,9 +201,6 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
       const { lead: updated } = await res.json();
       setCurrentLead(updated);
       setEditing(false);
-      toast.success("Lead updated successfully");
-    } else {
-      toast.error("Failed to update lead");
     }
     setSaving(false);
   }
@@ -266,11 +218,7 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
                 disabled={saving}
                 className="flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-1.5 text-sm font-semibold text-on-secondary transition hover:opacity-90 disabled:opacity-50"
               >
-                {saving ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="h-4 w-4" />
-                )}
+                <Save className="h-4 w-4" />
                 {saving ? "Saving..." : "Save"}
               </button>
             ) : (
@@ -364,85 +312,6 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
                 )}
               </>
             )}
-          </div>
-
-          {/* Schedule Follow-Up Section */}
-          <div className="rounded-lg border border-outline-variant/50 bg-surface-container-low p-4">
-            <div className="mb-3 flex items-center gap-2">
-              <Bell className="h-4 w-4 text-secondary" />
-              <h3 className="text-sm font-semibold text-on-surface">Schedule Follow-Up</h3>
-            </div>
-
-            {currentLead.follow_up_requested && !editing && (
-              <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
-                <span className="rounded-full bg-amber-100 px-2.5 py-1 font-semibold text-amber-700">
-                  {currentLead.follow_up_sent ? "Sent" : "Pending"}
-                </span>
-                {currentLead.follow_up_date && (
-                  <span className="text-on-surface-variant">
-                    Date: {new Date(currentLead.follow_up_date).toLocaleDateString()}
-                  </span>
-                )}
-                {currentLead.follow_up_sent_at && (
-                  <span className="text-on-surface-variant">
-                    Sent at: {new Date(currentLead.follow_up_sent_at).toLocaleString()}
-                  </span>
-                )}
-              </div>
-            )}
-
-            <div className="space-y-3">
-              <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
-                  Follow-Up Date
-                </label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-on-surface-variant/50" />
-                  <input
-                    type="date"
-                    value={followUpDate}
-                    onChange={(e) => {
-                      setFollowUpDate(e.target.value);
-                      if (e.target.value) setFollowUpRequested(true);
-                    }}
-                    className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest py-2.5 pl-10 pr-3 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/10"
-                  />
-                </div>
-              </div>
-
-              <label className="flex items-center gap-2 text-sm text-on-surface-variant">
-                <input
-                  type="checkbox"
-                  checked={followUpRequested}
-                  onChange={(e) => setFollowUpRequested(e.target.checked)}
-                  className="h-4 w-4 rounded border-outline-variant text-secondary focus:ring-secondary/10"
-                />
-                Follow-up requested
-              </label>
-
-              {followUpError && (
-                <p className="text-xs text-error">{followUpError}</p>
-              )}
-              {followUpSuccess && (
-                <p className="text-xs text-secondary">{followUpSuccess}</p>
-              )}
-
-              <button
-                onClick={saveFollowUp}
-                disabled={savingFollowUp || !followUpDate}
-                className="flex items-center gap-2 rounded-lg bg-secondary px-4 py-2 text-xs font-semibold text-on-secondary transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {savingFollowUp ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <Save className="h-3.5 w-3.5" />
-                )}
-                {currentLead.follow_up_requested ? "Reschedule" : "Save Follow-Up"}
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 text-sm">
             <Field label="Created" value={new Date(currentLead.created_at).toLocaleString()} />
             <Field label="Updated" value={new Date(currentLead.updated_at).toLocaleString()} />
           </div>

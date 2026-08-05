@@ -73,6 +73,17 @@ export interface BroadcastHistory {
   completed_at: string | null;
 }
 
+export interface Template {
+  name: string;
+  label: string;
+  status: "approved" | "pending" | "rejected" | string;
+  language: string;
+  category: string;
+  body_text: string | null;
+  header_text: string | null;
+  footer_text: string | null;
+}
+
 export interface StaffAlert {
   id: number;
   lead_id: number | null;

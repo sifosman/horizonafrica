@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Conversation, LeadScore } from "@/lib/types";
+import { extractMessageText } from "@/lib/utils";
 import { ScoreBadge } from "@/components/score-badge";
 import { Search, X, MessageSquare, Bot, Send } from "lucide-react";
 
@@ -97,7 +98,7 @@ export function ConversationView({ conversations }: ConversationViewProps) {
                     <ScoreBadge score={last.lead_score as LeadScore} />
                   </div>
                   <p className="mt-1 truncate text-xs text-on-surface-variant">
-                    {last.incoming_message ?? last.ai_response ?? "—"}
+                    {extractMessageText(last.incoming_message) ?? last.ai_response ?? "—"}
                   </p>
                   <p className="mt-1 text-[11px] text-on-surface-variant/60">
                     {msgs.length} messages · {new Date(last.created_at).toLocaleDateString()}
@@ -145,7 +146,7 @@ export function ConversationView({ conversations }: ConversationViewProps) {
                         <MessageSquare className="h-4 w-4 text-on-surface-variant" />
                       </div>
                       <div className="rounded-lg rounded-tl-sm bg-surface-container-low px-4 py-2.5 max-w-[70%]">
-                        <p className="text-sm text-on-surface">{msg.incoming_message}</p>
+                        <p className="text-sm text-on-surface">{extractMessageText(msg.incoming_message)}</p>
                         <p className="mt-1 text-[11px] text-on-surface-variant/60">
                           {new Date(msg.created_at).toLocaleTimeString()}
                         </p>

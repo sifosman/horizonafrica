@@ -85,7 +85,7 @@ async function checkMetaWhatsApp(): Promise<ServiceCheck> {
 
   try {
     const res = await fetch(
-      `https://graph.facebook.com/${apiVersion}/${phoneNumberId}?fields=name,phone_number,verified_name,messaging_limit_tier,quality_rating`,
+      `https://graph.facebook.com/${apiVersion}/${phoneNumberId}?fields=phone_number,verified_name,messaging_limit_tier,quality_rating`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
         signal: AbortSignal.timeout(8000),
@@ -139,6 +139,25 @@ async function checkMetaWhatsApp(): Promise<ServiceCheck> {
       latencyMs: Date.now() - start,
       message: err instanceof Error ? err.message : "Request failed",
     };
+  }
+}
+
+async function checkOpenRouterCredits(apiKey: string): Promise<{ limit: number | null; usage: number | null; remaining: number | null; isFreeTier: boolean | null }> {
+  try {
+    const res = await fetch("https://openrouter.ai/api/v1/key", {
+      headers: { Authorization: `Bearer ${apiKey}` },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return { limit: null, usage: null, remaining: null, isFreeTier: null };
+    const json = await res.json();
+    return {
+      limit: json?.data?.limit ?? null,
+      usage: json?.data?.usage ?? null,
+      remaining: json?.data?.limit_remaining ?? null,
+      isFreeTier: json?.data?.is_free_tier ?? null,
+    };
+  } catch {
+    return { limit: null, usage: null, remaining: null, isFreeTier: null };
   }
 }
 
@@ -231,12 +250,24 @@ async function checkOpenRouter(): Promise<ServiceCheck> {
 
     const data = await res.json();
     const modelCount = data?.data?.length ?? 0;
+    const credits = await checkOpenRouterCredits(apiKey);
+
+    let message = `API key valid — ${modelCount} models available`;
+    if (credits.remaining !== null) {
+      message += ` — $${credits.remaining.toFixed(2)} credits remaining`;
+    }
 
     return {
       name: "OpenRouter AI",
       status: "healthy",
       latencyMs: latency,
-      message: `API key valid — ${modelCount} models available`,
+      message,
+      details: {
+        creditLimit: credits.limit,
+        creditUsage: credits.usage,
+        creditsRemaining: credits.remaining,
+        isFreeTier: credits.isFreeTier,
+      },
     };
   } catch (err) {
     return {
@@ -289,7 +320,7 @@ async function checkWebhookProxy(): Promise<ServiceCheck> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://dashboard.horizonafrica.co.za";
 
   try {
-    const res = await fetch(`${baseUrl}/api/whatsapp-webhook?hub.mode=test&hub.verify_token=horizon_africa_verify_2026&hub.challenge=healthcheck`, {
+    const res = await fetch(`${baseUrl}/api/whatsapp-webhook?hub.mode=subscribe&hub.verify_token=horizon_africa_verify_2026&hub.challenge=healthcheck`, {
       signal: AbortSignal.timeout(8000),
     });
 

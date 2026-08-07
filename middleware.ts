@@ -34,8 +34,10 @@ export async function middleware(request: NextRequest) {
     pathname === "/login" ||
     pathname === "/forgot-password" ||
     pathname === "/reset-password";
+  const isPublicApi =
+    pathname === "/api/whatsapp-webhook";
 
-  if (!user && !isAuthPage) {
+  if (!user && !isAuthPage && !isPublicApi) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);

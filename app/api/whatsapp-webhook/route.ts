@@ -2,23 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 
 const VERIFY_TOKEN = "horizon_africa_verify_2026";
 const N8N_WEBHOOK_URL = "https://n8n.horizonafrica.co.za/webhook/whatsapp-webhook";
-const BREVO_API_KEY = process.env.BREVO_API_KEY;
-const ALERT_EMAIL = "mohamed@owdsolutions.co.za";
+const N8N_ERROR_WEBHOOK_URL = "https://n8n.horizonafrica.co.za/webhook/webhook-proxy-error";
 
 async function sendErrorAlert(error: string) {
-  if (!BREVO_API_KEY) return;
   try {
-    await fetch("https://api.brevo.com/v3/smtp/email", {
+    await fetch(N8N_ERROR_WEBHOOK_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "api-key": BREVO_API_KEY,
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        sender: { email: "alerts@horizonafrica.co.za", name: "Horizon Africa Alerts" },
-        to: [{ email: ALERT_EMAIL }],
-        subject: "URGENT: WhatsApp Webhook Proxy Error",
-        htmlContent: `<html><body><h2>WhatsApp Webhook Proxy Error</h2><p>The Vercel webhook proxy failed to forward a Meta webhook event to n8n.</p><p><strong>Error:</strong> ${error}</p><p><strong>Time:</strong> ${new Date().toISOString()}</p><p>This means inbound WhatsApp messages may not be reaching Layla (AI assistant).</p><p>Check: https://n8n.horizonafrica.co.za</p></body></html>`,
+        error,
+        source: "Vercel Webhook Proxy",
+        timestamp: new Date().toISOString(),
       }),
     });
   } catch {
@@ -56,7 +50,8 @@ export async function POST(request: NextRequest) {
     });
 
     if (!response.ok) {
-      await sendErrorAlert(`n8n returned HTTP ${response.status} - ${await response.text()}`);
+      const errorBody = await response.text();
+      await sendErrorAlert(`n8n returned HTTP ${response.status} - ${errorBody.substring(0, 500)}`);
     }
 
     const responseText = await response.text();

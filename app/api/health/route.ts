@@ -85,7 +85,7 @@ async function checkMetaWhatsApp(): Promise<ServiceCheck> {
 
   try {
     const res = await fetch(
-      `https://graph.facebook.com/${apiVersion}/${phoneNumberId}?fields=phone_number,verified_name,messaging_limit_tier,quality_rating`,
+      `https://graph.facebook.com/${apiVersion}/${phoneNumberId}?fields=display_phone_number,verified_name,messaging_limit_tier,quality_rating`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
         signal: AbortSignal.timeout(8000),
@@ -110,14 +110,15 @@ async function checkMetaWhatsApp(): Promise<ServiceCheck> {
     const tier = data.messaging_limit_tier;
 
     let status: ServiceCheck["status"] = "healthy";
-    let message = `Connected — ${data.phone_number ?? "unknown"}`;
+    const displayNumber = data.display_phone_number ?? "unknown";
+    let message = `Connected — ${displayNumber}`;
 
     if (quality && quality.toUpperCase() === "RED") {
       status = "down";
-      message = `Quality rating is RED — ${data.phone_number ?? "unknown"}`;
+      message = `Quality rating is RED — ${displayNumber}`;
     } else if (quality && quality.toUpperCase() === "YELLOW") {
       status = "degraded";
-      message = `Quality rating is YELLOW — ${data.phone_number ?? "unknown"}`;
+      message = `Quality rating is YELLOW — ${displayNumber}`;
     }
 
     return {
@@ -126,7 +127,7 @@ async function checkMetaWhatsApp(): Promise<ServiceCheck> {
       latencyMs: latency,
       message,
       details: {
-        phoneNumber: data.phone_number,
+        phoneNumber: displayNumber,
         verifiedName: data.verified_name,
         qualityRating: quality,
         messagingLimitTier: tier,
@@ -281,7 +282,6 @@ async function checkOpenRouter(): Promise<ServiceCheck> {
       latencyMs: latency,
       message,
       details: {
-        creditLimit: credits.limit !== null ? fmt(credits.limit) : "No cap",
         totalUsage: credits.usage !== null ? fmt(credits.usage) : "—",
         monthlyUsage: credits.usageMonthly !== null ? fmt(credits.usageMonthly) : "—",
         weeklyUsage: credits.usageWeekly !== null ? fmt(credits.usageWeekly) : "—",

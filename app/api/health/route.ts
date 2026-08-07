@@ -142,22 +142,37 @@ async function checkMetaWhatsApp(): Promise<ServiceCheck> {
   }
 }
 
-async function checkOpenRouterCredits(apiKey: string): Promise<{ limit: number | null; usage: number | null; remaining: number | null; isFreeTier: boolean | null }> {
+interface OpenRouterCredits {
+  limit: number | null;
+  usage: number | null;
+  usageDaily: number | null;
+  usageWeekly: number | null;
+  usageMonthly: number | null;
+  remaining: number | null;
+  isFreeTier: boolean | null;
+}
+
+async function checkOpenRouterCredits(apiKey: string): Promise<OpenRouterCredits> {
+  const empty: OpenRouterCredits = { limit: null, usage: null, usageDaily: null, usageWeekly: null, usageMonthly: null, remaining: null, isFreeTier: null };
   try {
     const res = await fetch("https://openrouter.ai/api/v1/key", {
       headers: { Authorization: `Bearer ${apiKey}` },
       signal: AbortSignal.timeout(5000),
     });
-    if (!res.ok) return { limit: null, usage: null, remaining: null, isFreeTier: null };
+    if (!res.ok) return empty;
     const json = await res.json();
+    const d = json?.data;
     return {
-      limit: json?.data?.limit ?? null,
-      usage: json?.data?.usage ?? null,
-      remaining: json?.data?.limit_remaining ?? null,
-      isFreeTier: json?.data?.is_free_tier ?? null,
+      limit: d?.limit ?? null,
+      usage: d?.usage ?? null,
+      usageDaily: d?.usage_daily ?? null,
+      usageWeekly: d?.usage_weekly ?? null,
+      usageMonthly: d?.usage_monthly ?? null,
+      remaining: d?.limit_remaining ?? null,
+      isFreeTier: d?.is_free_tier ?? null,
     };
   } catch {
-    return { limit: null, usage: null, remaining: null, isFreeTier: null };
+    return empty;
   }
 }
 
@@ -252,9 +267,12 @@ async function checkOpenRouter(): Promise<ServiceCheck> {
     const modelCount = data?.data?.length ?? 0;
     const credits = await checkOpenRouterCredits(apiKey);
 
+    const fmt = (v: number | null) => v !== null ? `$${v.toFixed(2)}` : "—";
     let message = `API key valid — ${modelCount} models available`;
     if (credits.remaining !== null) {
-      message += ` — $${credits.remaining.toFixed(2)} credits remaining`;
+      message += ` — ${fmt(credits.remaining)} credits remaining`;
+    } else if (credits.usage !== null) {
+      message += ` — ${fmt(credits.usageMonthly)} used this month`;
     }
 
     return {
@@ -263,10 +281,13 @@ async function checkOpenRouter(): Promise<ServiceCheck> {
       latencyMs: latency,
       message,
       details: {
-        creditLimit: credits.limit,
-        creditUsage: credits.usage,
-        creditsRemaining: credits.remaining,
-        isFreeTier: credits.isFreeTier,
+        creditLimit: credits.limit !== null ? fmt(credits.limit) : "No cap",
+        totalUsage: credits.usage !== null ? fmt(credits.usage) : "—",
+        monthlyUsage: credits.usageMonthly !== null ? fmt(credits.usageMonthly) : "—",
+        weeklyUsage: credits.usageWeekly !== null ? fmt(credits.usageWeekly) : "—",
+        dailyUsage: credits.usageDaily !== null ? fmt(credits.usageDaily) : "—",
+        creditsRemaining: credits.remaining !== null ? fmt(credits.remaining) : "Unlimited",
+        plan: credits.isFreeTier === true ? "Free tier" : credits.isFreeTier === false ? "Paid" : "—",
       },
     };
   } catch (err) {

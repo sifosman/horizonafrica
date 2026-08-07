@@ -22,17 +22,24 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text();
+    const contentType = request.headers.get("content-type") || "application/json";
 
     const response = await fetch(N8N_WEBHOOK_URL, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": contentType,
       },
       body,
     });
 
-    return new NextResponse(null, { status: response.status });
+    const responseText = await response.text();
+    return new NextResponse(responseText || null, {
+      status: response.status,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch {
     return NextResponse.json({ error: "Forwarding failed" }, { status: 502 });
   }
 }
+
+export const runtime = "nodejs";
